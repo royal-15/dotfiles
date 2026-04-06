@@ -1,0 +1,22 @@
+{
+    "layer": "top",
+    "position": "top",
+    "css": "/home/rajat/.config/waybar/style.css",
+    "margin-top": 8,
+    "include": [
+        "modules/workspaces.jsonc",
+        "modules/clock.jsonc",
+        "modules/audio.jsonc",
+        "modules/battery.jsonc",
+        "modules/network.jsonc"
+    ],
+    "modules-left": [],
+    "modules-center": [
+        "clock",
+        "hyprland/workspaces",
+        "network",
+        "pulseaudio",
+        "battery"
+    ],
+    "modules-right": []
+}

@@ -1,0 +1,9 @@
+{
+    "network": {
+        "format": "{ifname}",
+        "format-wifi": "",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰖪",
+        "on-click": "nm-connection-editor"
+    }
+}
