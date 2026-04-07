@@ -52,7 +52,8 @@ window#waybar {
 /* === RIGHT MODULES === */
 #pulseaudio,
 #network,
-#battery {
+#battery,
+#custom-power-battery {
     background: #1e1e2e;
     border-radius: 999px;
     padding: 2px 12px;
@@ -67,7 +68,8 @@ window#waybar {
     color: #cdd6f4;
 }
 
-#battery {
+#battery,
+#custom-power-battery {
     color: #cdd6f4;
 }
 

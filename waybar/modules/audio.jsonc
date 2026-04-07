@@ -2,6 +2,7 @@
     "pulseaudio": {
         "format": " ",
         "format-muted": " ",
+        "tooltip-format": "{desc} - {volume}%",
         "on-click": "pavucontrol"
     }
 }

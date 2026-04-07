@@ -1,14 +1,9 @@
 {
-    "battery": {
-        "format": "{icon}  {capacity}%",
-        "format-icons": [
-            "",
-            "",
-            "",
-            "",
-            ""
-        ],
-        "format-charging": "  {capacity}%",
-        "critical-threshold": 15
+    "custom/power-battery": {
+        "exec": "/home/rajat/.config/waybar/scripts/power-battery-status.sh",
+        "return-type": "json",
+        "interval": 5,
+        "signal": 8,
+        "on-click": "/home/rajat/.config/waybar/scripts/power-mode-menu.sh && pkill -RTMIN+8 waybar"
     }
 }

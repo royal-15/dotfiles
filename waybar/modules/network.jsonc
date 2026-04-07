@@ -4,6 +4,7 @@
         "format-wifi": " ",
         "format-ethernet": "󰈀 ",
         "format-disconnected": "󰖪 ",
+        "tooltip-format": "{essid} {signalStrength}%",
         "on-click": "nm-connection-editor"
     }
 }
