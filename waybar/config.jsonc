@@ -10,13 +10,15 @@
         "modules/battery.jsonc",
         "modules/network.jsonc"
     ],
-    "modules-left": [],
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
     "modules-center": [
-        "clock",
-        "hyprland/workspaces",
+        "clock"
+    ],
+    "modules-right": [
         "network",
         "pulseaudio",
         "battery"
-    ],
-    "modules-right": []
+    ]
 }

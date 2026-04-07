@@ -1,7 +1,7 @@
 {
     "pulseaudio": {
-        "format": "",
-        "format-muted": "",
+        "format": " ",
+        "format-muted": " ",
         "on-click": "pavucontrol"
     }
 }

@@ -1,6 +1,6 @@
 {
     "battery": {
-        "format": "{icon} {capacity}%",
+        "format": "{icon}  {capacity}%",
         "format-icons": [
             "",
             "",
@@ -8,7 +8,7 @@
             "",
             ""
         ],
-        "format-charging": " {capacity}%",
+        "format-charging": "  {capacity}%",
         "critical-threshold": 15
     }
 }
