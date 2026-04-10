@@ -49,6 +49,11 @@ window#waybar {
     color: #cdd6f4;
 }
 
+#custom-cpu_temp {
+    color: #f38ba8;
+    padding: 0 10px;
+}
+
 /* === RIGHT MODULES === */
 #pulseaudio,
 #network,

@@ -1,0 +1,8 @@
+{
+    "custom/cpu_temp": {
+        "exec": "$HOME/.config/waybar/scripts/cpu_temp.sh",
+        "interval": 5,
+        "return-type": "json",
+        "format": "{}"
+    }
+}

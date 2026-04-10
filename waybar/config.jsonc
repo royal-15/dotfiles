@@ -8,10 +8,12 @@
         "modules/clock.jsonc",
         "modules/audio.jsonc",
         "modules/battery.jsonc",
-        "modules/network.jsonc"
+        "modules/network.jsonc",
+        "modules/cpu_temp.jsonc"
     ],
     "modules-left": [
-        "hyprland/workspaces"
+        "hyprland/workspaces",
+        "custom/cpu_temp"
     ],
     "modules-center": [
         "clock"
