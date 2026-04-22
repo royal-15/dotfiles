@@ -1,0 +1,30 @@
+{
+    "layer": "bottom",
+    "position": "top",
+    "css": "/home/rajat/.config/waybar/style.css",
+    "margin-top": 8,
+    "margin-left": 10,
+    "margin-right": 10,
+    "include": [
+        "modules/workspaces.jsonc",
+        "modules/clock.jsonc",
+        "modules/audio.jsonc",
+        "modules/battery.jsonc",
+        "modules/cpu_temp.jsonc",
+        "modules/tray.jsonc",
+        "modules/notification.jsonc"
+    ],
+    "modules-left": [
+        "hyprland/workspaces",
+        "custom/cpu_temp"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "tray",
+        "pulseaudio",
+        "custom/power-battery",
+        "custom/notification"
+    ]
+}

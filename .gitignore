@@ -1,0 +1,7 @@
+
+hypr/hyprlock/assets/blurred_wallpaper.png
+
+*.backup.*
+machine/*
+.env*
+

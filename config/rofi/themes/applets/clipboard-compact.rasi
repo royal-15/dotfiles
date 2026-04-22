@@ -1,0 +1,132 @@
+/*****----- Configuration -----*****/
+configuration {
+    show-icons:                 false;
+}
+
+/*****----- Global Properties -----*****/
+@import                          "../shared/colors/gruvbox.rasi"
+@import                          "../shared/fonts.rasi"
+
+/*****----- Main Window -----*****/
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    fullscreen:                  false;
+    width:                       500px;
+    height:                      360px;
+    x-offset:                    0px;
+    y-offset:                    0px;
+    margin:                      0px;
+    padding:                     0px;
+    border-radius:               16px;
+    border-color:                @selected;
+    cursor:                      "default";
+    background-color:            @background;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    enabled:                     true;
+    spacing:                     15px;
+    margin:                      0px;
+    padding:                     23px;
+    background-color:            transparent;
+    children:                    [ "inputbar", "listview" ];
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    enabled:                     true;
+    spacing:                     10px;
+    padding:                     10px 12px;
+    border:                      1px solid;
+    border-radius:               10px;
+    border-color:                rgba(255, 255, 255, 0.2);
+    background-color:            rgba(255, 255, 255, 0.05);
+    text-color:                  @foreground;
+    children:                    [ "entry"];
+}
+
+entry {
+    enabled:                     true;
+    padding:                     3px 7px;
+    border-radius:               0px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    placeholder:                 "Type to search clipboard history...";
+    placeholder-color:           rgba(255, 255, 255, 0.3);
+    font:                        "monospace 11";
+}
+
+/*****----- Listview -----*****/
+listview {
+    enabled:                     true;
+    columns:                     1;
+    lines:                       6;
+    cycle:                       true;
+    layout:                      vertical;
+    spacing:                     8px;
+    background-color:            transparent;
+    cursor:                      "default";
+    scrollbar:                   true;
+}
+
+/*****----- Scrollbar -----*****/
+scrollbar {
+    enabled:                     true;
+    handle-width:                3px;
+    handle-color:                rgba(255, 255, 255, 0.3);
+    background-color:            rgba(255, 255, 255, 0.1);
+    border-radius:               2px;
+}
+
+/*****----- Elements -----*****/
+element {
+    enabled:                     true;
+    padding:                     12px 15px;
+    border:                      1px solid;
+    border-radius:               10px;
+    border-color:                rgba(255, 255, 255, 0.1);
+    background-color:            rgba(255, 255, 255, 0.05);
+    text-color:                  @foreground;
+    cursor:                      pointer;
+}
+
+element-text {
+    font:                        "monospace 11";
+    background-color:            transparent;
+    text-color:                  inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color:            rgba(255, 255, 255, 0.05);
+    border-color:                rgba(255, 255, 255, 0.1);
+    text-color:                  @foreground;
+}
+
+element normal.urgent,
+element alternate.urgent,
+element selected.active {
+    background-color:            rgba(255, 100, 100, 0.2);
+    border-color:                rgba(255, 100, 100, 0.4);
+    text-color:                  @foreground;
+}
+
+element normal.active,
+element alternate.active,
+element selected.urgent {
+    background-color:            rgba(100, 150, 255, 0.2);
+    border-color:                rgba(100, 150, 255, 0.4);
+    text-color:                  @foreground;
+}
+
+element selected.normal {
+    background-color:            rgba(255, 255, 255, 0.15);
+    border-color:                @selected;
+    text-color:                  @selected;
+}

@@ -1,0 +1,28 @@
+{
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "on-click": "activate",
+        "format-icons": {
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "urgent": "",
+            "active": "",
+            "default": ""
+        },
+        "persistent-workspaces": {
+            "eDP-1": [
+                4,
+                5,
+                6
+            ],
+            "HDMI-A-1": [
+                1,
+                2,
+                3
+            ]
+        }
+    }
+}

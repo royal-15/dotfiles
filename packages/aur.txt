@@ -1,0 +1,12 @@
+ani-cli
+cursor-bin
+github-desktop-bin
+google-chrome
+orchis-dracula-theme-git
+visual-studio-code-bin
+vscodium-bin
+vscodium-bin-marketplace
+waydroid-image
+wlogout
+yay
+yay-debug
