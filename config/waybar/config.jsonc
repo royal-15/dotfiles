@@ -1,30 +1,43 @@
-{
-    "layer": "bottom",
-    "position": "top",
-    "css": "/home/rajat/.config/waybar/style.css",
-    "margin-top": 8,
-    "margin-left": 10,
-    "margin-right": 10,
-    "include": [
-        "modules/workspaces.jsonc",
-        "modules/clock.jsonc",
-        "modules/audio.jsonc",
-        "modules/battery.jsonc",
-        "modules/cpu_temp.jsonc",
-        "modules/tray.jsonc",
-        "modules/notification.jsonc"
-    ],
-    "modules-left": [
-        "hyprland/workspaces",
-        "custom/cpu_temp"
-    ],
-    "modules-center": [
-        "clock"
-    ],
-    "modules-right": [
-        "tray",
-        "pulseaudio",
-        "custom/power-battery",
-        "custom/notification"
-    ]
-}
+[
+    {
+        "name": "waybar-main",
+        "output": [
+            "HDMI-A-1",
+            "eDP-1"
+        ],
+        "layer": "top",
+        "position": "top",
+        "css": "/home/rajat/.config/waybar/style.css",
+        "reload_style_on_change": true,
+        "spacing": 5,
+        "margin-top": 7,
+        "margin-left": 8,
+        "margin-right": 8,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/tray.jsonc",
+            "modules/notification.jsonc",
+            "modules/network.jsonc",
+            "modules/media.jsonc"
+        ],
+        "modules-left": [
+            "hyprland/workspaces",
+            "custom/cpu_temp",
+            "custom/media"
+        ],
+        "modules-center": [
+            "clock"
+        ],
+        "modules-right": [
+            "tray",
+            "pulseaudio",
+            "network",
+            "custom/power-battery",
+            "custom/notification"
+        ]
+    }
+]

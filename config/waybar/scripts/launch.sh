@@ -1,8 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-killall -9 waybar
-killall -9 swaync
+set -euo pipefail
 
-waybar &
-swaync &
+pkill -x waybar 2>/dev/null || true
+pkill -x swaync 2>/dev/null || true
 
+sleep 0.2
+
+env -u DISPLAY GDK_BACKEND=wayland waybar >/dev/null 2>&1 &
+swaync >/dev/null 2>&1 &

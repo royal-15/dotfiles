@@ -1,0 +1,13 @@
+{
+    "custom/media": {
+        "exec": "/home/rajat/.config/waybar/scripts/media.sh",
+        "return-type": "json",
+        "hide-empty-text": true,
+        "restart-interval": 2,
+        "exec-on-event": false,
+        "on-click": "playerctl --player=playerctld play-pause",
+        "on-click-middle": "playerctl --player=playerctld previous",
+        "on-click-right": "playerctl --player=playerctld next",
+        "tooltip": true
+    }
+}

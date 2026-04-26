@@ -1,0 +1,23 @@
+{
+    "network": {
+        "interval": 5,
+        "family": "ipv4",
+        "format-wifi": "{icon}",
+        "format-ethernet": "󰈀",
+        "format-linked": "󰈀",
+        "format-disconnected": "󰤭",
+        "format-disabled": "󰤮",
+        "tooltip-format-wifi": "{essid}\n{ipaddr}/{cidr}\nSignal: {signalStrength}% ({signaldBm} dBm)",
+        "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}\nGateway: {gwaddr}",
+        "tooltip-format-linked": "{ifname}\nWaiting for IP",
+        "tooltip-format-disconnected": "Disconnected",
+        "tooltip-format-disabled": "Wireless disabled",
+        "format-icons": [
+            "󰤯 ",
+            "󰤟 ",
+            "󰤢 ",
+            "󰤥 ",
+            "󰤨 "
+        ]
+    }
+}

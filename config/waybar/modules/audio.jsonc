@@ -1,14 +1,27 @@
 {
     "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": " ",
+        "format": "{icon}",
+        "format-bluetooth": "󰂯",
+        "format-muted": "󰖁",
+        "format-source": "󰍬",
+        "format-source-muted": "󰍭",
         "format-icons": {
             "headphone": "",
+            "speaker": "󰓃",
+            "hdmi": "󰡁",
             "default": [
-                " "
+                "󰕿",
+                "󰖀",
+                "󰕾"
             ]
         },
         "scroll-step": 1,
+        "max-volume": 100,
+        "tooltip-format": "{volume}%\n{desc}",
+        "states": {
+            "warning": 65,
+            "critical": 90
+        },
         "on-click": "pavucontrol",
         "ignored-sinks": [
             "Easy Effects Sink"

@@ -1,16 +1,13 @@
 {
     "hyprland/workspaces": {
-        "format": "{name}",
+        "format": "{icon}",
         "on-click": "activate",
+        "show-special": false,
+        "persistent-only": true,
+        "all-outputs": true,
         "format-icons": {
-            "1": "",
-            "2": "",
-            "3": "",
-            "4": "",
-            "5": "",
-            "urgent": "",
-            "active": "",
-            "default": ""
+            "active": "●",
+            "default": "•"
         },
         "persistent-workspaces": {
             "eDP-1": [

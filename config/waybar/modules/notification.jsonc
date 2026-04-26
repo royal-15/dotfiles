@@ -1,7 +1,7 @@
 {
     "custom/notification": {
         "tooltip": true,
-        "format": "<span size='11pt'>{icon}</span>",
+        "format": "<span size='10pt'>{icon}</span>",
         "format-icons": {
             "notification": "󱅫",
             "none": "󰂜",

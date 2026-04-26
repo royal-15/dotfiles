@@ -1,12 +1,36 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Get CPU temp (Package id 0 is common on Intel)
-temp=$(sensors | grep -m 1 'Package id 0:' | awk '{print $4}' | tr -d '+°C')
+set -euo pipefail
 
-# Fallback if above fails (AMD or different label)
-if [ -z "$temp" ]; then
-  temp=$(sensors | grep -m 1 'Tctl:' | awk '{print $2}' | tr -d '+°C')
+temp_raw="$(
+    sensors 2>/dev/null | awk '
+        /Package id 0:/ { print $4; exit }
+        /Tctl:/ { print $2; exit }
+        /Tdie:/ { print $2; exit }
+    '
+)"
+
+temp="${temp_raw#+}"
+temp="${temp%°C}"
+temp="${temp%%.*}"
+
+if [[ -z "$temp" || ! "$temp" =~ ^[0-9]+$ ]]; then
+    printf '{"text":"󰔄 --","tooltip":"CPU temperature unavailable","class":["unknown"]}\n'
+    exit 0
 fi
 
-# Output for Waybar
-echo "{\"text\": \" ${temp}°C\", \"tooltip\": \"CPU Temp: ${temp}°C\"}"
+state="normal"
+icon="󰔏"
+if (( temp >= 90 )); then
+    state="critical"
+    icon="󰸁"
+elif (( temp >= 80 )); then
+    state="hot"
+    icon="󰔄"
+elif (( temp >= 70 )); then
+    state="warm"
+    icon="󱃂"
+fi
+
+printf '{"text":"%s %s°","tooltip":"CPU temperature: %s°C","class":["%s"],"percentage":%s}\n' \
+    "$icon" "$temp" "$temp" "$state" "$temp"
