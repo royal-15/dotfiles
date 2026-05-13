@@ -35,6 +35,7 @@ echo "[*] Syncing configs..."
 sync .config/hypr config/hypr
 sync .config/kitty config/kitty
 sync .config/rofi config/rofi
+sync .config/swaync config/swaync
 sync .config/waybar config/waybar
 
 # local

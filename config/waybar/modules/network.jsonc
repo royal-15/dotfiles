@@ -1,6 +1,6 @@
 {
     "network": {
-        "interval": 5,
+        "interval": 10,
         "family": "ipv4",
         "format-wifi": "{icon}",
         "format-ethernet": "󰈀",

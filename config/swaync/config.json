@@ -1,0 +1,71 @@
+{
+  "$schema": "/etc/xdg/swaync/configSchema.json",
+  "ignore-gtk-theme": true,
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "cssPriority": "user",
+  "control-center-width": 396,
+  "control-center-height": 720,
+  "control-center-margin-top": 6,
+  "control-center-margin-bottom": 6,
+  "control-center-margin-right": 6,
+  "control-center-margin-left": 0,
+  "control-center-exclusive-zone": true,
+  "notification-window-width": 396,
+  "notification-body-image-height": 120,
+  "notification-body-image-width": 200,
+  "timeout": 4,
+  "timeout-low": 2,
+  "timeout-critical": 6,
+  "fit-to-screen": false,
+  "keyboard-shortcuts": true,
+  "notification-grouping": true,
+  "image-visibility": "when-available",
+  "relative-timestamps": true,
+  "transition-time": 200,
+  "hide-on-clear": false,
+  "hide-on-action": false,
+  "text-empty": "No notifications",
+  "script-fail-notify": true,
+  "widgets": [
+    "menubar#top",
+    "mpris",
+    "volume",
+    "notifications"
+  ],
+  "widget-config": {
+    "menubar#top": {
+      "buttons#status": {
+        "position": "right",
+        "actions": [
+          {
+            "label": "󰂛",
+            "type": "toggle",
+            "command": "/home/rajat/.config/swaync/scripts/toggle-dnd.sh",
+            "update-command": "/home/rajat/.config/swaync/scripts/get-dnd.sh"
+          }
+        ]
+      }
+    },
+    "mpris": {
+      "show-album-art": "always",
+      "autohide": true,
+      "loop-carousel": false
+    },
+    "volume": {
+      "label": "󰕾",
+      "show-per-app": true,
+      "show-per-app-icon": true,
+      "show-per-app-label": false,
+      "expand-per-app": false,
+      "empty-list-label": "No active audio streams",
+      "expand-button-label": "󰐮",
+      "collapse-button-label": "󰐰"
+    },
+    "notifications": {
+      "vexpand": true
+    }
+  }
+}

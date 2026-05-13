@@ -1,0 +1,10 @@
+FORMAT 2
+* DEV  /dev/i2c device
+* EC   EDID check sum byte
+* C    current step
+* I    interval remaining
+* L    current lookback
+* DEV EC C I L Values
+* Values {tries required, step, epoch seconds}
+i2c-4 0f 10 3 5
+i2c-6 5c 7 3 5

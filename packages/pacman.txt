@@ -59,6 +59,7 @@ lsp-plugins
 ly
 man-db
 mda.lv2
+mpv-mpris
 nano
 nautilus
 neovim
@@ -88,6 +89,7 @@ rclone
 ristretto
 rofi
 sddm
+seahorse
 slurp
 smartmontools
 sudo
@@ -113,7 +115,7 @@ vlc
 vscodium-bin
 vscodium-bin-marketplace
 vulkan-intel
-waybar
+waybar-cava-git
 waydroid
 waydroid-image
 wget

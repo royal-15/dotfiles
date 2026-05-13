@@ -2,10 +2,25 @@
 
 set -euo pipefail
 
-pkill -x waybar 2>/dev/null || true
-pkill -x swaync 2>/dev/null || true
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_PATH="${SCRIPT_DIR}/../config.jsonc"
 
-sleep 0.2
+launch_waybar() {
+    pkill -x waybar 2>/dev/null || true
+    sleep 0.2
 
-env -u DISPLAY GDK_BACKEND=wayland waybar >/dev/null 2>&1 &
-swaync >/dev/null 2>&1 &
+    env -u DISPLAY GDK_BACKEND=wayland waybar -c "${CONFIG_PATH}" >/dev/null 2>&1 &
+}
+
+start_swaync() {
+    if ! pgrep -x swaync >/dev/null 2>&1; then
+        swaync >/dev/null 2>&1 &
+    fi
+}
+
+main() {
+    launch_waybar
+    start_swaync
+}
+
+main

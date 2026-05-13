@@ -27,8 +27,42 @@ json_escape() {
     printf '%s' "$value"
 }
 
+normalize_player_name() {
+    local raw_name="${1-}"
+    local normalized="${raw_name,,}"
+
+    normalized="${normalized#org.mpris.mediaplayer2.}"
+
+    case "$normalized" in
+        firefox.instance*|firefox.*)
+            printf 'firefox'
+            ;;
+        chromium.instance*|chromium.*)
+            printf 'chromium'
+            ;;
+        google-chrome.instance*|google-chrome.*|chrome.instance*|chrome.*)
+            printf 'google-chrome'
+            ;;
+        brave-browser.instance*|brave-browser.*|brave.instance*|brave.*)
+            printf 'brave-browser'
+            ;;
+        spotify.instance*|spotify.*)
+            printf 'spotify'
+            ;;
+        mpv.instance*|mpv.*)
+            printf 'mpv'
+            ;;
+        vlc.instance*|vlc.*)
+            printf 'vlc'
+            ;;
+        *)
+            printf '%s' "$normalized"
+            ;;
+    esac
+}
+
 player_icon() {
-    case "${1,,}" in
+    case "$(normalize_player_name "$1")" in
         spotify)
             printf ' '
             ;;
@@ -37,6 +71,9 @@ player_icon() {
             ;;
         mpv)
             printf '󰐹 '
+            ;;
+        vlc)
+            printf '󰕼 '
             ;;
         chromium|google-chrome|brave|brave-browser)
             printf ' '
@@ -70,9 +107,15 @@ print_state() {
     local tooltip="$title"
     local payload
     local status_class="${status,,}"
+    local is_active=false
 
-    if [ -z "$display_title" ]; then
-        payload='{"text":"","tooltip":"","class":"stopped"}'
+    if [ "$status_class" = "playing" ] && [ -n "$display_title" ]; then
+        is_active=true
+    fi
+
+    if ! $is_active; then
+        payload=$(printf '{"text":"","tooltip":"","class":"%s"}' \
+            "$(json_escape "$status_class")")
     else
         short_title="$(marquee_text "$display_title" "$max_chars")"
         if [ -n "$artist" ] && [ "$artist" != "$display_title" ]; then
@@ -100,11 +143,12 @@ update_state() {
     local new_status="$2"
     local new_artist="$3"
     local new_title="$4"
-    local next_title
+    local next_title="$new_title"
 
-    next_title="$new_title"
-    if [ -z "$next_title" ]; then
-        next_title="${new_artist:-${new_player:-No media}}"
+    if [ "$new_status" != "Playing" ]; then
+        next_title=""
+    elif [ -z "$next_title" ]; then
+        next_title="$new_artist"
     fi
 
     if [ "$new_player" != "$player" ] || [ "$new_status" != "$status" ] || [ "$new_artist" != "$artist" ] || [ "$next_title" != "$title" ]; then

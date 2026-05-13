@@ -2,7 +2,7 @@
     "custom/power-battery": {
         "exec": "/home/rajat/.config/waybar/scripts/power-battery-status.sh",
         "return-type": "json",
-        "interval": 5,
+        "interval": 10,
         "signal": 8,
         "on-click": "/home/rajat/.config/waybar/scripts/power-mode-menu.sh && pkill -RTMIN+8 waybar"
     }

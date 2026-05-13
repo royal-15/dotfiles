@@ -1,14 +1,10 @@
 [
     {
         "name": "waybar-main",
-        "output": [
-            "HDMI-A-1",
-            "eDP-1"
-        ],
         "layer": "top",
         "position": "top",
         "css": "/home/rajat/.config/waybar/style.css",
-        "reload_style_on_change": true,
+        "reload_style_on_change": false,
         "spacing": 5,
         "margin-top": 7,
         "margin-left": 8,

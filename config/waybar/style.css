@@ -14,6 +14,7 @@
 @define-color critical #e78284;
 
 * {
+    all: unset;
     border: none;
     border-radius: 0;
     font-family: "DejaVu Sans", "JetBrainsMono Nerd Font", "Symbols Nerd Font";
@@ -56,7 +57,7 @@ tooltip label {
     color: @text;
     min-height: 19px;
     padding: 0 8px;
-    transition: all 160ms ease;
+    transition: background-color 160ms ease, color 160ms ease;
 }
 
 #clock {
@@ -80,7 +81,7 @@ tooltip label {
     margin: 2px 1px;
     min-width: 15px;
     padding: 0 4px;
-    transition: all 140ms ease;
+    transition: background-color 140ms ease, color 140ms ease;
 }
 
 #workspaces button:hover {
@@ -166,17 +167,17 @@ tooltip label {
 #custom-media.playing {
     background: @surface-strong;
     color: @text;
+    padding: 0 10px;
 }
 
-#custom-media.paused {
-    color: @text-dim;
-}
-
+#custom-media.paused,
 #custom-media.stopped {
     background: transparent;
     box-shadow: none;
+    min-height: 0;
     min-width: 0;
     padding: 0;
+    color: transparent;
 }
 
 #pulseaudio {
