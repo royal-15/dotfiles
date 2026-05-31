@@ -1,19 +1,26 @@
-* {
-    background:     #282828FF;
-    background-alt: #353535FF;
-    foreground:     #EBDBB2FF;
-    selected:       #83A598FF;
-    active:         #B8BB26FF;
-    urgent:         #FB4934FF;
+/* Base */
 
-// new template format
-    bg-primary:      #282828FF;
-    bg-secondary:    #353535FF;
-    fg-primary:      #EBDBB2FF;
-    fg-secondary:    #83A598FF;
-    accent:          #000000FF;
-    border:          #000000FF;
-    success:         #B8BB26FF;
-    warning:         #000000FF;
-    error:           #FB4934FF;
+* {
+    bg-main:      #132326;
+    bg-surface:   #182d31;
+    bg-elevated:  #21383d;
+
+    fg-primary:   #eef2f1;
+    fg-secondary: #d3dddb;
+    fg-muted:     #9eb2af;
+
+    accent:       #67afb5;
+    accent-soft:  rgba(114,200,207,0.12);
+
+    danger:       #e87a84;
+    danger-soft:  rgba(232,122,132,0.12);
+
+    border:       #202a2b;
+    shadow:       rgba(0,0,0,0.28);
+
+    selected-bg:  #6bb3ba;
+    selected-fg:  #132326;
+
+    hover-bg:     rgba(114,200,207,0.06);
+    hover-fg:     #eef2f1;
 }

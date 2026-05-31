@@ -33,10 +33,10 @@ hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("wlogout"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("blueman-manager"))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("kitty -e htop"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("$HOME/.config/theme-switcher/scripts/theme_switcher_menu.sh"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("$HOME/.config/theme-switcher/scripts/theme_switcher_menu.sh || pkill rofi"))
 
 -- # Clipboard
-hl.bind(mod .. " + V", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard.sh history"))
+hl.bind(mod .. " + V", hl.dsp.exec_cmd("pkill rofi || ~/.config/hypr/scripts/clipboard.sh history"))
 hl.bind(mod .. " + SHIFT + V", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard.sh wipe"))
 
 -- # Screenshot

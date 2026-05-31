@@ -336,7 +336,7 @@ main() {
                 wallpaper)
                     switch_wallpaper "$3"
                     "$SCRIPT_DIR"/reload wallpaper
-                    blur_wallpaper2 
+                    blur_wallpaper
                     ;;
                 waybar_layout)
                     switch_waybar_layout "$3"
