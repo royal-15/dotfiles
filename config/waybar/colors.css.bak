@@ -1,0 +1,54 @@
+/*
+ * Waybar Color Palette
+ */
+
+/* Base Palette */
+@define-color foreground #a2dde3;
+@define-color background #0d180a;
+
+@define-color color0 #0d180a;
+@define-color color1 #348c68;
+@define-color color2 #5e9d6b;
+@define-color color3 #98ae6c;
+@define-color color4 #117c85;
+@define-color color5 #26969b;
+@define-color color6 #4fb9b1;
+@define-color color7 #a2dde3;
+@define-color color8 #719a9e;
+@define-color color9 #348c68;
+@define-color color10 #5e9d6b;
+@define-color color11 #98ae6c;
+@define-color color12 #117c85;
+@define-color color13 #26969b;
+@define-color color14 #4fb9b1;
+@define-color color15 #a2dde3;
+
+/* Text */
+@define-color text-primary @foreground;
+@define-color text-muted #95a0aa;
+@define-color text-faint alpha(@text-muted, 0.56);
+@define-color text-on-accent #0d1014;
+@define-color clear transparent;
+
+/* Surfaces */
+@define-color surface rgba(15, 17, 21, 0.82);
+@define-color surface-strong rgba(20, 23, 29, 0.92);
+@define-color surface-soft rgba(15, 17, 21, 0.68);
+@define-color surface-tooltip rgba(15, 17, 21, 0.96);
+@define-color surface-hover rgba(255, 255, 255, 0.05);
+
+/* Accent Colors */
+@define-color accent-primary @color14;
+@define-color accent-primary-soft alpha(@accent-primary, 0.16);
+
+@define-color accent-secondary @color9;
+@define-color accent-secondary-soft alpha(@accent-secondary, 0.16);
+
+/* Status */
+@define-color status-success #a6d189;
+@define-color status-warning #e5c890;
+@define-color status-critical #e78284;
+
+/* Shadows */
+@define-color shadow rgba(0, 0, 0, 0.24);
+@define-color shadow-tooltip rgba(0, 0, 0, 0.28);

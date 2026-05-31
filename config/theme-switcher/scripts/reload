@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+reload_hyprland() {
+    hyprctl reload
+}
+
+reload_waybar() {
+    ~/.local/bin/restart-daemon.sh waybar
+}
+
+reload_swaync() {
+    ~/.local/bin/restart-daemon.sh swaync
+}
+
+reload_wallpaper() {
+    transition=$1
+    awww img ~/.config/theme-switcher/state/current_wallpaper --transition-type "$transition" --transition-duration 2
+}
+
+reload_rofi() {
+    pkill rofi || true
+}
+
+reload_wlogout() {
+    :
+}
+
+reload_all() {
+    reload_hyprland
+    reload_waybar
+    reload_swaync
+    reload_wallpaper center
+    reload_rofi
+    reload_wlogout
+}
+
+main() {
+    [[ $# -gt 0 ]] || {
+        echo "Usage: reload.sh <aspect>..."
+        exit 1
+    }
+
+    for aspect in "$@"; do
+        case "$aspect" in
+            hyprland)
+                reload_hyprland
+                ;;
+            waybar)
+                reload_waybar
+                ;;
+            swaync)
+                reload_swaync
+                ;;
+            wallpaper)
+                reload_wallpaper wipe
+                ;;
+            rofi)
+                reload_rofi
+                ;;
+            wlogout)
+                reload_wlogout
+                ;;
+            all)
+                reload_all
+                ;;
+            *)
+                echo "Unknown aspect: $aspect"
+                exit 1
+                ;;
+        esac
+    done
+}
+
+main "$@"

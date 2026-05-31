@@ -1,7 +1,7 @@
 {
     "pulseaudio": {
-        "format": "{icon}",
-        "format-bluetooth": "󰂯",
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "󰂯 {volume}%",
         "format-muted": "󰖁",
         "format-source": "󰍬",
         "format-source-muted": "󰍭",
@@ -17,7 +17,7 @@
         },
         "scroll-step": 1,
         "max-volume": 100,
-        "tooltip-format": "{volume}%\n{desc}",
+        "tooltip-format": "Volume: {volume}%\n{desc}",
         "states": {
             "warning": 65,
             "critical": 90

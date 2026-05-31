@@ -1,0 +1,362 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+###############################################################################
+# Paths
+###############################################################################
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(realpath "$SCRIPT_DIR/..")"
+
+STATE_FILE="$ROOT_DIR/state/active_theme.env"
+CURRENT_WALLPAPER_LINK="$ROOT_DIR/state/current_wallpaper"
+
+THEMES_DIR="$ROOT_DIR/themes"
+WAYBAR_LAYOUTS_DIR="$ROOT_DIR/layouts/waybars"
+
+###############################################################################
+# Config Targets
+###############################################################################
+
+KITTY_TARGET="$HOME/.config/kitty/colors.conf"
+ROFI_TARGET="$HOME/.config/rofi/colors.rasi"
+SWAYNC_TARGET="$HOME/.config/swaync/colors.css"
+WAYBAR_COLORS_TARGET="$HOME/.config/waybar/colors.css"
+
+WAYBAR_CONFIG_TARGET="$HOME/.config/waybar/config.jsonc"
+WAYBAR_LAYOUT_TARGET="$HOME/.config/waybar/layout.css"
+
+###############################################################################
+# Helpers
+###############################################################################
+
+die() {
+    echo "[ERROR] $*" >&2
+    exit 1
+}
+
+ok() {
+    echo "[OK] $*"
+}
+
+warn() {
+    echo "[WARN] $*"
+}
+
+ensure_state_file() {
+    mkdir -p "$(dirname "$STATE_FILE")"
+
+    if [[ ! -f "$STATE_FILE" ]]; then
+        cat > "$STATE_FILE" <<EOF
+ACTIVE_THEME=
+ACTIVE_WALLPAPER=
+ACTIVE_WAYBAR_LAYOUT=
+EOF
+    fi
+}
+
+load_state() {
+    ensure_state_file
+    source "$STATE_FILE"
+}
+
+save_state() {
+    cat > "$STATE_FILE" <<EOF
+ACTIVE_THEME=${ACTIVE_THEME:-}
+ACTIVE_WALLPAPER=${ACTIVE_WALLPAPER:-}
+ACTIVE_WAYBAR_LAYOUT=${ACTIVE_WAYBAR_LAYOUT:-}
+EOF
+}
+
+create_symlink() {
+    local source="$1"
+    local target="$2"
+
+    mkdir -p "$(dirname "$target")"
+
+    ln -sfn "$source" "$target"
+}
+
+verify_link() {
+    local expected="$1"
+    local actual="$2"
+    local label="$3"
+
+    if [[ ! -L "$actual" ]]; then
+        echo "[FAIL] $label"
+        echo "  Not a symlink"
+        return 1
+    fi
+
+    local resolved
+    resolved="$(realpath "$actual")"
+
+    if [[ "$resolved" == "$(realpath "$expected")" ]]; then
+        echo "[OK] $label"
+        return 0
+    fi
+
+    echo "[FAIL] $label"
+    echo "  Expected: $(realpath "$expected")"
+    echo "  Actual:   $resolved"
+    return 1
+}
+
+reload_system() {
+    local reload_script="$SCRIPT_DIR/reload.sh"
+
+    if [[ -x "$reload_script" ]]; then
+        "$reload_script"
+    elif [[ -f "$reload_script" ]]; then
+        bash "$reload_script"
+    fi
+}
+
+###############################################################################
+# Theme
+###############################################################################
+
+switch_theme() {
+    local theme="$1"
+
+    local colors_dir="$THEMES_DIR/$theme/colors"
+
+    [[ -d "$colors_dir" ]] || die "Theme not found: $theme"
+
+    create_symlink \
+        "$colors_dir/kitty_colors.conf" \
+        "$KITTY_TARGET"
+
+    create_symlink \
+        "$colors_dir/rofi_colors.rasi" \
+        "$ROFI_TARGET"
+
+    create_symlink \
+        "$colors_dir/swaync_colors.css" \
+        "$SWAYNC_TARGET"
+
+    create_symlink \
+        "$colors_dir/waybar_colors.css" \
+        "$WAYBAR_COLORS_TARGET"
+
+    #
+    # Theme default wallpaper
+    #
+    local default_wallpaper
+
+    default_wallpaper="$(find "$THEMES_DIR/$theme/wallpapers" \
+        -maxdepth 1 \
+        -type f \
+        | sort \
+        | sed -n '1p')"
+
+    [[ -n "$default_wallpaper" ]] \
+        || die "Theme '$theme' has no wallpapers"
+
+    create_symlink \
+        "$default_wallpaper" \
+        "$CURRENT_WALLPAPER_LINK"
+
+    load_state
+
+    ACTIVE_THEME="$theme"
+    ACTIVE_WALLPAPER="$(basename "$default_wallpaper")"
+
+    save_state
+
+    ok "Theme switched to '$theme'"
+    ok "Wallpaper switched to '$ACTIVE_WALLPAPER'"
+}
+
+###############################################################################
+# Wallpaper
+###############################################################################
+
+find_wallpaper() {
+    local wallpaper="$1"
+
+    find "$THEMES_DIR" \
+        -type f \
+        -path "*/wallpapers/*" \
+        -name "$wallpaper" \
+        | head -n1
+}
+
+switch_wallpaper() {
+    local wallpaper="$1"
+
+    local wallpaper_path
+    wallpaper_path="$(find_wallpaper "$wallpaper")"
+
+    [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper"
+
+    create_symlink \
+        "$wallpaper_path" \
+        "$CURRENT_WALLPAPER_LINK"
+
+    load_state
+    ACTIVE_WALLPAPER="$wallpaper"
+    save_state
+
+    ok "Wallpaper switched to '$wallpaper'"
+}
+
+blur_wallpaper(){
+    local image_to_blur="$ROOT_DIR/state/current_wallpaper"
+    local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
+
+    ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image"
+}
+
+###############################################################################
+# Waybar Layout
+###############################################################################
+
+switch_waybar_layout() {
+    local layout="$1"
+
+    local layout_dir="$WAYBAR_LAYOUTS_DIR/$layout"
+
+    [[ -d "$layout_dir" ]] || die "Waybar layout not found: $layout"
+
+    create_symlink \
+        "$layout_dir/config.jsonc" \
+        "$WAYBAR_CONFIG_TARGET"
+
+    create_symlink \
+        "$layout_dir/layout.css" \
+        "$WAYBAR_LAYOUT_TARGET"
+
+    load_state
+    ACTIVE_WAYBAR_LAYOUT="$layout"
+    save_state
+
+    ok "Waybar layout switched to '$layout'"
+}
+
+###############################################################################
+# Verify
+###############################################################################
+
+verify_theme() {
+    local theme_dir="$THEMES_DIR/$ACTIVE_THEME/colors"
+
+    verify_link \
+        "$theme_dir/kitty_colors.conf" \
+        "$KITTY_TARGET" \
+        "kitty colors"
+
+    verify_link \
+        "$theme_dir/rofi_colors.rasi" \
+        "$ROFI_TARGET" \
+        "rofi colors"
+
+    verify_link \
+        "$theme_dir/swaync_colors.css" \
+        "$SWAYNC_TARGET" \
+        "swaync colors"
+
+    verify_link \
+        "$theme_dir/waybar_colors.css" \
+        "$WAYBAR_COLORS_TARGET" \
+        "waybar colors"
+}
+
+verify_wallpaper() {
+    local wallpaper_path
+    wallpaper_path="$(find_wallpaper "$ACTIVE_WALLPAPER")"
+
+    verify_link \
+        "$wallpaper_path" \
+        "$CURRENT_WALLPAPER_LINK" \
+        "wallpaper"
+}
+
+verify_waybar() {
+    local layout_dir="$WAYBAR_LAYOUTS_DIR/$ACTIVE_WAYBAR_LAYOUT"
+
+    verify_link \
+        "$layout_dir/config.jsonc" \
+        "$WAYBAR_CONFIG_TARGET" \
+        "waybar config"
+
+    verify_link \
+        "$layout_dir/style.css" \
+        "$WAYBAR_LAYOUT_TARGET" \
+        "waybar style"
+}
+
+cmd_verify() {
+    load_state
+
+    local failed=0
+
+    verify_theme || failed=1
+    verify_wallpaper || failed=1
+    verify_waybar || failed=1
+
+    echo
+
+    if (( failed == 0 )); then
+        ok "All symlinks valid"
+    else
+        die "Verification failed"
+    fi
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+usage() {
+    cat <<EOF
+Usage:
+
+  theme_switcher.sh switch theme <theme>
+  theme_switcher.sh switch wallpaper <wallpaper>
+  theme_switcher.sh switch waybar_layout <layout>
+
+  theme_switcher.sh verify
+EOF
+}
+
+main() {
+    case "${1:-}" in
+
+        switch)
+            [[ $# -eq 3 ]] || die "Invalid switch arguments"
+
+            case "$2" in
+                theme)
+                    switch_theme "$3"
+                    "$SCRIPT_DIR"/reload all
+                    blur_wallpaper
+                    ;;
+                wallpaper)
+                    switch_wallpaper "$3"
+                    "$SCRIPT_DIR"/reload wallpaper
+                    blur_wallpaper2 
+                    ;;
+                waybar_layout)
+                    switch_waybar_layout "$3"
+                    "$SCRIPT_DIR"/reload waybar
+                    ;;
+                *)
+                    die "Unknown aspect: $2"
+                    ;;
+            esac
+            ;;
+
+        verify)
+            cmd_verify
+            ;;
+
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

@@ -37,6 +37,7 @@ sync .config/kitty config/kitty
 sync .config/rofi config/rofi
 sync .config/swaync config/swaync
 sync .config/waybar config/waybar
+sync .config/theme-switcher config/theme-switcher
 
 # local
 echo "[*] Syncing local..."

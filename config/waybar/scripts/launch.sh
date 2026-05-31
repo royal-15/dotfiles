@@ -4,12 +4,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_PATH="${SCRIPT_DIR}/../config.jsonc"
+LOG_PATH="${XDG_RUNTIME_DIR:-/tmp}/waybar-theme-switcher.log"
 
 launch_waybar() {
     pkill -x waybar 2>/dev/null || true
     sleep 0.2
 
-    env -u DISPLAY GDK_BACKEND=wayland waybar -c "${CONFIG_PATH}" >/dev/null 2>&1 &
+    nohup env -u DISPLAY GDK_BACKEND=wayland waybar -c "${CONFIG_PATH}" >"${LOG_PATH}" 2>&1 &
 }
 
 start_swaync() {

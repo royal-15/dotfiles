@@ -5,7 +5,7 @@ configuration {
 }
 
 /*****----- Global Properties -----*****/
-@import                          "../shared/colors/cyberpunk.rasi"
+@import                          "../colors.rasi"
 @import                          "../shared/fonts.rasi"
 
 /*****----- Main Window -----*****/

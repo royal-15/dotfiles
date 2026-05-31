@@ -20,16 +20,16 @@ if [[ -z "$temp" || ! "$temp" =~ ^[0-9]+$ ]]; then
 fi
 
 state="normal"
-icon="󰔏"
+icon=""
 if (( temp >= 90 )); then
     state="critical"
-    icon="󰸁"
+    icon=""
 elif (( temp >= 80 )); then
     state="hot"
-    icon="󰔄"
+    icon=""
 elif (( temp >= 70 )); then
     state="warm"
-    icon="󱃂"
+    icon=""
 fi
 
 printf '{"text":"%s %s°","tooltip":"CPU temperature: %s°C","class":["%s"],"percentage":%s}\n' \

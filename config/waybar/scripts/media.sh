@@ -28,31 +28,31 @@ json_escape() {
 }
 
 normalize_player_name() {
-    local raw_name="${1-}"
-    local normalized="${raw_name,,}"
+    local normalized="${1,,}"
 
     normalized="${normalized#org.mpris.mediaplayer2.}"
+    normalized="${normalized#org.mpris.mediaplayer2}"
 
     case "$normalized" in
-        firefox.instance*|firefox.*)
+        *firefox*)
             printf 'firefox'
             ;;
-        chromium.instance*|chromium.*)
+        *chromium*)
             printf 'chromium'
             ;;
-        google-chrome.instance*|google-chrome.*|chrome.instance*|chrome.*)
+        *google-chrome*|*chrome*)
             printf 'google-chrome'
             ;;
-        brave-browser.instance*|brave-browser.*|brave.instance*|brave.*)
+        *brave*)
             printf 'brave-browser'
             ;;
-        spotify.instance*|spotify.*)
+        *spotify*)
             printf 'spotify'
             ;;
-        mpv.instance*|mpv.*)
+        *mpv*)
             printf 'mpv'
             ;;
-        vlc.instance*|vlc.*)
+        *vlc*)
             printf 'vlc'
             ;;
         *)

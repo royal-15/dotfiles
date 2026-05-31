@@ -1,0 +1,39 @@
+[
+    {
+        "name": "waybar-main",
+        "layer": "top",
+        "position": "top",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "spacing": 9,
+        "margin-top": 8,
+        "margin-left": 14,
+        "margin-right": 14,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/tray.jsonc",
+            "modules/notification.jsonc",
+            "modules/network.jsonc",
+            "modules/media.jsonc"
+        ],
+        "modules-left": [
+            "hyprland/workspaces"
+        ],
+        "modules-center": [
+            "custom/media",
+            "clock"
+        ],
+        "modules-right": [
+            "custom/cpu_temp",
+            "pulseaudio",
+            "network",
+            "custom/power-battery",
+            "custom/notification",
+            "tray"
+        ]
+    }
+]

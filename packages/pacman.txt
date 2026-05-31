@@ -1,6 +1,7 @@
 adw-gtk-theme
 android-tools
 ani-cli
+apple_cursor
 awww
 base
 base-devel
@@ -46,7 +47,11 @@ imv
 intel-media-driver
 intel-ucode
 iwd
+jre21-openjdk
 kitty
+lib32-mesa
+lib32-vulkan-intel
+lib32-vulkan-radeon
 libpulse
 libreoffice-fresh
 libva-intel-driver
@@ -56,6 +61,7 @@ linux-lts
 linux-zen
 llvm
 lsp-plugins
+lua-filesystem
 ly
 man-db
 mda.lv2
@@ -92,6 +98,7 @@ sddm
 seahorse
 slurp
 smartmontools
+spotify-launcher
 sudo
 swappy
 swaync
@@ -102,6 +109,7 @@ thunar-archive-plugin
 thunar-media-tags-plugin
 thunar-volman
 tk
+tlauncher-installer
 tree
 ttf-cascadia-code-nerd
 ttf-jetbrains-mono-nerd
@@ -115,7 +123,8 @@ vlc
 vscodium-bin
 vscodium-bin-marketplace
 vulkan-intel
-waybar-cava-git
+vulkan-radeon
+waybar
 waydroid
 waydroid-image
 wget
