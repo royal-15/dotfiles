@@ -7,6 +7,8 @@
 hl.on("hyprland.start", function () 
   hl.exec_cmd("awww-daemon & waybar & swaync & nm-applet")
   hl.exec_cmd("awww img ~/.config/theme-switcher/state/current_wallpaper")
+  
+  hl.exec_cmd("hyprctl setcursor macOS 24")
 
   -- Clipboard History
   hl.exec_cmd("wl-paste --type text --watch cliphist store")

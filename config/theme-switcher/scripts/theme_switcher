@@ -199,7 +199,9 @@ switch_wallpaper() {
     ACTIVE_WALLPAPER="$wallpaper"
     save_state
 
-    ok "Wallpaper switched to '$wallpaper'"
+    local msg="Wallpaper switched to '$wallpaper'"
+    ok "$msg"
+    notify-send "Theme switcher" "$msg"
 }
 
 blur_wallpaper(){
@@ -341,6 +343,7 @@ main() {
                 waybar_layout)
                     switch_waybar_layout "$3"
                     "$SCRIPT_DIR"/reload waybar
+                    # notify-send "Theme Switcher" "Successfuly switched waybar to $3"
                     ;;
                 *)
                     die "Unknown aspect: $2"

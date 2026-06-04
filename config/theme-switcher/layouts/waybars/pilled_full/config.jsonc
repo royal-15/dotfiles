@@ -17,7 +17,7 @@
             "modules/cpu_temp.jsonc",
             "modules/tray.jsonc",
             "modules/notification.jsonc",
-            "modules/network.jsonc",
+            // "modules/network.jsonc",
             "modules/media.jsonc"
         ],
         "modules-left": [
@@ -31,7 +31,7 @@
         "modules-right": [
             "tray",
             "pulseaudio",
-            "network",
+            // "network",
             "custom/power-battery",
             "custom/notification"
         ]

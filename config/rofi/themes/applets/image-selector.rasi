@@ -1,0 +1,130 @@
+/*****----- Configuration -----*****/
+configuration {
+    show-icons: true;
+}
+
+/*****----- Imports -----*****/
+@import "../colors.rasi"
+@import "../shared/fonts.rasi"
+
+/*****----- Window -----*****/
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+
+    margin: 0px;
+    padding: 0px;
+
+    border: 1px solid;
+    border-radius: 12px;
+    border-color: @border;
+
+    background-color: @bg-main;
+    
+    cursor: "default";
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    spacing: 0px;
+    margin: 0px;
+    padding: 16px;
+
+    background-color: transparent;
+
+    children: [ "listview" ];
+}
+
+/*****----- List View -----*****/
+listview {
+    columns: 5;
+    lines: 1;
+
+    layout: vertical;
+
+    dynamic: true;
+    fixed-height: false;
+
+    cycle: true;
+
+    spacing: 12px;
+
+    scrollbar: false;
+
+    background-color: transparent;
+}
+
+/*****----- Element -----*****/
+element {
+    orientation: vertical;
+    children: [ "element-icon", "element-text" ];
+
+    spacing: 8px;
+
+    padding: 10px;
+
+    border: 0px;
+    border-radius: 10px;
+
+    background-color: transparent;
+    text-color: @fg-primary;
+
+    cursor: pointer;
+}
+
+/*****----- Thumbnail -----*****/
+element-icon {
+    size: 128px;
+
+    expand: false;
+
+    background-color: transparent;
+
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+}
+    
+/*****----- Filename -----*****/
+element-text {
+    enabled: false;
+    font: "monospace 10";
+
+    background-color: transparent;
+    text-color: inherit;
+
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+
+    cursor: inherit;
+}
+
+/*****----- States -----*****/
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color: @fg-primary;
+}
+
+element normal.active,
+element alternate.active {
+    background-color: @hover-bg;
+    text-color: @hover-fg;
+}
+
+element selected.normal {
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}
+
+element selected.active {
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}
+
+element normal.urgent,
+element alternate.urgent,
+element selected.urgent {
+    background-color: @danger-soft;
+    text-color: @danger;
+}

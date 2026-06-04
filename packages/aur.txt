@@ -4,6 +4,8 @@ cursor-bin
 github-desktop-bin
 google-chrome
 orchis-dracula-theme-git
+papirus-folders
+rofi-pass-wayland-git
 tlauncher-installer
 visual-studio-code-bin
 vscodium-bin

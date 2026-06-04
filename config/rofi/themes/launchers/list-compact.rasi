@@ -98,10 +98,10 @@ listview {
     columns:                    1;
     lines:                      6;
 
-    cycle:                      true;
     dynamic:                    true;
     scrollbar:                  false;
 
+    cycle:                      true;
     layout:                     vertical;
     reverse:                    false;
 

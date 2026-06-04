@@ -7,7 +7,7 @@ current="$(powerprofilesctl get 2>/dev/null || echo balanced)"
 
 # Define modes and icons (order matters)
 modes=("power-saver" "balanced" "performance")
-icons=(" " " " "")
+icons=(" " "󰾆 " "")
 
 # Map current → index
 selected_index=1  # default = balanced

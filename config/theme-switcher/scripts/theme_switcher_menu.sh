@@ -43,13 +43,16 @@ list_files_of_type() {
     local dir="$1"
     shift
 
+    [[ -d "$dir" ]] || return 1
+    (($# > 0)) || return 0
+
     local find_args=()
+    local ext
 
     for ext in "$@"; do
         find_args+=(-iname "*.${ext}" -o)
     done
 
-    # Remove trailing -o
     unset 'find_args[${#find_args[@]}-1]'
 
     find "$dir" \
@@ -57,12 +60,21 @@ list_files_of_type() {
         -maxdepth 1 \
         -type f \
         \( "${find_args[@]}" \) \
-        -printf "%f\n" \
-        | sort
+        -print0 |
+    sort -z |
+    while IFS= read -r -d '' path; do
+        printf '%s\0icon\x1f%s\n' \
+            "$(basename "$path")" \
+            "$path"
+    done
 }
 
 show_menu() {
     rofi -dmenu -i -p "$1" -theme "$HOME/.config/rofi/themes/applets/selector-medium.rasi"
+}
+
+show_image_menu() {
+    rofi -dmenu -i -p "$1" -show-icons -theme "$HOME/.config/rofi/themes/applets/image-selector.rasi"
 }
 
 # =========================================================
@@ -98,7 +110,7 @@ case "$selected_aspect" in
     
     "wallpaper")
         final_selection=$(
-            list_files_of_type "$WALLPAPERS_DIR" jpg jpeg png webp | show_menu "Select Wallpaper"
+            list_files_of_type "$WALLPAPERS_DIR" jpg jpeg png webp | show_image_menu "Select Wallpaper"
         )
         ;;
     

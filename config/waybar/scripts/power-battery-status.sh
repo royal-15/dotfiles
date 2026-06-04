@@ -4,9 +4,9 @@ set -euo pipefail
 mode="$(powerprofilesctl get 2>/dev/null || echo balanced)"
 
 case "$mode" in
-    power-saver) mode_icon=""; mode_label="Power Saver" ;;
+    power-saver) mode_icon=" "; mode_label="Power Saver" ;;
     performance) mode_icon=""; mode_label="Performance" ;;
-    *) mode="balanced"; mode_label="Balanced"; mode_icon="󰾆" ;;
+    *) mode="balanced"; mode_label="Balanced"; mode_icon="󰾆 " ;;
 esac
 
 battery_path="/sys/class/power_supply/BAT0"

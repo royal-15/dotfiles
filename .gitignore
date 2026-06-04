@@ -5,3 +5,4 @@ hypr/hyprlock/assets/blurred_wallpaper.png
 machine/*
 .env*
 
+config/theme-switcher/cache/blurred_wallpaper.jpg

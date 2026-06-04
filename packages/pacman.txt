@@ -57,6 +57,7 @@ libreoffice-fresh
 libva-intel-driver
 linux
 linux-firmware
+linux-headers
 linux-lts
 linux-zen
 llvm
@@ -77,6 +78,7 @@ nwg-look
 obsidian
 orchis-dracula-theme-git
 pamixer
+papirus-folders
 papirus-icon-theme
 pavucontrol
 pipewire
@@ -94,6 +96,7 @@ qt6-wayland
 rclone
 ristretto
 rofi
+rofi-pass-wayland-git
 sddm
 seahorse
 slurp
@@ -118,6 +121,10 @@ udiskie
 udisks2
 uwsm
 vim
+virtualbox
+virtualbox-ext-vnc
+virtualbox-guest-iso
+virtualbox-host-dkms
 visual-studio-code-bin
 vlc
 vscodium-bin
