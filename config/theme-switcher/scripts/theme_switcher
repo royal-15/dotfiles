@@ -38,6 +38,8 @@ die() {
 
 ok() {
     echo "[OK] $*"
+
+    notify-send "Theme Switcher" "$*"
 }
 
 warn() {
@@ -159,14 +161,12 @@ switch_theme() {
         "$CURRENT_WALLPAPER_LINK"
 
     load_state
-
     ACTIVE_THEME="$theme"
     ACTIVE_WALLPAPER="$(basename "$default_wallpaper")"
-
     save_state
 
-    ok "Theme switched to '$theme'"
-    ok "Wallpaper switched to '$ACTIVE_WALLPAPER'"
+    ok "Theme switched to '$theme'" 
+    # ok "Wallpaper switched to '$ACTIVE_WALLPAPER'"
 }
 
 ###############################################################################
@@ -201,13 +201,13 @@ switch_wallpaper() {
 
     local msg="Wallpaper switched to '$wallpaper'"
     ok "$msg"
-    notify-send "Theme switcher" "$msg"
 }
 
 blur_wallpaper(){
     local image_to_blur="$ROOT_DIR/state/current_wallpaper"
     local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
 
+    # pkill -f ~/.local/bin/blur_image.sh
     ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image"
 }
 
@@ -343,7 +343,6 @@ main() {
                 waybar_layout)
                     switch_waybar_layout "$3"
                     "$SCRIPT_DIR"/reload waybar
-                    # notify-send "Theme Switcher" "Successfuly switched waybar to $3"
                     ;;
                 *)
                     die "Unknown aspect: $2"

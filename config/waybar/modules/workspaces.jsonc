@@ -6,8 +6,8 @@
         "persistent-only": true,
         "all-outputs": true,
         "format-icons": {
-            "active": "●",
-            "default": "•"
+            // "active": "●",
+            // "default": "•"
         },
         "persistent-workspaces": {
             "eDP-1": [

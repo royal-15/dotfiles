@@ -1,0 +1,441 @@
+@import "colors.css";
+
+* {
+    all: unset;
+    color: @txt;
+    font-family: "CaskaydiaCove Nerd Font Propo", "JetBrainsMono Nerd Font", "Symbols Nerd Font";
+    font-size: 12px;
+    font-weight: 700;
+    transition: 160ms ease;
+}
+
+.blank-window,
+notificationwindow,
+blankwindow {
+    background: @clear;
+}
+
+.control-center {
+    background: @bg-panel;
+    border: 1px solid alpha(@fg, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 14px 34px @shadow;
+    margin: 8px;
+    padding: 8px;
+}
+
+.control-center .control-center-list,
+.widget-notifications {
+    background: @clear;
+    margin: 0;
+}
+
+.control-center .control-center-list-placeholder {
+    color: @txt-faint;
+    padding: 10px;
+}
+
+.control-center scrollbar,
+.control-center scrollbar slider {
+    background: @clear;
+    min-height: 0;
+    min-width: 0;
+    opacity: 0;
+}
+
+.widget {
+    background: @clear;
+    color: @txt;
+    margin: 4px 0;
+    padding: 0;
+}
+
+.widget-mpris {
+    background: @clear;
+    border-radius: 18px;
+    padding: 0;
+}
+
+.widget-mpris .widget-mpris-player {
+    background: @bg-solid;
+    border: 1px solid alpha(@fg, 0.07);
+    border-radius: 18px;
+    box-shadow: 0 10px 24px alpha(@shadow, 0.72);
+    margin: 0;
+    min-height: 112px;
+    overflow: hidden;
+}
+
+.widget-mpris .mpris-background {
+    border-radius: 18px;
+    filter: blur(24px) saturate(1.08);
+}
+
+.widget-mpris .mpris-overlay {
+    background: linear-gradient(to bottom right, alpha(@bg, 0.46), alpha(@bg, 0.72));
+    border-radius: 18px;
+    min-height: 112px;
+    padding: 12px;
+}
+
+.widget-mpris-album-art {
+    background: alpha(@fg, 0.05);
+    border-radius: 14px;
+    box-shadow: 0 12px 24px alpha(@shadow, 0.86);
+    margin: 0 8px 0 0;
+    min-height: 74px;
+    min-width: 74px;
+    -gtk-icon-size: 74px;
+}
+
+.widget-mpris-title {
+    color: @txt;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.widget-mpris-subtitle {
+    color: @txt-faint;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.widget-mpris-player button,
+.widget-mpris>box>button {
+    background: alpha(@fg, 0.05);
+    border-radius: 999px;
+    color: @txt-faint;
+    margin: 0 2px;
+    min-height: 30px;
+    min-width: 30px;
+    padding: 0;
+}
+
+.widget-mpris-player button:hover,
+.widget-mpris>box>button:hover {
+    background: @bg-hover;
+    color: @txt;
+}
+
+.widget-mpris-player button:active,
+.widget-mpris>box>button:active {
+    background: @accent-soft;
+    color: @accent;
+}
+
+.widget-dnd,
+.widget-volume,
+.widget-backlight,
+.widget-buttons-grid {
+    background: @bg-soft;
+    border: 1px solid alpha(@fg, 0.06);
+    border-radius: 18px;
+    box-shadow: 0 8px 20px alpha(@shadow, 0.58);
+}
+
+.widget-dnd {
+    padding: 10px 12px;
+}
+
+.widget-dnd>label {
+    color: @txt;
+    font-size: 12px;
+}
+
+.widget-dnd switch {
+    background: alpha(@fg, 0.14);
+    border-radius: 999px;
+    padding: 2px;
+}
+
+.widget-dnd switch slider {
+    background: @txt;
+    border-radius: 999px;
+    min-height: 16px;
+    min-width: 16px;
+}
+
+.widget-dnd switch:hover {
+    background: @bg-hover;
+}
+
+.widget-dnd switch:checked {
+    background: @accent;
+}
+
+.widget-dnd switch:checked slider {
+    background: @txt-accent;
+}
+
+.widget-volume,
+.widget-backlight {
+    padding: 8px 10px;
+}
+
+.widget-volume>box,
+.widget-backlight>box {
+    border-spacing: 8px;
+}
+
+.widget-volume label,
+.widget-backlight label {
+    color: @txt;
+    font-size: 12px;
+}
+
+.widget-volume scale trough,
+.widget-backlight scale trough {
+    background: alpha(@fg, 0.14);
+    border-radius: 999px;
+    min-height: 6px;
+}
+
+.widget-volume scale highlight,
+.widget-backlight scale highlight {
+    background: @accent;
+    border-radius: 999px;
+}
+
+.widget-volume scale slider,
+.widget-backlight scale slider {
+    background: @bg-solid;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 2px @accent;
+    margin: -4px 0;
+    min-height: 14px;
+    min-width: 14px;
+}
+
+.widget-volume row {
+    background: alpha(@fg, 0.04);
+    border-radius: 12px;
+    margin-top: 6px;
+    padding: 4px 6px;
+}
+
+.widget-volume>box>button {
+    background: alpha(@fg, 0.05);
+    border-radius: 999px;
+    color: @txt-faint;
+    min-height: 24px;
+    min-width: 24px;
+    padding: 0;
+}
+
+.widget-volume>box>button:hover {
+    background: @bg-hover;
+    color: @txt;
+}
+
+.widget-buttons-grid {
+    padding: 6px;
+}
+
+.widget-buttons-grid flowbox {
+    margin: 0;
+}
+
+.widget-buttons-grid flowboxchild {
+    padding: 0;
+}
+
+.widget-buttons-grid flowboxchild>button {
+    background: alpha(@fg, 0.05);
+    border-radius: 14px;
+    color: @txt-faint;
+    font-size: 17px;
+    margin: 3px;
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0;
+}
+
+.widget-buttons-grid flowboxchild>button:hover {
+    background: @bg-hover;
+    color: @txt;
+}
+
+.widget-buttons-grid flowboxchild>button:active {
+    background: @accent-soft;
+    color: @accent;
+}
+
+.widget-buttons-grid flowboxchild>button.toggle:checked,
+.widget-buttons-grid flowboxchild>button:checked {
+    background: @accent;
+    color: @txt-accent;
+}
+
+.floating-notifications.background .notification-background {
+    background: @clear;
+    border-radius: 18px;
+    margin: 8px;
+    padding: 0;
+}
+
+.notification-row,
+.notification-row:focus {
+    background: @clear;
+    outline: none;
+}
+
+.notification-row .notification-background {
+    background: @clear;
+    border-radius: 18px;
+    /* box-shadow: 0 100px 50px alpha(@shadow, 0.70); */
+    box-shadow: none;
+    padding: 0;
+}
+
+.floating-notifications .notification-row .notification-background .notification,
+.control-center .notification-row .notification-background .notification {
+    background: @bg-solid;
+    border: 1px solid alpha(@fg, 0.07);
+    border-radius: 18px;
+    box-shadow: none;
+    padding: 0;
+}
+
+.floating-notifications .notification-row .notification-background .notification.critical,
+.control-center .notification-row .notification-background .notification.critical {
+    border-color: alpha(@err, 0.55);
+    box-shadow: inset 0 0 0 1px alpha(@err, 0.18);
+}
+
+.notification-default-action {
+    background: @clear;
+    border-radius: 18px;
+    color: @txt;
+    padding: 0;
+}
+
+.notification-default-action:hover {
+    background: @bg-hover;
+}
+
+.notification-content {
+    color: @txt;
+    margin: 0;
+    padding: 11px;
+}
+
+.notification-content .image {
+    margin: 0 11px 0 0;
+    -gtk-icon-size: 44px;
+}
+
+.summary {
+    color: @txt;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.time {
+    color: @txt-faint;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.body {
+    color: @txt-muted;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.close-button {
+    background: alpha(@fg, 0.08);
+    border-radius: 999px;
+    color: @txt-faint;
+    margin-right: 10px;
+    margin-top: 10px;
+    min-height: 22px;
+    min-width: 22px;
+    padding: 0;
+}
+
+.close-button:hover {
+    background: @bg-hover;
+    color: @txt;
+}
+
+.control-center .notification-background .close-button,
+.notification-group-close-button {
+    opacity: 0;
+}
+
+.notification-alt-actions {
+    background: @clear;
+    padding: 0 10px 10px;
+}
+
+.notification-action {
+    background: @clear;
+    margin: 0;
+    padding: 0;
+}
+
+.notification-action>button,
+.inline-reply-button {
+    background: alpha(@fg, 0.05);
+    border-radius: 999px;
+    color: @txt;
+    min-height: 28px;
+    padding: 0 12px;
+}
+
+.notification-action>button:hover,
+.inline-reply-button:hover {
+    background: @bg-hover;
+}
+
+.inline-reply-entry {
+    background: alpha(@fg, 0.05);
+    border-radius: 14px;
+    color: @txt;
+    caret-color: @txt;
+    padding: 8px 10px;
+}
+
+.notification-group {
+    background: @clear;
+    margin: 6px 0;
+}
+
+.notification-group:not(.collapsed) {
+    margin: 8px 0;
+}
+
+.notification-group-headers,
+.notification-group-buttons {
+    background: alpha(@fg, 0.06);
+    border-radius: 14px;
+    color: @txt;
+    margin: 0 4px 6px;
+    padding: 5px 8px;
+}
+
+.notification-group-icon {
+    color: @accent;
+}
+
+.notification-group-buttons .image-button {
+    background: @clear;
+    border-radius: 999px;
+    color: @txt-faint;
+    padding: 4px;
+}
+
+.notification-group-buttons .image-button:hover {
+    background: @bg-hover;
+    color: @txt;
+}
+
+progressbar,
+progress,
+trough {
+    border-radius: 999px;
+}
+
+.notification progress {
+    background-color: @accent;
+}

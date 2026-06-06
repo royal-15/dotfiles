@@ -4,6 +4,6 @@
         "return-type": "json",
         "interval": 10,
         "signal": 8,
-        "on-click": "/home/rajat/.config/waybar/scripts/power-mode-menu.sh && pkill -RTMIN+8 waybar"
+        "on-click": "/home/rajat/.local/bin/power-mode-menu.sh && pkill -RTMIN+8 waybar"
     }
 }

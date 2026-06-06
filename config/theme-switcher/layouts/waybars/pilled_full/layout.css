@@ -47,7 +47,7 @@ tooltip label {
 
 #clock {
     background: @bg-solid;
-    font-size: 11px;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     min-width: 88px;
@@ -56,6 +56,7 @@ tooltip label {
 
 #workspaces {
     padding: 0 4px;
+    font-size: 0.6rem;
 }
 
 #workspaces button {
@@ -66,7 +67,7 @@ tooltip label {
     margin: 2px 1px;
     min-width: 15px;
     padding: 0 4px;
-    transition: background-color 140ms ease, color 140ms ease;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
 #workspaces button:hover {

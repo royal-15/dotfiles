@@ -34,9 +34,11 @@ selection="$(
 for i in "${!icons[@]}"; do
     if [[ "${icons[$i]}" == "$selection" ]]; then
         powerprofilesctl set "${modes[$i]}"
+        notify-send "Battery" "Power mode switched to ${modes[$i]}"
         break
     fi
 done
 
 # refresh waybar
 pkill -RTMIN+8 waybar
+

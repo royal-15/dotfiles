@@ -1,69 +1,52 @@
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
-
 -- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 -- and https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
-
 -- Normal
 hl.window_rule({
-    match = {
-        class = "google-chrome",
-        title = "New Tab.*"
-    },
+    match = {class = "google-chrome", title = "New Tab.*"},
     workspace = "3"
 })
+hl.window_rule({match = {class = "firefox"}, workspace = "3"})
 hl.window_rule({
-    match = {
-        class = "jetbrains-studio",
-        title = "Agent.*"
-    },
+    match = {class = "jetbrains-studio", title = "Agent.*"},
     workspace = "4"
 })
 hl.window_rule({
-    match = {
-        class = "jetbrains-studio",
-        title = "Logcat.*"
-    },
+    match = {class = "jetbrains-studio", title = "Logcat.*"},
     workspace = "5"
 })
 
 -- Special
 hl.window_rule({
-    match = { class = "obsidian" },
+    match = {class = "obsidian"},
     -- opacity = "0.8 override 0.8 override",
-    workspace = "special:s1",
+    workspace = "special:s1"
 })
-hl.window_rule({
-    match = { class = "firefox" },
-    workspace = "special:s2"
-})
-hl.window_rule({
-    match = { class = "Spotify" },
-    workspace = "special:s2"
-})
+hl.window_rule({match = {class = "Spotify"}, workspace = "special:s2"})
 
 -- Ignore maximize requests from all apps. You'll probably like this.
 hl.window_rule({
-    name           = "suppress-maximize-events",
-    match          = { class = ".*" },
+    name = "suppress-maximize-events",
+    match = {class = ".*"},
 
-    suppress_event = "maximize",
+    suppress_event = "maximize"
 })
 
 -- Fix some dragging issues with XWayland
 hl.window_rule({
-    name     = "fix-xwayland-drags",
-    match    = {
-        class      = "^$",
-        title      = "^$",
-        xwayland   = true,
-        float      = true,
+    name = "fix-xwayland-drags",
+    match = {
+        class = "^$",
+        title = "^$",
+        xwayland = true,
+        float = true,
         fullscreen = false,
-        pin        = false,
+        pin = false
     },
 
-    no_focus = true,
+    no_focus = true
 })
 
 -- Layer rules also return a handle.
@@ -76,11 +59,11 @@ hl.window_rule({
 
 -- Hyprland-run windowrule
 hl.window_rule({
-    name  = "move-hyprland-run",
-    match = { class = "hyprland-run" },
+    name = "move-hyprland-run",
+    match = {class = "hyprland-run"},
 
-    move  = "20 monitor_h-120",
-    float = true,
+    move = "20 monitor_h-120",
+    float = true
 })
 
 -- Ref https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/

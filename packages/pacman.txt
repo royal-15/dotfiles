@@ -41,6 +41,7 @@ hypridle
 hyprland
 hyprlock
 hyprpaper
+hyprpicker
 hyprshot
 imagemagick
 imv
@@ -63,6 +64,7 @@ linux-zen
 llvm
 lsp-plugins
 lua-filesystem
+lutris
 ly
 man-db
 mda.lv2
@@ -131,14 +133,16 @@ vscodium-bin
 vscodium-bin-marketplace
 vulkan-intel
 vulkan-radeon
-waybar
+waybar-cava-git
 waydroid
 waydroid-image
 wget
+wine
 wireless_tools
 wireplumber
 wl-clipboard
 wlogout
+wlsunset
 wob
 wofi
 wpa_supplicant

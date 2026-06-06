@@ -14,26 +14,16 @@
             "modules/clock.jsonc",
             "modules/audio.jsonc",
             "modules/battery.jsonc",
-            "modules/cpu_temp.jsonc",
-            "modules/tray.jsonc",
-            "modules/notification.jsonc",
-            "modules/network.jsonc",
-            "modules/media.jsonc"
+            "modules/tray.jsonc"
         ],
-        "modules-left": [
-            "hyprland/workspaces"
-        ],
+        "modules-left": [],
         "modules-center": [
-            "custom/media",
-            "clock"
-        ],
-        "modules-right": [
-            "custom/cpu_temp",
+            "clock",
+            "hyprland/workspaces",
+            "tray",
             "pulseaudio",
-            "network",
-            "custom/power-battery",
-            "custom/notification",
-            "tray"
-        ]
+            "custom/power-battery"
+        ],
+        "modules-right": []
     }
 ]

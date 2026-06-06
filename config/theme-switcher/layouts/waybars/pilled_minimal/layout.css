@@ -1,0 +1,108 @@
+* {
+    all: unset;
+    font-family: "CaskaydiaCove Nerd Font", "JetBrainsMono Nerd Font", "Symbols Nerd Font";
+}
+
+window#waybar {
+    font-size: 11px;
+}
+
+tooltip {
+    background: @bg-solid;
+    border: 1px solid @shadow-tip;
+    border-radius: 10px;
+    color: @txt;
+    padding: 8px 10px;
+}
+
+tooltip label {
+    color: @txt;
+}
+
+.modules-center {
+    background: @bg-solid;
+    padding: 3px 16px;
+    border-radius: 99px;
+}
+
+#workspaces {
+    /* background: @bg-solid; */
+    background: @clear;
+    font-size: 0.6rem;
+    padding: 0px 4px;
+    margin: 0px 2px;
+    min-height: 0;
+    min-width: 0;
+}
+
+#workspaces button {
+    background: @clear;
+    color: @txt-muted;
+    border-radius: 9px;
+    margin: 0px 2px;
+    min-height: 8px;
+    padding: 0px 13px;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+#workspaces button.active {
+    background: @accent;
+    color: @bg;
+    min-height: 8px;
+    padding: 0px 13px;
+}
+
+#workspaces button:hover {
+    background: alpha(@accent, 0.10);
+    color: @txt;
+}
+
+#workspaces button.visible {
+    background: @accent;
+    color: @bg;
+}
+
+#workspaces button.urgent {
+    background: @err;
+    color: @txt-accent;
+}
+
+#clock {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin: 0px 6px;
+}
+
+#tray,
+#pulseaudio,
+#custom-power-battery {
+    margin: 0px 4px;
+}
+
+#tray,
+#pulseaudio.muted,
+#custom-power-battery.unknown {
+    color: @txt-muted;
+}
+
+#pulseaudio.warning,
+#custom-power-battery.warning {
+    color: @warn;
+}
+
+#pulseaudio.critical,
+#custom-power-battery.critical {
+    color: @err;
+}
+
+#custom-power-battery.power-saver {
+    color: @ok;
+}
+
+#custom-power-battery.performance {
+    color: @accent;
+}
+
+#custom-power-battery.charging {
+    color: @color10
+}
