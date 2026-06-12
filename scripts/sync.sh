@@ -37,6 +37,10 @@ sync .config/kitty config/kitty
 sync .config/rofi config/rofi
 sync .config/swaync config/swaync
 sync .config/waybar config/waybar
+sync .config/wlogout config/wlogout
+sync .config/cava config/cava
+sync .config/Kvantum config/Kvantum
+sync .config/Thunar config/Thunar
 sync .config/theme-switcher config/theme-switcher
 
 # local
@@ -57,7 +61,7 @@ echo "[*] Syncing packages..."
 PACKAGES_DIR="$DOTFILES_DIR/packages"
 mkdir -p "$PACKAGES_DIR"
 
-pacman -Qqe > "$PACKAGES_DIR/pacman.txt"
+pacman -Qqen > "$PACKAGES_DIR/pacman.txt"
 pacman -Qqem > "$PACKAGES_DIR/aur.txt"
 
 echo "[*] Sync complete."

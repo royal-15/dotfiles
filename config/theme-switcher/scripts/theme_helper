@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+THEME_ENV="${1:-}"
+
+if [[ -z "$THEME_ENV" ]]; then
+    echo "Usage: $0 <theme.env>"
+    exit 1
+fi
+
+if [[ ! -f "$THEME_ENV" ]]; then
+    echo "Theme file not found: $THEME_ENV"
+    exit 1
+fi
+
+# shellcheck source=/dev/null
+source "$THEME_ENV"
+
+log() {
+    printf '[theme_helper] %s\n' "$*"
+}
+
+warn() {
+    printf '[theme_helper] Warning: %s\n' "$*" >&2
+}
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+apply_gtk_theme() {
+    [[ -n "${GTK_THEME:-}" ]] || return 0
+
+    if command_exists gsettings; then
+        log "Applying GTK theme: $GTK_THEME"
+
+        gsettings set org.gnome.desktop.interface gtk-theme \
+            "$GTK_THEME"
+    else
+        warn "gsettings not found. Skipping GTK theme."
+    fi
+}
+
+apply_gtk_icons() {
+    [[ -n "${GTK_ICON_THEME:-}" ]] || return 0
+
+    if command_exists gsettings; then
+        log "Applying icon theme: $GTK_ICON_THEME"
+
+        gsettings set org.gnome.desktop.interface icon-theme \
+            "$GTK_ICON_THEME"
+    else
+        warn "gsettings not found. Skipping icon theme."
+    fi
+}
+
+apply_gtk_cursor() {
+    [[ -n "${GTK_CURSOR_THEME:-}" ]] || return 0
+
+    if command_exists gsettings; then
+        log "Applying cursor theme: $GTK_CURSOR_THEME"
+
+        gsettings set org.gnome.desktop.interface cursor-theme \
+            "$GTK_CURSOR_THEME"
+    else
+        warn "gsettings not found. Skipping cursor theme."
+    fi
+}
+
+apply_gtk_font() {
+    [[ -n "${GTK_FONT:-}" ]] || return 0
+
+    if command_exists gsettings; then
+        log "Applying font: $GTK_FONT"
+
+        gsettings set org.gnome.desktop.interface font-name \
+            "$GTK_FONT"
+    else
+        warn "gsettings not found. Skipping font."
+    fi
+}
+
+apply_kvantum() {
+    [[ "${QT_STYLE:-}" == "kvantum-dark" ]] || return 0
+    [[ -n "${KVANTUM_THEME:-}" ]] || return 0
+
+    if command_exists kvantummanager; then
+        log "Applying Kvantum theme: $KVANTUM_THEME"
+
+        kvantummanager --set "$KVANTUM_THEME"
+    else
+        warn "kvantummanager not found. Skipping Kvantum theme."
+    fi
+}
+
+reload_gtk_apps() {
+    if command_exists hyprctl; then
+        log "Refreshing GTK settings"
+
+        hyprctl reload >/dev/null 2>&1 || true
+    fi
+}
+
+main() {
+    log "Loading theme: $THEME_ENV"
+
+    apply_gtk_theme
+    apply_gtk_icons
+    apply_gtk_cursor
+    apply_gtk_font
+
+    apply_kvantum
+
+    reload_gtk_apps
+
+    log "Theme applied successfully"
+}
+
+main "$@"
+
+# EXAMPLE THEME FILE :-
+# GTK_THEME="Catppuccin-Mocha-Standard-Blue-Dark"
+# GTK_ICON_THEME="Papirus-Dark"
+# GTK_CURSOR_THEME="Bibata-Modern-Ice"
+# GTK_FONT="Inter 10"
+
+# QT_STYLE="kvantum"
+# KVANTUM_THEME="Catppuccin-Mocha-Blue"

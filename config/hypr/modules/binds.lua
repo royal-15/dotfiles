@@ -16,8 +16,7 @@ local mod = "SUPER"
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + L",
-        hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock/hyprlock.conf"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({action = "toggle"}))
 hl.bind(mainMod .. " + D",
@@ -30,7 +29,8 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/launch.sh")
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("google-chrome-stable"))
 hl.bind(mainMod .. " + M",
         hl.dsp.exec_cmd("$HOME/.local/bin/power-mode-menu.sh || pkill rofi"))
-hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("wlogout"))
+hl.bind(mainMod .. " + SHIFT + M",
+        hl.dsp.exec_cmd("wlogout --protocol layer-shell"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("blueman-manager"))
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("kitty -e htop"))
@@ -39,6 +39,11 @@ hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("~/.local/bin/night-mode.sh")
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(
             "$HOME/.config/theme-switcher/scripts/theme_switcher_menu.sh || pkill rofi"))
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("hyprctl kill"))
+
+-- # Emoji picker
+hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd(
+            "pkill rofi || rofimoji --selector-args=\"-theme ~/.config/rofi/themes/applets/clipboard-compact.rasi\""))
+hl.bind(mainMod .. " + SHIFT + PERIOD", hl.dsp.exec_cmd("hypremoji"))
 
 -- # Clipboard
 hl.bind(mod .. " + V",

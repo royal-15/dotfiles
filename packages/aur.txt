@@ -3,6 +3,8 @@ apple_cursor
 cursor-bin
 github-desktop-bin
 google-chrome
+graphite-gtk-theme
+hypremoji
 orchis-dracula-theme-git
 papirus-folders
 rofi-pass-wayland-git

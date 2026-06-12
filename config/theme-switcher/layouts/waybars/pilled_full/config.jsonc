@@ -18,7 +18,8 @@
             "modules/tray.jsonc",
             "modules/notification.jsonc",
             // "modules/network.jsonc",
-            "modules/media.jsonc"
+            "modules/media.jsonc",
+            "modules/bt_battery.jsonc"
         ],
         "modules-left": [
             "hyprland/workspaces",
@@ -30,6 +31,7 @@
         ],
         "modules-right": [
             "tray",
+            "custom/bt-battery",
             "pulseaudio",
             // "network",
             "custom/power-battery",

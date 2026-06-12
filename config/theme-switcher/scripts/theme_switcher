@@ -10,6 +10,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(realpath "$SCRIPT_DIR/..")"
 
 STATE_FILE="$ROOT_DIR/state/active_theme.env"
+
+source "$SCRIPT_DIR/state_utils.sh"
+
 CURRENT_WALLPAPER_LINK="$ROOT_DIR/state/current_wallpaper"
 
 THEMES_DIR="$ROOT_DIR/themes"
@@ -19,10 +22,13 @@ WAYBAR_LAYOUTS_DIR="$ROOT_DIR/layouts/waybars"
 # Config Targets
 ###############################################################################
 
+HYPR_DECORATIONS_TARGET="$HOME/.config/hypr/modules/decorations.lua"
+
 KITTY_TARGET="$HOME/.config/kitty/colors.conf"
 ROFI_TARGET="$HOME/.config/rofi/colors.rasi"
 SWAYNC_TARGET="$HOME/.config/swaync/colors.css"
 WAYBAR_COLORS_TARGET="$HOME/.config/waybar/colors.css"
+WLOGOUT_COLORS_TARGET="$HOME/.config/wlogout/colors.css"
 
 WAYBAR_CONFIG_TARGET="$HOME/.config/waybar/config.jsonc"
 WAYBAR_LAYOUT_TARGET="$HOME/.config/waybar/layout.css"
@@ -44,31 +50,6 @@ ok() {
 
 warn() {
     echo "[WARN] $*"
-}
-
-ensure_state_file() {
-    mkdir -p "$(dirname "$STATE_FILE")"
-
-    if [[ ! -f "$STATE_FILE" ]]; then
-        cat > "$STATE_FILE" <<EOF
-ACTIVE_THEME=
-ACTIVE_WALLPAPER=
-ACTIVE_WAYBAR_LAYOUT=
-EOF
-    fi
-}
-
-load_state() {
-    ensure_state_file
-    source "$STATE_FILE"
-}
-
-save_state() {
-    cat > "$STATE_FILE" <<EOF
-ACTIVE_THEME=${ACTIVE_THEME:-}
-ACTIVE_WALLPAPER=${ACTIVE_WALLPAPER:-}
-ACTIVE_WAYBAR_LAYOUT=${ACTIVE_WAYBAR_LAYOUT:-}
-EOF
 }
 
 create_symlink() {
@@ -123,8 +104,13 @@ switch_theme() {
     local theme="$1"
 
     local colors_dir="$THEMES_DIR/$theme/colors"
+    local hypr_dir="$THEMES_DIR/$theme/hypr"
 
     [[ -d "$colors_dir" ]] || die "Theme not found: $theme"
+
+    create_symlink \
+        "$hypr_dir/decorations.lua" \
+        "$HYPR_DECORATIONS_TARGET"
 
     create_symlink \
         "$colors_dir/kitty_colors.conf" \
@@ -142,9 +128,14 @@ switch_theme() {
         "$colors_dir/waybar_colors.css" \
         "$WAYBAR_COLORS_TARGET"
 
-    #
+    create_symlink \
+        "$colors_dir/wlogout_colors.css" \
+        "$WLOGOUT_COLORS_TARGET"
+
+    local theme_file="$THEMES_DIR/$theme/theme.env"
+    "$SCRIPT_DIR"/theme_helper "$theme_file"
+
     # Theme default wallpaper
-    #
     local default_wallpaper
 
     default_wallpaper="$(find "$THEMES_DIR/$theme/wallpapers" \
@@ -175,10 +166,10 @@ switch_theme() {
 
 find_wallpaper() {
     local wallpaper="$1"
+    local theme="$2"
 
-    find "$THEMES_DIR" \
+    find "$THEMES_DIR/$theme/wallpapers/" \
         -type f \
-        -path "*/wallpapers/*" \
         -name "$wallpaper" \
         | head -n1
 }
@@ -186,8 +177,11 @@ find_wallpaper() {
 switch_wallpaper() {
     local wallpaper="$1"
 
+    load_state
+    theme="$ACTIVE_THEME"
+
     local wallpaper_path
-    wallpaper_path="$(find_wallpaper "$wallpaper")"
+    wallpaper_path="$(find_wallpaper "$wallpaper" "$theme")"
 
     [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper"
 
@@ -262,6 +256,11 @@ verify_theme() {
     verify_link \
         "$theme_dir/waybar_colors.css" \
         "$WAYBAR_COLORS_TARGET" \
+        "waybar colors"
+
+    verify_link \
+        "$theme_dir/wlogout_colors.css" \
+        "$WLOGOUT_COLORS_TARGET" \
         "waybar colors"
 }
 

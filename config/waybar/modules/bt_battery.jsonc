@@ -1,0 +1,10 @@
+{
+    "custom/bt-battery": {
+        "exec": "$HOME/.local/bin/bt_battery.sh",
+        "hide-empty-text": true,
+        "interval": 2,
+        "return-type": "json",
+        "format": "{text}",
+        "tooltip-format": "{tooltip}"
+    }
+}

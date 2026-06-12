@@ -3,26 +3,24 @@
 set -euo pipefail
 
 # =========================================================
-# Config
+# Paths
 # =========================================================
 
-scripts_dir=$(dirname "${BASH_SOURCE[0]}")
-state_manager="$scripts_dir/state_manager"
-theme_switcher="$scripts_dir/theme_switcher"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-current_theme="$($state_manager get theme)"
-current_wallpaper="$($state_manager get wallpaper)"
-current_waybar="$($state_manager get waybar)"
+THEME_SWITCHER="$SCRIPT_DIR/theme_switcher"
 
-echo "current theme: $current_theme"
-echo "current wallpaper: $current_wallpaper"
-echo "current waybar: $current_waybar"
+STATE_FILE="$ROOT_DIR/state/active_theme.env"
 
-THEMES_DIR="$HOME/.config/theme-switcher/themes"
+# shellcheck source=state_utils.sh
+source "$SCRIPT_DIR/state_utils.sh"
 
-WALLPAPERS_DIR="$HOME/.config/theme-switcher/themes/$current_theme/wallpapers"
+load_state
 
-WAYBAR_DIR="$HOME/.config/theme-switcher/layouts/waybars"
+THEMES_DIR="$ROOT_DIR/themes"
+WAYBAR_DIR="$ROOT_DIR/layouts/waybars"
+WALLPAPERS_DIR="$THEMES_DIR/$ACTIVE_THEME/wallpapers"
 
 # =========================================================
 # Helpers
@@ -35,8 +33,8 @@ list_subfolders() {
         -mindepth 1 \
         -maxdepth 1 \
         -type d \
-        -printf "%f\n" \
-        | sort
+        -printf '%f\n' |
+        sort
 }
 
 list_files_of_type() {
@@ -70,65 +68,70 @@ list_files_of_type() {
 }
 
 show_menu() {
-    rofi -dmenu -i -p "$1" -theme "$HOME/.config/rofi/themes/applets/selector-medium.rasi"
+    rofi \
+        -dmenu \
+        -i \
+        -p "$1" \
+        -theme "$HOME/.config/rofi/themes/applets/selector-medium.rasi"
 }
 
 show_image_menu() {
-    rofi -dmenu -i -p "$1" -show-icons -theme "$HOME/.config/rofi/themes/applets/image-selector.rasi"
+    rofi \
+        -dmenu \
+        -i \
+        -show-icons \
+        -p "$1" \
+        -theme "$HOME/.config/rofi/themes/applets/image-selector.rasi"
 }
 
 # =========================================================
-# Main Menu
+# Aspect Selection
 # =========================================================
 
-theme_aspects=(
-    "theme"
-    "wallpaper"
-    "waybar_layout"
+SELECTED_ASPECT=$(
+    printf '%s\n' \
+        theme \
+        wallpaper \
+        waybar_layout |
+        show_menu "Select Aspect"
 )
 
-selected_aspect=$(
-    printf "%s\n" "${theme_aspects[@]}" \
-    | show_menu "Select Aspect"
-)
-
-[ -z "${selected_aspect:-}" ] && exit 0
+[[ -n "${SELECTED_ASPECT:-}" ]] || exit 0
 
 # =========================================================
-# Selection Logic
+# Value Selection
 # =========================================================
 
-final_selection=""
-
-case "$selected_aspect" in
-    "theme")
-        final_selection=$(
-            list_subfolders "$THEMES_DIR" \
-            | show_menu "Select Theme"
+case "$SELECTED_ASPECT" in
+    theme)
+        FINAL_SELECTION=$(
+            list_subfolders "$THEMES_DIR" |
+                show_menu "Select Theme"
         )
         ;;
-    
-    "wallpaper")
-        final_selection=$(
-            list_files_of_type "$WALLPAPERS_DIR" jpg jpeg png webp | show_image_menu "Select Wallpaper"
+    wallpaper)
+        FINAL_SELECTION=$(
+            list_files_of_type \
+                "$WALLPAPERS_DIR" \
+                jpg jpeg png webp |
+                show_image_menu "Select Wallpaper"
         )
         ;;
-    
-    "waybar_layout")
-        final_selection=$(
-            list_subfolders "$WAYBAR_DIR" \
-            | show_menu "Select Waybar"
+    waybar_layout)
+        FINAL_SELECTION=$(
+            list_subfolders "$WAYBAR_DIR" |
+                show_menu "Select Waybar Layout"
         )
+        ;;
+    *)
+        exit 1
         ;;
 esac
 
-[ -z "${final_selection:-}" ] && exit 0
+[[ -n "${FINAL_SELECTION:-}" ]] || exit 0
 
 # =========================================================
-# Result
+# Apply Selection
 # =========================================================
 
-echo "Selected Aspect: $selected_aspect"
-echo "Final Selection: $final_selection"
-
-$theme_switcher switch "$selected_aspect" "$final_selection"
+"$THEME_SWITCHER" switch "$SELECTED_ASPECT" "$FINAL_SELECTION"

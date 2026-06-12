@@ -1,3 +1,5 @@
+// @theme "themes/applets/clipboard-compact.rasi"
+
 configuration {
 	/*---------- General setting ----------*/
 	modi: "drun,run,filebrowser,window";

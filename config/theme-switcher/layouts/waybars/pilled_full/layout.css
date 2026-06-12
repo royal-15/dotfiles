@@ -2,7 +2,8 @@
     all: unset;
     border: none;
     border-radius: 0;
-    font-family: "CaskaydiaCove Nerd Font", "JetBrainsMono Nerd Font", "Symbols Nerd Font";
+    font-family: "CaskaydiaCove Nerd Font", "JetBrainsMono Nerd Font", "Symbols Nerd Font", "Noto Sans CJK JP",
+        "Noto Sans CJK SC";
     font-size: 11px;
     font-weight: 600;
     margin: 0;
@@ -34,6 +35,7 @@ tooltip label {
 #custom-notification,
 #custom-media,
 #pulseaudio,
+#custom-bt-battery,
 #network,
 #custom-power-battery {
     background: @bg-solid;
@@ -94,7 +96,8 @@ tooltip label {
     color: @txt-muted;
 }
 
-#custom-cpu_temp {
+#custom-cpu_temp,
+#custom-bt-battery {
     color: @accent;
 }
 
@@ -104,6 +107,7 @@ tooltip label {
 
 #custom-cpu_temp.warm,
 #pulseaudio.warning,
+#custom-bt-battery.warn,
 #network.disconnected,
 #network.disabled,
 #custom-power-battery.warning {
@@ -111,6 +115,7 @@ tooltip label {
 }
 
 #custom-cpu_temp.hot,
+#custom-bt-battery.critical,
 #custom-cpu_temp.critical,
 #pulseaudio.critical,
 #custom-power-battery.critical {
