@@ -1,0 +1,52 @@
+/* Base */
+@define-color fg #bec8ca;
+@define-color bg #0f0f10;
+
+@define-color color0 #0f0f10;
+@define-color color1 #657479;
+@define-color color2 #73817e;
+@define-color color3 #697b84;
+@define-color color4 #778a91;
+@define-color color5 #7e97a1;
+@define-color color6 #84979a;
+@define-color color7 #bec8ca;
+
+@define-color color8 #858c8d;
+@define-color color9 #657479;
+@define-color color10 #73817e;
+@define-color color11 #697b84;
+@define-color color12 #778a91;
+@define-color color13 #7e97a1;
+@define-color color14 #84979a;
+@define-color color15 #bec8ca;
+
+/* Text */
+@define-color txt @fg;
+@define-color txt-muted #8d999c;
+@define-color txt-faint alpha(@txt-muted, 0.55);
+@define-color txt-accent #0f0f10;
+
+/* Surfaces */
+@define-color bg-panel rgba(15, 15, 16, 0.82);
+@define-color bg-solid rgba(22, 23, 25, 0.94);
+@define-color bg-soft rgba(15, 15, 16, 0.70);
+@define-color bg-tip rgba(10, 10, 11, 0.97);
+@define-color bg-hover rgba(126, 151, 161, 0.08);
+
+/* Accent */
+@define-color accent #7e97a1;
+@define-color accent-soft alpha(@accent, 0.18);
+
+@define-color accent-alt #84979a;
+@define-color accent-alt-soft alpha(@accent-alt, 0.16);
+
+/* Status */
+@define-color ok #88a39a;
+@define-color warn #b79c73;
+@define-color err #b67b82;
+
+/* Effects */
+@define-color shadow rgba(0, 0, 0, 0.30);
+@define-color shadow-tip rgba(0, 0, 0, 0.36);
+
+@define-color clear transparent;

@@ -94,6 +94,31 @@ apply_kvantum() {
     fi
 }
 
+apply_spotify_and_reload() {
+    [[ -n "$SPOTIFY_THEME" ]] || return 0
+
+    local changed=0
+
+    # Update theme
+    if [[ "$(spicetify config current_theme | awk '{print $2}')" != "$SPOTIFY_THEME" ]]; then
+        spicetify config current_theme "$SPOTIFY_THEME"
+        changed=1
+    fi
+
+    # Update color scheme
+    if [[ -n "$SPOTIFY_COLOR_SCHEME" ]]; then
+        if [[ "$(spicetify config color_scheme | awk '{print $2}')" != "$SPOTIFY_COLOR_SCHEME" ]]; then
+            spicetify config color_scheme "$SPOTIFY_COLOR_SCHEME"
+            changed=1
+        fi
+    fi
+
+    # (( changed )) && spicetify apply >/dev/null 2>&1 &
+    if (( changed )) && pgrep -x spotify >/dev/null; then
+        spicetify apply >/dev/null 2>&1 &
+    fi
+}
+
 reload_gtk_apps() {
     if command_exists hyprctl; then
         log "Refreshing GTK settings"
@@ -109,6 +134,7 @@ main() {
     apply_gtk_icons
     apply_gtk_cursor
     apply_gtk_font
+    # apply_spotify_and_reload
 
     apply_kvantum
 

@@ -19,6 +19,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({action = "toggle"}))
+hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + D",
         hl.dsp.exec_cmd("$HOME/.config/rofi/scripts/launcher.sh || pkill rofi"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo())
@@ -38,12 +39,13 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("~/.local/bin/night-mode.sh"))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(
             "$HOME/.config/theme-switcher/scripts/theme_switcher_menu.sh || pkill rofi"))
-hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("hyprctl kill"))
+hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("kitty --class \"kew-kitty\" -e kew"))
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("hyprctl kill"))
 
 -- # Emoji picker
 hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd(
             "pkill rofi || rofimoji --selector-args=\"-theme ~/.config/rofi/themes/applets/clipboard-compact.rasi\""))
-hl.bind(mainMod .. " + SHIFT + PERIOD", hl.dsp.exec_cmd("hypremoji"))
+-- hl.bind(mainMod .. " + SHIFT + PERIOD", hl.dsp.exec_cmd("hypremoji"))
 
 -- # Clipboard
 hl.bind(mod .. " + V",
@@ -76,7 +78,7 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({workspace = i}))
 end
 
--- Example special workspace (scratchpad)
+-- Special workspace (scratchpad)
 hl.bind(mainMod .. " + A", hl.dsp.workspace.toggle_special("s1"))
 hl.bind(mainMod .. " + SHIFT + A",
         hl.dsp.window.move({workspace = "special:s1"}))
@@ -126,10 +128,69 @@ hl.bind(mod .. " + SHIFT + down",
         hl.dsp.exec_cmd("brightnessctl -e4 -n25 set 5%-"))
 
 -- Requires playerctl
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), {locked = true})
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"),
-        {locked = true})
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"),
-        {locked = true})
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), {locked = true})
+function audioctl(key, command)
+    hl.bind(key, hl.dsp.exec_cmd("playerctl " .. command), {locked = true})
+end
 
+audioctl("XF86AudioNext", "next")
+audioctl("XF86AudioPause", "play-pause")
+audioctl("XF86AudioPlay", "play-pause")
+audioctl("XF86AudioPrev", "previous")
+
+-- hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), {locked = true})
+-- hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"),
+--         {locked = true})
+-- hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"),
+--         {locked = true})
+-- hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), {locked = true})
+
+-- LOGICAL BINDS
+hl.bind(mainMod .. " + G", function()
+    local game_mode = (hl.get_config("animations.enabled") == false)
+
+    if game_mode then
+        hl.exec_cmd("hyprctl reload")
+        hl.exec_cmd("notify-send \"Game Mode\" \"Disabled\"")
+        return
+    end
+
+    hl.config({
+        general = {gaps_in = 0, gaps_out = 0, border_size = 0},
+        animations = {enabled = false},
+        decoration = {
+            active_opacity = 1,
+            inactive_opacity = 1,
+            shadow = {enabled = false},
+            blur = {enabled = false},
+            rounding = 0
+        }
+    })
+
+    hl.exec_cmd("notify-send \"Game Mode\" \"Enabled\"")
+
+end)
+
+local previous_layout = {}
+
+hl.bind(mod .. " + S", function()
+    local workspace = hl.get_active_special_workspace() or
+                          hl.get_active_workspace()
+
+    if not workspace then return end
+
+    local ws_id = tostring(workspace.id)
+
+    if workspace.tiled_layout == "scrolling" then
+        -- Restore the layout we had before scrolling
+        local layout = previous_layout[ws_id] or "dwindle"
+
+        hl.workspace_rule({workspace = ws_id, layout = layout})
+
+        previous_layout[ws_id] = nil
+    else
+        -- Remember the current layout before switching
+        previous_layout[ws_id] = workspace.tiled_layout
+
+        hl.workspace_rule({workspace = ws_id, layout = "scrolling"})
+    end
+end)

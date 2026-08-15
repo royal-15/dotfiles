@@ -1,13 +1,16 @@
 ani-cli
 apple_cursor
+brave-nightly-bin
 cursor-bin
 github-desktop-bin
 google-chrome
 graphite-gtk-theme
-hypremoji
 orchis-dracula-theme-git
 papirus-folders
 rofi-pass-wayland-git
+spicetify-cli
+spicetify-themes-git
+spotify
 tlauncher-installer
 visual-studio-code-bin
 vscodium-bin
@@ -17,3 +20,4 @@ waydroid-image
 wlogout
 yay
 yay-debug
+zen-browser-bin

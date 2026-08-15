@@ -8,6 +8,7 @@ hl.window_rule({
     match = {class = "google-chrome", title = "New Tab.*"},
     workspace = "3"
 })
+hl.window_rule({match = {class = "zen", title = "Zen Browser"}, workspace = "3"})
 hl.window_rule({match = {class = "firefox"}, workspace = "3"})
 hl.window_rule({
     match = {class = "jetbrains-studio", title = "Agent.*"},
@@ -24,7 +25,12 @@ hl.window_rule({
     -- opacity = "0.8 override 0.8 override",
     workspace = "special:s1"
 })
-hl.window_rule({match = {class = "Spotify"}, workspace = "special:s2"})
+hl.window_rule({
+    match = {class = "Spotify"},
+    opacity = "0.8 override 0.8 override",
+    workspace = "special:s2"
+})
+hl.window_rule({match = {class = "kew-kitty"}, workspace = "special:s2"})
 
 -- Ignore maximize requests from all apps. You'll probably like this.
 hl.window_rule({

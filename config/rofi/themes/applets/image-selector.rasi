@@ -13,6 +13,8 @@ window {
     location: center;
     anchor: center;
 
+    // width: 760px;
+
     margin: 0px;
     padding: 0px;
 
@@ -21,34 +23,66 @@ window {
     border-color: @border;
 
     background-color: @bg-main;
-    
-    cursor: "default";
 }
 
 /*****----- Main Box -----*****/
 mainbox {
-    spacing: 0px;
+    spacing: 12px;
     margin: 0px;
     padding: 16px;
 
     background-color: transparent;
 
-    children: [ "listview" ];
+    children: [ "inputbar", "listview" ];
+}
+
+/*****----- Input -----*****/
+inputbar {
+    children: [ "prompt", "entry" ];
+
+    spacing: 10px;
+    padding: 10px 14px;
+
+    border: 0px;
+    border-radius: 10px;
+
+    background-color: @bg-surface;
+}
+
+prompt {
+    enabled: true;
+    text-color: @accent;
+    background-color: transparent;
+}
+
+textbox-prompt-colon {
+    enabled: false;
+}
+
+entry {
+    expand: true;
+
+    // placeholder: "search...";
+
+    background-color: transparent;
+    text-color: @fg-primary;
+
+    cursor: text;
 }
 
 /*****----- List View -----*****/
 listview {
-    columns: 5;
-    lines: 1;
+    columns: 4;
+    lines: 2;
 
     layout: vertical;
 
-    dynamic: true;
+    dynamic: false;
     fixed-height: false;
 
     cycle: true;
 
-    spacing: 12px;
+    // spacing: 8px;
 
     scrollbar: false;
 
@@ -60,9 +94,9 @@ element {
     orientation: vertical;
     children: [ "element-icon", "element-text" ];
 
-    spacing: 8px;
+    // spacing: 8px;
 
-    padding: 10px;
+    // padding: 6px 0px;
 
     border: 0px;
     border-radius: 10px;
@@ -75,9 +109,9 @@ element {
 
 /*****----- Thumbnail -----*****/
 element-icon {
-    size: 128px;
+    size: 132px;
 
-    expand: false;
+    expand: true;
 
     background-color: transparent;
 
@@ -94,7 +128,7 @@ element-text {
     text-color: inherit;
 
     horizontal-align: 0.5;
-    vertical-align: 0.5;
+    // vertical-align: 0.5;
 
     cursor: inherit;
 }

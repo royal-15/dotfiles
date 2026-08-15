@@ -1,0 +1,32 @@
+[
+    {
+        "name": "waybar-main",
+        "layer": "top",
+        "position": "top",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "width": 800,
+        "spacing": 9,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/tray.jsonc",
+            "modules/cava.jsonc"
+        ],
+        "modules-left": [
+            "pulseaudio",
+            "cava"
+        ],
+        "modules-center": [
+            "clock#left",
+            "hyprland/workspaces",
+            "clock#right"
+        ],
+        "modules-right": [
+            "tray",
+            "custom/power-battery"
+        ]
+    }
+]

@@ -201,15 +201,16 @@ blur_wallpaper(){
     local image_to_blur="$ROOT_DIR/state/current_wallpaper"
     local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
 
-    # pkill -f ~/.local/bin/blur_image.sh
-    ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image"
+    # pkill -f "blur_image.sh" 2>/dev/null
+
+    ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image" &
 }
 
 ###############################################################################
 # Waybar Layout
 ###############################################################################
 
-switch_waybar_layout() {
+switch_waybar() {
     local layout="$1"
 
     local layout_dir="$WAYBAR_LAYOUTS_DIR/$layout"
@@ -229,6 +230,41 @@ switch_waybar_layout() {
     save_state
 
     ok "Waybar layout switched to '$layout'"
+}
+
+###############################################################################
+# Waybar Layout
+###############################################################################
+
+switch_spotify()
+{
+    local arg="$1"
+
+    read -r spotify_theme spotify_color_scheme <<< "$arg"
+
+    local changed=0
+
+    # Update theme
+    if [[ "$(spicetify config current_theme | awk '{print $2}')" != "$spotify_theme" ]]; then
+        spicetify config current_theme "$spotify_theme"
+        changed=1
+    fi
+
+    # Update color scheme
+    if [[ -n "$spotify_color_scheme" ]]; then
+        if [[ "$(spicetify config color_scheme | awk '{print $2}')" != "$spotify_color_scheme" ]]; then
+            spicetify config color_scheme "$spotify_color_scheme"
+            changed=1
+        fi
+    fi
+
+    # (( changed )) && spicetify apply >/dev/null 2>&1 &
+    if (( changed )) && pgrep -x spotify >/dev/null; then
+        spicetify apply >/dev/null 2>&1 &
+    fi
+
+    local msg="Spotify theme switched to '$spotify_theme $spotify_color_scheme'"
+    ok "$msg"
 }
 
 ###############################################################################
@@ -339,9 +375,12 @@ main() {
                     "$SCRIPT_DIR"/reload wallpaper
                     blur_wallpaper
                     ;;
-                waybar_layout)
-                    switch_waybar_layout "$3"
+                waybar)
+                    switch_waybar "$3"
                     "$SCRIPT_DIR"/reload waybar
+                    ;;
+                spotify)
+                    switch_spotify "$3"
                     ;;
                 *)
                     die "Unknown aspect: $2"

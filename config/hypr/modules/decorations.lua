@@ -1,1 +1,1 @@
-/home/rajat/.config/theme-switcher/themes/soft-cyan/hypr/decorations.lua
+/home/rajat/.config/theme-switcher/themes/solstice/hypr/decorations.lua

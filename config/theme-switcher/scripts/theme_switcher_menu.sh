@@ -12,6 +12,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 THEME_SWITCHER="$SCRIPT_DIR/theme_switcher"
 
 STATE_FILE="$ROOT_DIR/state/active_theme.env"
+SPOTIFY_THEMES_FILE="$ROOT_DIR/scripts/spotify_themes.tsv"
 
 # shellcheck source=state_utils.sh
 source "$SCRIPT_DIR/state_utils.sh"
@@ -67,6 +68,13 @@ list_files_of_type() {
     done
 }
 
+list_spotify_themes(){
+    # while IFS=$'\t' read -r theme scheme; do
+    #     echo "$theme-$scheme"
+    # done < "$SPOTIFY_THEMES"
+    cat "$SPOTIFY_THEMES_FILE"
+}
+
 show_menu() {
     rofi \
         -dmenu \
@@ -92,8 +100,9 @@ SELECTED_ASPECT=$(
     printf '%s\n' \
         theme \
         wallpaper \
-        waybar_layout |
-        show_menu "Select Aspect"
+        waybar \
+        spotify |
+        show_menu "Aspect"
 )
 
 [[ -n "${SELECTED_ASPECT:-}" ]] || exit 0
@@ -106,7 +115,7 @@ case "$SELECTED_ASPECT" in
     theme)
         FINAL_SELECTION=$(
             list_subfolders "$THEMES_DIR" |
-                show_menu "Select Theme"
+                show_menu "Theme"
         )
         ;;
     wallpaper)
@@ -114,13 +123,19 @@ case "$SELECTED_ASPECT" in
             list_files_of_type \
                 "$WALLPAPERS_DIR" \
                 jpg jpeg png webp |
-                show_image_menu "Select Wallpaper"
+                show_image_menu "Wallpaper"
         )
         ;;
-    waybar_layout)
+    waybar)
         FINAL_SELECTION=$(
             list_subfolders "$WAYBAR_DIR" |
-                show_menu "Select Waybar Layout"
+                show_menu "Waybar"
+        )
+        ;;
+    spotify)
+        FINAL_SELECTION=$(
+            list_spotify_themes |
+                show_menu "Spotify"
         )
         ;;
     *)

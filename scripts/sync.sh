@@ -38,9 +38,20 @@ sync .config/rofi config/rofi
 sync .config/swaync config/swaync
 sync .config/waybar config/waybar
 sync .config/wlogout config/wlogout
-sync .config/cava config/cava
-sync .config/Kvantum config/Kvantum
 sync .config/Thunar config/Thunar
+
+sync .config/cava config/cava
+sync .config/kew config/kew
+sync .config/spicetify config/spicetify
+
+sync .config/Kvantum config/Kvantum
+sync .config/qt5ct config/qt5ct
+sync .config/qt6ct config/qt6ct
+
+sync .config/gtk-3.0 config/gtk-3.0
+sync .config/gtk-4.0 config/gtk-4.0
+sync .config/nwg-look config/nwg-look
+
 sync .config/theme-switcher config/theme-switcher
 
 # local

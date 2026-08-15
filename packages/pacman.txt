@@ -1,9 +1,11 @@
 adobe-source-han-sans-otc-fonts
 adw-gtk-theme
 android-tools
+audacity
 awww
 base
 base-devel
+bitwarden
 blueman
 bluez
 bluez-utils
@@ -24,6 +26,7 @@ fastfetch
 ffmpegthumbnailer
 file-roller
 firefox
+gimp
 git
 gnome-keyring
 grim
@@ -40,12 +43,14 @@ hyprlock
 hyprpaper
 hyprpicker
 hyprshot
+hyprsunset
 imagemagick
 imv
 intel-media-driver
 intel-ucode
 iwd
 jre21-openjdk
+kew
 kitty
 kvantum
 kvantum-qt5
@@ -67,6 +72,7 @@ lutris
 ly
 man-db
 mda.lv2
+modemmanager
 mpv-mpris
 nano
 nautilus
@@ -81,6 +87,7 @@ obsidian
 pamixer
 papirus-icon-theme
 pavucontrol
+picard
 pipewire
 pipewire-alsa
 pipewire-jack
@@ -103,7 +110,7 @@ sddm
 seahorse
 slurp
 smartmontools
-spotify-launcher
+strawberry
 sudo
 swappy
 swaync
@@ -135,7 +142,6 @@ wine
 wireless_tools
 wireplumber
 wl-clipboard
-wlsunset
 wob
 wofi
 wpa_supplicant

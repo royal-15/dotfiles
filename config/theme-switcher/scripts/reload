@@ -20,7 +20,14 @@ reload_wallpaper() {
 }
 
 reload_rofi() {
-    pkill rofi || true
+    # pkill rofi || true
+    :
+}
+
+reload_kitty() {
+    if kitty=$(pgrep -x kitty); then
+        kill -SIGUSR1 "$kitty"
+    fi
 }
 
 reload_wlogout() {
@@ -33,6 +40,7 @@ reload_all() {
     reload_swaync
     reload_wallpaper center
     reload_rofi
+    reload_kitty
     reload_wlogout
 }
 
@@ -58,6 +66,9 @@ main() {
                 ;;
             rofi)
                 reload_rofi
+                ;;
+            kitty)
+                reload_kitty
                 ;;
             wlogout)
                 reload_wlogout
