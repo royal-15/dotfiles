@@ -25,9 +25,9 @@ sync() {
 echo "[*] Sync started..."
 
 # assets
-echo "[*] Syncing assets..."
+# echo "[*] Syncing assets..."
 
-sync Wallpapers assets/Wallpapers
+# sync Wallpapers assets/Wallpapers
 
 # configs
 echo "[*] Syncing configs..."
