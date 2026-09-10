@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Skycut C24 — Document-faithful HPGL</name>
+  <id>org.skycut.c24.document_faithful_hpgl</id>
+
+  <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
+  <dependency type="file" location="inx">hpgl_encoder.py</dependency>
+
+  <label>Export a .plt for Skycut C24 with automatic 90° orientation compensation, document-origin placement, and C24-compatible PD commands.</label>
+
+  <param name="tab" type="notebook">
+    <page name="plotter" gui-text="C24 Settings">
+      <param name="resolutionX" type="float" min="1.0" max="4096.0" precision="1" gui-text="Resolution X (dpi):">1016.0</param>
+      <param name="resolutionY" type="float" min="1.0" max="4096.0" precision="1" gui-text="Resolution Y (dpi):">1016.0</param>
+      <param name="pen" type="int" min="0" max="99" gui-text="Pen number:">1</param>
+      <param name="force" type="int" min="0" max="1000" gui-text="Pen force (g):">0</param>
+      <param name="speed" type="int" min="0" max="1000" gui-text="Pen speed (cm/s):">0</param>
+
+      <param name="info" type="description" appearance="header">C24 coordinate handling</param>
+      <param name="orientationInfo" type="description">The exporter automatically compensates the C24's observed 90° clockwise rotation. Do not use the normal HPGL rotation control.</param>
+      <param name="placementInfo" type="description">Drawing auto-alignment, centering, knife offset, overcut and precut are disabled so the cut remains tied to the Inkscape document coordinates.</param>
+
+      <param name="flat" type="float" min="0.1" max="10.0" precision="1" gui-text="Curve flatness:">1.2</param>
+    </page>
+  </param>
+
+  <output>
+    <extension>.plt</extension>
+    <mimetype>application/octet-stream</mimetype>
+    <filetypename>Skycut C24 PLT (*.plt)</filetypename>
+    <filetypetooltip>Document-faithful HPGL for Skycut C24</filetypetooltip>
+    <dataloss>true</dataloss>
+  </output>
+
+  <script>
+    <command location="inx" interpreter="python">skycut_c24_hpgl.py</command>
+  </script>
+</inkscape-extension>
