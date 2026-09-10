@@ -46,6 +46,7 @@ hyprshot
 hyprsunset
 imagemagick
 imv
+inkscape
 intel-media-driver
 intel-ucode
 iwd
@@ -84,6 +85,7 @@ npm
 ntfs-3g
 nwg-look
 obsidian
+okular
 pamixer
 papirus-icon-theme
 pavucontrol
@@ -95,9 +97,7 @@ pipewire-pulse
 polkit-gnome
 polkit-kde-agent
 power-profiles-daemon
-proton-vpn-gtk-app
 pyenv
-python-pywal
 qt5-wayland
 qt5ct
 qt6-wayland
@@ -152,5 +152,7 @@ xdg-utils
 xorg-server
 xorg-xinit
 zam-plugins
+zathura
+zathura-pdf-mupdf
 zram-generator
 zsh

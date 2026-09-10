@@ -25,7 +25,7 @@ selection="$(
         | rofi -dmenu \
             -p "Power mode" \
             -selected-row "$selected_index" \
-            -theme "$HOME/.config/rofi/themes/applets/selector-compact.rasi"
+            -theme "$HOME/.config/rofi/themes/applets/powermode-compact.rasi"
 )"
 
 [ -z "$selection" ] && exit 0

@@ -21,7 +21,7 @@ hl.window_rule({
 
 -- Special
 hl.window_rule({
-    match = {class = "obsidian"},
+    match = {class = "md.obsidian.Obsidian"},
     -- opacity = "0.8 override 0.8 override",
     workspace = "special:s1"
 })

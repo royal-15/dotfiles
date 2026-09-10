@@ -1,6 +1,6 @@
 return {
-    name = "soft-cyan",
-    wallpaper_group = "soft-cyan",
+    name = "serenity",
+    wallpaper_group = "serenity",
     palette = {
         background = "#0d1117",
         background_alt = "#121822",
@@ -14,6 +14,6 @@ return {
         accent_soft = "rgba(119, 228, 255, 0.16)",
         success = "#8fe3b0",
         warning = "#f0c674",
-        critical = "#ff8f98",
-    },
+        critical = "#ff8f98"
+    }
 }

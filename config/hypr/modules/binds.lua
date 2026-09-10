@@ -32,7 +32,9 @@ hl.bind(mainMod .. " + M",
         hl.dsp.exec_cmd("$HOME/.local/bin/power-mode-menu.sh || pkill rofi"))
 hl.bind(mainMod .. " + SHIFT + M",
         hl.dsp.exec_cmd("wlogout --protocol layer-shell"))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("blueman-manager"))
+hl.bind(mainMod .. " + B",
+        hl.dsp.exec_cmd("~/.local/bin/bluetooth-menu.sh || pkill rofi"))
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("blueman-manager"))
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("kitty -e htop"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
@@ -166,6 +168,12 @@ hl.bind(mainMod .. " + G", function()
         }
     })
 
+    hl.window_rule({
+        match = {class = "Spotify"},
+        opacity = "1.0 override 1.0 override"
+        -- workspace = "special:s2"
+    })
+
     hl.exec_cmd("notify-send \"Game Mode\" \"Enabled\"")
 
 end)
@@ -194,3 +202,9 @@ hl.bind(mod .. " + S", function()
         hl.workspace_rule({workspace = ws_id, layout = "scrolling"})
     end
 end)
+
+-- Scrolling layout
+hl.bind(mod .. " + equal", hl.dsp.layout("colresize +0.1"))
+hl.bind(mod .. " + minus", hl.dsp.layout("colresize -0.1"))
+
+hl.bind(mod .. " + 0", hl.dsp.layout("colresize +conf"))

@@ -1,6 +1,6 @@
 return {
-    name = "soft-cyan",
-    wallpaper_group = "soft-cyan",
+    name = "monochrome",
+    wallpaper_group = "monochrome",
     palette = {
         background = "#0a0b0d",
         background_alt = "#111214",

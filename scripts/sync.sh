@@ -52,6 +52,8 @@ sync .config/gtk-3.0 config/gtk-3.0
 sync .config/gtk-4.0 config/gtk-4.0
 sync .config/nwg-look config/nwg-look
 
+sync .config/inkscape config/inkscape
+
 sync .config/theme-switcher config/theme-switcher
 
 # local

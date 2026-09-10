@@ -1,7 +1,7 @@
 
 [miscellaneous]
 
-allowNotifications=1
+allowNotifications=0
 
 alwaysCrossfade=0
 
@@ -17,7 +17,7 @@ coverAnsi=0
 
 [visualizer]
 
-visualizerColortype=2
+visualizerColortype=3
 
 [chroma]
 

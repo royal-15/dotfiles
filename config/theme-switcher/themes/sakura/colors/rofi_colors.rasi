@@ -1,0 +1,24 @@
+* {
+    bg-main:      #13131a;
+    bg-surface:   #1d1e27;
+    bg-elevated:  #242630;
+
+    fg-primary:   #cacfc4;
+    fg-secondary: #aeb3aa;
+    fg-muted:     #8d9089;
+
+    accent:       #538E8E;
+    accent-soft:  rgba(83,142,142,0.12);
+
+    danger:       #DC8678;
+    danger-soft:  rgba(220,134,120,0.12);
+
+    border:       #2c2e38;
+    shadow:       rgba(0,0,0,0.30);
+
+    selected-bg:  #7DA193;
+    selected-fg:  #13131a;
+
+    hover-bg:     rgba(83,142,142,0.08);
+    hover-fg:     #cacfc4;
+}
