@@ -1,6 +1,8 @@
 ani-cli
+antigravity
 apple_cursor
 brave-nightly-bin
+claude-code
 cursor-bin
 github-desktop-bin
 google-chrome

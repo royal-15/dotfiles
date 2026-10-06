@@ -5,7 +5,6 @@
         "position": "top",
         "css": "~/.config/waybar/style.css",
         "reload_style_on_change": false,
-        "width": 800,
         "spacing": 9,
         "include": [
             "modules/workspaces.jsonc",
@@ -13,19 +12,16 @@
             "modules/audio.jsonc",
             "modules/battery.jsonc",
             "modules/tray.jsonc",
-            "modules/cava.jsonc"
         ],
         "modules-left": [
-            "pulseaudio",
-            "cava"
+            "hyprland/workspaces",
         ],
         "modules-center": [
-            "clock#left",
-            "hyprland/workspaces",
-            "clock#right"
+            "clock"
         ],
         "modules-right": [
             "tray",
+            "pulseaudio",
             "custom/power-battery"
         ]
     }

@@ -1,0 +1,270 @@
+/* ============================================================
+ * Pulse
+ * Minimal gaming-mode Waybar
+ * ============================================================ */
+
+* {
+    all: unset;
+
+    font-family:
+        "CaskaydiaCove Nerd Font",
+        "JetBrainsMono Nerd Font",
+        "Symbols Nerd Font";
+}
+
+
+/* ------------------------------------------------------------
+ * Bar
+ * ------------------------------------------------------------ */
+
+window#waybar {
+    background: @bg-solid;
+    color: @fg;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* ------------------------------------------------------------
+ * Global layout
+ * ------------------------------------------------------------ */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.modules-left {
+    margin-left: 12px;
+}
+
+.modules-right {
+    margin-right: 12px;
+}
+
+
+/* ------------------------------------------------------------
+ * Tooltips
+ * ------------------------------------------------------------ */
+
+tooltip {
+    background: @bg-solid;
+
+    border: 1px solid @shadow-tip;
+    border-radius: 8px;
+
+    color: @txt;
+
+    padding: 7px 10px;
+}
+
+tooltip label {
+    color: @txt;
+}
+
+
+/* ------------------------------------------------------------
+ * Workspaces
+ * ------------------------------------------------------------ */
+
+#workspaces {
+    background: @clear;
+
+    min-height: 0;
+    min-width: 0;
+
+    font-size: 0.6rem;
+}
+
+#workspaces button {
+    background: @clear;
+    color: @txt-muted;
+
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0 2px;
+    padding: 0 11px;
+
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+/* Active workspace */
+
+#workspaces button.active {
+    background: @accent;
+    color: @bg;
+
+    padding: 4px 20px;
+}
+
+
+/* Visible but inactive */
+
+#workspaces button.visible {
+    background: alpha(@accent, 0.08);
+    color: @txt;
+}
+
+
+/* Hover */
+
+#workspaces button:hover {
+    background: alpha(@accent, 0.14);
+    color: @txt;
+}
+
+
+/* Urgent */
+
+#workspaces button.urgent {
+    background: @err;
+    color: @txt-accent;
+}
+
+
+/* ------------------------------------------------------------
+ * Clock
+ * ------------------------------------------------------------ */
+
+#clock {
+    color: @txt;
+
+    font-weight: 600;
+    letter-spacing: 0.06em;
+
+    padding: 0 8px;
+}
+
+#tray,
+#pulseaudio,
+#custom-media,
+#custom-power-battery,
+#custom-cpu_temp {
+    color: @fg;
+    background: alpha(@accent, 0.08);
+
+    padding: 4px 14px;
+}
+
+#custom-media {
+    color: @txt-muted;
+}
+
+#custom-media.playing,
+#custom-media.paused {
+    background: @bg-solid;
+    color: @accent;
+    padding: 0 10px;
+}
+
+#custom-media.stopped {
+    background: @clear;
+    box-shadow: none;
+    color: @clear;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+}
+
+#tray>.needs-attention {
+    color: @warn;
+    -gtk-icon-effect: highlight;
+}
+
+#pulseaudio.muted {
+    color: @txt-muted;
+}
+
+#custom-power-battery {
+    font-weight: 600;
+}
+
+#custom-power-battery.charging {
+    color: @color10;
+    background: @accent-soft;
+}
+
+#custom-power-battery.power-saver {
+    color: @ok;
+}
+
+#custom-power-battery.performance {
+    color: @accent;
+}
+
+#pulseaudio,
+#custom-power-battery {
+    transition: color 150ms ease;
+}
+
+#cava {
+    color: @fg;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+#custom-cpu_temp.normal {
+    color: @ok ;
+}
+
+#custom-cpu_temp.warm,
+#pulseaudio.warning,
+#custom-bt-battery.warn,
+#network.disconnected,
+#network.disabled,
+#custom-power-battery.warning {
+    color: @warn;
+}
+
+#custom-cpu_temp.hot,
+#custom-bt-battery.critical,
+#custom-cpu_temp.critical,
+#pulseaudio.critical,
+#custom-power-battery.critical {
+    color: @err;
+}
+
+#custom-cpu_temp.unknown,
+#custom-notification.none,
+#custom-notification.dnd-none,
+#custom-notification.inhibited-none,
+#custom-notification.dnd-inhibited-none,
+#pulseaudio.muted,
+#custom-power-battery.unknown {
+    color: @txt-muted;
+}
+
+#custom-notification.notification,
+#custom-notification.dnd-notification,
+#custom-notification.inhibited-notification,
+#custom-notification.dnd-inhibited-notification,
+#network.wifi {
+    color: @accent;
+}
+
+#custom-media {
+    color: @txt-muted;
+}
+
+#custom-media.playing,
+#custom-media.paused {
+    background: @bg-solid;
+    color: @accent;
+    padding: 0 10px;
+}
+
+#custom-media.stopped {
+    background: @clear;
+    box-shadow: none;
+    color: @clear;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+}

@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# ============================================================
+# Wallpaper Preprocess Utility
+#
+# Usage:
+#   wallpaper_preprocess --themes
+#   wallpaper_preprocess --theme solstice
+#   wallpaper_preprocess --all
+#   wallpaper_preprocess --clean
+#
+# Environment:
+#   THEMES_DIR   Override the default themes directory.
+# ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(realpath "$SCRIPT_DIR/..")"
+
+THEMES_DIR="$ROOT_DIR/themes"
+BLUR_CACHE_DIR="$ROOT_DIR/cache/wallpaper-blur"
+BLUR_SCRIPT="$HOME/.local/bin/blur_image.sh"
+
+# Supported wallpaper formats
+WALLPAPER_EXTENSIONS=(
+    jpg
+    jpeg
+    png
+    webp
+)
+
+# ------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------
+
+print_usage() {
+    cat <<EOF
+Usage:
+  $SCRIPT_NAME --themes
+  $SCRIPT_NAME --theme <theme>
+  $SCRIPT_NAME --all
+  $SCRIPT_NAME --clean
+
+Options:
+  --themes              List all available themes.
+  --theme <theme>       Blur wallpapers for a specific theme.
+  --all                 Blur wallpapers for all themes.
+  --clean               Remove the entire blurred wallpaper cache.
+  -h, --help            Show this help message.
+
+Examples:
+  $SCRIPT_NAME --themes
+  $SCRIPT_NAME --theme solstice
+  $SCRIPT_NAME --all
+  $SCRIPT_NAME --clean
+EOF
+}
+
+error() {
+    printf 'Error: %s\n' "$*" >&2
+    exit 1
+}
+
+info() {
+    printf '%s\n' "$*"
+}
+
+is_valid_theme() {
+    local theme="$1"
+
+    [[ -d "$THEMES_DIR/$theme" ]]
+}
+
+is_wallpaper() {
+    local file="$1"
+    local extension="${file##*.}"
+
+    extension="${extension,,}"
+
+    for supported in "${WALLPAPER_EXTENSIONS[@]}"; do
+        [[ "$extension" == "$supported" ]] && return 0
+    done
+
+    return 1
+}
+
+# ------------------------------------------------------------
+# Theme discovery
+# ------------------------------------------------------------
+
+list_themes() {
+    [[ -d "$THEMES_DIR" ]] ||
+        error "Themes directory does not exist: $THEMES_DIR"
+
+    local found=0
+
+    while IFS= read -r -d '' theme_dir; do
+        found=1
+        basename "$theme_dir"
+    done < <(
+        find "$THEMES_DIR" \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -type d \
+            -print0 |
+            sort -z
+    )
+
+    if (( found == 0 )); then
+        info "No themes found."
+    fi
+}
+
+# ------------------------------------------------------------
+# Wallpaper processing
+# ------------------------------------------------------------
+
+process_theme() {
+    local theme="$1"
+
+    is_valid_theme "$theme" ||
+        error "Theme does not exist: $theme"
+
+    [[ -x "$BLUR_SCRIPT" ]] ||
+        error "Blur utility is not executable: $BLUR_SCRIPT"
+
+    local theme_wallpaper_dir="$THEMES_DIR/$theme/wallpapers"
+    local cache_dir="$BLUR_CACHE_DIR/$theme"
+
+    mkdir -p "$cache_dir"
+
+    info "Processing theme: $theme"
+
+    local processed=0
+    local skipped=0
+
+    while IFS= read -r -d '' wallpaper; do
+        local filename
+        local output
+
+        filename="$(basename "$wallpaper")"
+        output="$cache_dir/$filename"
+
+        # Do not process an already generated blurred wallpaper.
+        if [[ "$filename" == *.blur.* ]]; then
+            continue
+        fi
+
+        # Skip if the cached output is newer than the source.
+        if [[ -f "$output" && "$output" -nt "$wallpaper" ]]; then
+            skipped=$((skipped + 1))
+            continue
+        fi
+
+        info "  Blurring: $filename"
+
+        "$BLUR_SCRIPT" "$wallpaper" "$output"
+
+        processed=$((processed + 1))
+
+    done < <(
+        find "$theme_wallpaper_dir" \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -type f \
+            -print0 |
+            sort -z
+    )
+
+    info "  Processed: $processed"
+    info "  Skipped:   $skipped"
+}
+
+process_all() {
+    [[ -d "$THEMES_DIR" ]] ||
+        error "Themes directory does not exist: $THEMES_DIR"
+
+    local found=0
+
+    while IFS= read -r -d '' theme_dir; do
+        found=1
+        process_theme "$(basename "$theme_dir")"
+    done < <(
+        find "$THEMES_DIR" \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -type d \
+            -print0 |
+            sort -z
+    )
+
+    (( found == 1 )) ||
+        info "No themes found."
+}
+
+# ------------------------------------------------------------
+# Cache cleanup
+# ------------------------------------------------------------
+
+clean_cache() {
+    if [[ ! -d "$BLUR_CACHE_DIR" ]]; then
+        info "Blur cache does not exist. Nothing to clean."
+        return
+    fi
+
+    info "Cleaning blurred wallpaper cache:"
+    info "  $BLUR_CACHE_DIR"
+
+    rm -rf -- "$BLUR_CACHE_DIR"
+
+    info "Blur cache cleaned."
+}
+
+# ------------------------------------------------------------
+# Main
+# ------------------------------------------------------------
+
+main() {
+    [[ $# -gt 0 ]] ||
+        {
+            print_usage
+            exit 1
+        }
+
+    case "$1" in
+
+        --themes)
+            [[ $# -eq 1 ]] ||
+                error "--themes does not accept additional arguments."
+
+            list_themes
+            ;;
+
+        --theme)
+            [[ $# -eq 2 ]] ||
+                error "Usage: $SCRIPT_NAME --theme <theme>"
+
+            process_theme "$2"
+            ;;
+
+        --all)
+            [[ $# -eq 1 ]] ||
+                error "--all does not accept additional arguments."
+
+            process_all
+            ;;
+
+        --clean)
+            [[ $# -eq 1 ]] ||
+                error "--clean does not accept additional arguments."
+
+            clean_cache
+            ;;
+
+        -h|--help)
+            print_usage
+            ;;
+
+        *)
+            error "Unknown option: $1"
+            ;;
+    esac
+}
+
+main "$@"

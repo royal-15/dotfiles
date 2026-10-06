@@ -1,0 +1,281 @@
+/*****----- Configuration -----*****/
+
+configuration {
+    modi:                       "drun,filebrowser";
+    show-icons:                 false;
+    display-drun:               " Apps";
+    display-run:                "";
+    display-filebrowser:        "";
+    display-window:             "";
+    drun-display-format:        "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
+    window-format:              "{w} · {c} · {t}";
+}
+
+
+/*****----- Global Properties -----*****/
+
+@import                         "../colors.rasi"
+@import                         "../fonts/font.rasi"
+
+
+/*****----- Main Window -----*****/
+
+window {
+    transparency:                "real";
+    location:                    south;
+    anchor:                      south;
+    fullscreen:                  false;
+    width:                       100%;
+    x-offset:                    0px;
+    y-offset:                    0px;
+
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    cursor:                      "default";
+    background-color:            var(bg-main);
+}
+
+
+/*****----- Main Box -----*****/
+
+mainbox {
+    enabled:                     true;
+    spacing:                     5px;
+    margin:                      0px;
+    padding:                     5px;
+    border:                      0px solid;
+    border-radius:               0px 0px 0px 0px;
+    border-color:                var(border);
+    background-color:            transparent;
+    children:                    [ "prompt", "entry", "listview" ];
+    orientation:                 horizontal;
+}
+
+
+/*****----- Inputbar -----*****/
+
+inputbar {
+    enabled:                     true;
+    spacing:                     0px;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            var(bg-main);
+    text-color:                  var(fg-primary);
+    children:                    [ "prompt", "entry" ];
+}
+
+prompt {
+    enabled:                     true;
+    padding:                     5px 10px;
+    border:                      0px;
+    border-radius:               100%;
+    border-color:                var(border);
+    background-color:            var(accent);
+    text-color:                  var(selected-fg);
+}
+
+textbox-prompt-colon {
+    enabled:                     true;
+    expand:                      false;
+    str:                         "::";
+    background-color:            inherit;
+    text-color:                  inherit;
+}
+
+entry {
+    enabled:                     true;
+    expand:                      false;
+    padding:                     5px 10px;
+    width:                       200px;
+    border-radius:               100%;
+    background-color:            var(bg-surface);
+    text-color:                  var(fg-primary);
+    cursor:                      text;
+    placeholder:                 "Search...";
+    placeholder-color:           inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.5;
+}
+
+
+/*****----- Listview -----*****/
+
+listview {
+    enabled:                     true;
+    lines:                       100;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    layout:                      horizontal;
+    reverse:                     false;
+    fixed-height:                true;
+    fixed-columns:               true;
+    spacing:                     5px;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            transparent;
+    text-color:                  var(fg-primary);
+    cursor:                      "default";
+}
+
+scrollbar {
+    handle-width:                5px;
+    handle-color:                var(accent);
+    border-radius:               0px;
+    background-color:            var(bg-surface);
+}
+
+
+/*****----- Elements -----*****/
+
+element {
+    enabled:                     true;
+    spacing:                     10px;
+    margin:                      0px;
+    padding:                     5px 10px;
+    border:                      0px solid;
+    border-radius:               100%;
+    border-color:                var(border);
+    background-color:            transparent;
+    text-color:                  var(fg-primary);
+    cursor:                      pointer;
+}
+
+element normal.normal {
+    background-color:            var(bg-main);
+    text-color:                  var(fg-primary);
+}
+
+element normal.urgent {
+    background-color:            var(danger);
+    text-color:                  var(selected-fg);
+}
+
+element normal.active {
+    background-color:            var(accent);
+    text-color:                  var(selected-fg);
+}
+
+element selected.normal {
+    background-color:            var(selected-bg);
+    text-color:                  var(selected-fg);
+}
+
+element selected.urgent {
+    background-color:            var(danger);
+    text-color:                  var(selected-fg);
+}
+
+element selected.active {
+    background-color:            var(accent);
+    text-color:                  var(selected-fg);
+}
+
+element alternate.normal {
+    background-color:            var(bg-main);
+    text-color:                  var(fg-primary);
+}
+
+element alternate.urgent {
+    background-color:            var(danger);
+    text-color:                  var(selected-fg);
+}
+
+element alternate.active {
+    background-color:            var(accent);
+    text-color:                  var(selected-fg);
+}
+
+element-icon {
+    background-color:            transparent;
+    text-color:                  inherit;
+    size:                        24px;
+    cursor:                      inherit;
+}
+
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    highlight:                   inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+}
+
+
+/*****----- Mode Switcher -----*****/
+
+mode-switcher {
+    enabled:                     true;
+    spacing:                     10px;
+    margin:                      0px;
+    padding:                     0px;
+    border:                     0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            transparent;
+    text-color:                  var(fg-primary);
+}
+
+button {
+    padding:                     10px;
+    border:                      0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            var(bg-surface);
+    text-color:                  inherit;
+    cursor:                      pointer;
+}
+
+button selected {
+    background-color:            var(selected-bg);
+    text-color:                  var(selected-fg);
+}
+
+
+/*****----- Message -----*****/
+
+message {
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px solid;
+    border-radius:               0px 0px 0px 0px;
+    border-color:                var(border);
+    background-color:            transparent;
+    text-color:                  var(fg-primary);
+}
+
+textbox {
+    padding:                     5px;
+    border:                      0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            var(bg-surface);
+    text-color:                  var(fg-primary);
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+    highlight:                   none;
+    placeholder-color:           var(fg-primary);
+    blink:                       true;
+    markup:                      true;
+}
+
+error-message {
+    padding:                     0px;
+    border:                      0px solid;
+    border-radius:               0px;
+    border-color:                var(border);
+    background-color:            var(bg-main);
+    text-color:                  var(fg-primary);
+}

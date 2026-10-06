@@ -14,6 +14,9 @@ STATE_FILE="$ROOT_DIR/state/active_theme.env"
 source "$SCRIPT_DIR/state_utils.sh"
 
 CURRENT_WALLPAPER_LINK="$ROOT_DIR/state/current_wallpaper"
+BLURRED_WALLPAPER_LINK="$ROOT_DIR/state/blurred_wallpaper"
+
+BLUR_CACHE_DIR="$ROOT_DIR/cache/wallpaper-blur"
 
 THEMES_DIR="$ROOT_DIR/themes"
 WAYBAR_LAYOUTS_DIR="$ROOT_DIR/layouts/waybars"
@@ -39,6 +42,9 @@ WAYBAR_LAYOUT_TARGET="$HOME/.config/waybar/layout.css"
 
 die() {
     echo "[ERROR] $*" >&2
+
+    notify-send "Theme Switcher" "$*"
+
     exit 1
 }
 
@@ -147,9 +153,25 @@ switch_theme() {
     [[ -n "$default_wallpaper" ]] \
         || die "Theme '$theme' has no wallpapers"
 
+    # Theme blurred wallpaper
+    local blurred_wallpaper
+
+    blurred_wallpaper="$(find "$BLUR_CACHE_DIR/$theme" \
+        -maxdepth 1 \
+        -type f \
+        | sort \
+        | sed -n '1p')"
+
+    [[ -n "$blurred_wallpaper" ]] \
+        || die "Theme '$theme' has no blurred wallpaper"
+
     create_symlink \
         "$default_wallpaper" \
         "$CURRENT_WALLPAPER_LINK"
+
+    create_symlink \
+        "$blurred_wallpaper" \
+        "$BLURRED_WALLPAPER_LINK"
 
     load_state
     ACTIVE_THEME="$theme"
@@ -168,9 +190,25 @@ find_wallpaper() {
     local wallpaper="$1"
     local theme="$2"
 
+    # Resolve preview names to their GIF counterpart.
+    if [[ "$wallpaper" == *_preview* ]]; then
+        local gif_name="${wallpaper%%_preview*}.gif"
+        wallpaper="gifs/$gif_name"
+    fi
+
     find "$THEMES_DIR/$theme/wallpapers/" \
         -type f \
-        -name "$wallpaper" \
+        -path "*/$wallpaper" \
+        | head -n1
+}
+
+find_blurred_wallpaper() {
+    local wallpaper="$1"
+    local theme="$2"
+
+    find "$BLUR_CACHE_DIR/$theme/" \
+        -type f \
+        -path "*/$wallpaper" \
         | head -n1
 }
 
@@ -183,11 +221,19 @@ switch_wallpaper() {
     local wallpaper_path
     wallpaper_path="$(find_wallpaper "$wallpaper" "$theme")"
 
-    [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper"
+    [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper_path"
+
+    local blurred_wallpaper_path
+    blurred_wallpaper_path="$(find_blurred_wallpaper "$wallpaper" "$theme")"
+
+    [[ -n "$blurred_wallpaper_path" ]] || die "Blurred wallpaper not found: $blurred_wallpaper_path"
 
     create_symlink \
         "$wallpaper_path" \
         "$CURRENT_WALLPAPER_LINK"
+    create_symlink \
+        "$blurred_wallpaper_path" \
+        "$BLURRED_WALLPAPER_LINK"
 
     load_state
     ACTIVE_WALLPAPER="$wallpaper"
@@ -197,14 +243,14 @@ switch_wallpaper() {
     ok "$msg"
 }
 
-blur_wallpaper(){
-    local image_to_blur="$ROOT_DIR/state/current_wallpaper"
-    local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
+# blur_wallpaper(){
+#     local image_to_blur="${1:-$ROOT_DIR/state/current_wallpaper}"
+#     local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
 
-    # pkill -f "blur_image.sh" 2>/dev/null
+#     # pkill -f "blur_image.sh" 2>/dev/null
 
-    ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image" &
-}
+#     ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image" &
+# }
 
 ###############################################################################
 # Waybar Layout
@@ -233,7 +279,19 @@ switch_waybar() {
 }
 
 ###############################################################################
-# Waybar Layout
+# Launcher
+###############################################################################
+
+switch_launcher(){
+    local launcher="$1"
+
+    load_state
+    ACTIVE_LAUNCHER="$launcher"
+    save_state
+}
+
+###############################################################################
+# Spotify
 ###############################################################################
 
 switch_spotify()
@@ -368,16 +426,24 @@ main() {
                 theme)
                     switch_theme "$3"
                     "$SCRIPT_DIR"/reload all
-                    blur_wallpaper
+                    # blur_wallpaper
                     ;;
                 wallpaper)
-                    switch_wallpaper "$3"
+                    local wallpaper_name="$3"
+                    switch_wallpaper "$wallpaper_name"
                     "$SCRIPT_DIR"/reload wallpaper
-                    blur_wallpaper
+                    # if [[ "$wallpaper_name" == *_preview* ]]; then
+                    #     blur_wallpaper "$THEMES_DIR/$ACTIVE_THEME/wallpapers/$wallpaper_name"
+                    # else
+                    #     blur_wallpaper
+                    # fi
                     ;;
                 waybar)
                     switch_waybar "$3"
                     "$SCRIPT_DIR"/reload waybar
+                    ;;
+                launcher)
+                    switch_launcher "$3"
                     ;;
                 spotify)
                     switch_spotify "$3"

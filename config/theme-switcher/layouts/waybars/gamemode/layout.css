@@ -1,0 +1,251 @@
+/* ============================================================
+ * Pulse
+ * Minimal gaming-mode Waybar
+ * ============================================================ */
+
+* {
+    all: unset;
+
+    font-family:
+        "CaskaydiaCove Nerd Font",
+        "JetBrainsMono Nerd Font",
+        "Symbols Nerd Font";
+}
+
+
+/* ------------------------------------------------------------
+ * Bar
+ * ------------------------------------------------------------ */
+
+window#waybar {
+    background: @bg-solid;
+    color: @fg;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* ------------------------------------------------------------
+ * Global layout
+ * ------------------------------------------------------------ */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.modules-left {
+    margin-left: 12px;
+}
+
+.modules-right {
+    margin-right: 12px;
+}
+
+
+/* ------------------------------------------------------------
+ * Tooltips
+ * ------------------------------------------------------------ */
+
+tooltip {
+    background: @bg-solid;
+
+    border: 1px solid @shadow-tip;
+    border-radius: 8px;
+
+    color: @txt;
+
+    padding: 7px 10px;
+}
+
+tooltip label {
+    color: @txt;
+}
+
+
+/* ------------------------------------------------------------
+ * Workspaces
+ * ------------------------------------------------------------ */
+
+#workspaces {
+    background: @clear;
+
+    min-height: 0;
+    min-width: 0;
+
+    font-size: 0.6rem;
+}
+
+#workspaces button {
+    background: @clear;
+    color: @txt-muted;
+
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0 2px;
+    padding: 0 11px;
+
+    border-radius: 7px;
+
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+/* Active workspace */
+
+#workspaces button.active {
+    background: @accent;
+    color: @bg;
+
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+
+/* Visible but inactive */
+
+#workspaces button.visible {
+    background: alpha(@accent, 0.08);
+    color: @txt;
+}
+
+
+/* Hover */
+
+#workspaces button:hover {
+    background: alpha(@accent, 0.14);
+    color: @txt;
+}
+
+
+/* Urgent */
+
+#workspaces button.urgent {
+    background: @err;
+    color: @txt-accent;
+}
+
+
+/* ------------------------------------------------------------
+ * Clock
+ * ------------------------------------------------------------ */
+
+#clock {
+    color: @txt;
+
+    font-weight: 600;
+    letter-spacing: 0.06em;
+
+    padding: 0 8px;
+}
+
+
+/* ------------------------------------------------------------
+ * Right-side modules
+ * ------------------------------------------------------------ */
+
+#tray,
+#pulseaudio,
+#custom-power-battery {
+    margin: 0 3px;
+    padding: 0 7px;
+
+    color: @fg;
+}
+
+
+/* ------------------------------------------------------------
+ * Tray
+ * ------------------------------------------------------------ */
+
+#tray {
+    color: @txt-muted;
+}
+
+#tray>.needs-attention {
+    color: @warn;
+}
+
+
+/* ------------------------------------------------------------
+ * Audio
+ * ------------------------------------------------------------ */
+
+#pulseaudio {
+    color: @fg;
+}
+
+#pulseaudio.muted {
+    color: @txt-muted;
+}
+
+
+/* ------------------------------------------------------------
+ * Battery
+ * ------------------------------------------------------------ */
+
+#custom-power-battery {
+    font-weight: 600;
+}
+
+#custom-power-battery.unknown {
+    color: @txt-muted;
+}
+
+#custom-power-battery.warning {
+    color: @warn;
+}
+
+#custom-power-battery.critical {
+    color: @err;
+}
+
+#custom-power-battery.charging {
+    color: @color10;
+}
+
+#custom-power-battery.power-saver {
+    color: @ok;
+}
+
+#custom-power-battery.performance {
+    color: @accent;
+}
+
+
+/* ------------------------------------------------------------
+ * Gaming-mode emphasis
+ * ------------------------------------------------------------ */
+
+/*
+ * Keep the right side visually quiet.
+ * Only the state-changing elements receive color.
+ */
+
+#pulseaudio,
+#custom-power-battery {
+    transition: color 150ms ease;
+}
+
+
+/* ------------------------------------------------------------
+ * Subtle separators
+ * ------------------------------------------------------------ */
+
+#tray {
+    margin-right: 2px;
+}
+
+#pulseaudio {
+    margin-left: 2px;
+}
+
+#custom-power-battery {
+    margin-left: 2px;
+}

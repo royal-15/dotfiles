@@ -1,8 +1,6 @@
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
--- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
--- and https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
 -- Normal
 hl.window_rule({
     match = {class = "google-chrome", title = "New Tab.*"},
@@ -10,19 +8,24 @@ hl.window_rule({
 })
 hl.window_rule({match = {class = "zen", title = "Zen Browser"}, workspace = "3"})
 hl.window_rule({match = {class = "firefox"}, workspace = "3"})
+
+hl.window_rule({
+    match = {class = "jetbrains-studio", title = ""},
+    workspace = "1"
+})
 hl.window_rule({
     match = {class = "jetbrains-studio", title = "Agent.*"},
-    workspace = "4"
+    workspace = "2"
 })
 hl.window_rule({
     match = {class = "jetbrains-studio", title = "Logcat.*"},
-    workspace = "5"
+    workspace = "4"
 })
 
 -- Special
 hl.window_rule({
     match = {class = "md.obsidian.Obsidian"},
-    -- opacity = "0.8 override 0.8 override",
+    opacity = "0.8 override 0.8 override",
     workspace = "special:s1"
 })
 hl.window_rule({
@@ -30,7 +33,21 @@ hl.window_rule({
     opacity = "0.8 override 0.8 override",
     workspace = "special:s2"
 })
-hl.window_rule({match = {class = "kew-kitty"}, workspace = "special:s2"})
+hl.window_rule({
+    match = {class = "youtube-music-desktop-app"},
+    opacity = "0.8 override 0.8 override",
+    workspace = "special:s2"
+})
+hl.window_rule({
+    match = {class = "com.github.wwmm.easyeffects"},
+    opacity = "0.8 override 0.8 override",
+    workspace = "special:s2"
+})
+hl.window_rule({
+    match = {class = "kew-kitty"},
+    opacity = "0.8 override 0.8 override",
+    workspace = "special:s2"
+})
 
 -- Ignore maximize requests from all apps. You'll probably like this.
 hl.window_rule({
@@ -53,6 +70,12 @@ hl.window_rule({
     },
 
     no_focus = true
+})
+
+hl.window_rule({
+    name = "Waydroid fullscreen",
+    match = {class = "Waydroid"},
+    fullscreen = true
 })
 
 -- Layer rules also return a handle.

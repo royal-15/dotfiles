@@ -3,8 +3,9 @@
 --------------------
 local monitor_bindings = {
     {monitor = "eDP-1", workspaces = {4, 5, 6}},
-    {monitor = "HDMI-A-1", workspaces = {1, 2, 3}}
+    {monitor = "HDMI-A-2", workspaces = {1, 2, 3}}
 }
+-- {monitor = "HDMI-A-1", workspaces = {1, 2, 3}}
 
 for _, binding in ipairs(monitor_bindings) do
     for _, ws in ipairs(binding.workspaces) do

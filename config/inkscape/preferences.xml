@@ -649,11 +649,11 @@
     <group
        id="import"
        enable_preview="1"
-       path="/home/rajat/Downloads/"
+       path="/home/rajat/Downloads/outlines/"
        ask="1"
        ask_svg="1"
        link="embed"
-       scale="auto"
+       scale="optimizeQuality"
        forcexdpi="0"
        import_mode_svg="include" />
     <group
@@ -1060,7 +1060,9 @@
      org.skycut.c24.hpgl_output.orientation="0"
      org.skycut.c24.hpgl_output.precut="0"
      org.skycut.c24.hpgl_output.autoAlign="0"
-     org.skycut.c24.hpgl_output.toolOffset="0" />
+     org.skycut.c24.hpgl_output.toolOffset="0"
+     org.inkscape.input.gdkpixbuf.jpg.scale="optimizeQuality"
+     org.inkscape.input.gdkpixbuf.avif.scale="optimizeQuality" />
   <group
      id="desktop"
      style="fill:none;text-orientation:auto;fill-opacity:0;stroke-width:1.04314961;-inkscape-font-specification:'CaskaydiaCove Nerd Font, Ultra-Light';font-family:'CaskaydiaCove Nerd Font';font-size:24px;stroke:#000000;stroke-linejoin:round;stroke-linecap:round;font-weight:200">

@@ -13,9 +13,11 @@ brightnessctl
 calf
 cava
 cliphist
+cpupower
 cups
 cups-pk-helper
 ddcutil
+dolphin
 drawio-desktop
 dunst
 easyeffects
@@ -26,9 +28,11 @@ fastfetch
 ffmpegthumbnailer
 file-roller
 firefox
+flatpak
 gimp
 git
 gnome-keyring
+gpsd
 grim
 grub
 gst-plugin-pipewire
@@ -71,6 +75,7 @@ lsp-plugins
 lua-filesystem
 lutris
 ly
+lzip
 man-db
 mda.lv2
 modemmanager
@@ -86,6 +91,7 @@ ntfs-3g
 nwg-look
 obsidian
 okular
+opencode
 pamixer
 papirus-icon-theme
 pavucontrol
@@ -110,6 +116,7 @@ sddm
 seahorse
 slurp
 smartmontools
+sof-firmware
 strawberry
 sudo
 swappy
@@ -126,7 +133,6 @@ ttf-cascadia-code-nerd
 ttf-jetbrains-mono-nerd
 tumbler
 udiskie
-udisks2
 uwsm
 vim
 virtualbox

@@ -1,11 +1,10 @@
 [
     {
         "name": "waybar-main",
-        "layer": "top",
-        "position": "top",
+        "layer": "bottom",
+        "position": "bottom",
         "css": "~/.config/waybar/style.css",
         "reload_style_on_change": false,
-        "width": 800,
         "spacing": 9,
         "include": [
             "modules/workspaces.jsonc",
@@ -13,19 +12,23 @@
             "modules/audio.jsonc",
             "modules/battery.jsonc",
             "modules/tray.jsonc",
-            "modules/cava.jsonc"
+            "modules/cava.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/media.jsonc",
         ],
         "modules-left": [
-            "pulseaudio",
-            "cava"
+            "hyprland/workspaces",
+            "custom/media"
         ],
         "modules-center": [
             "clock#left",
-            "hyprland/workspaces",
+            "cava",
             "clock#right"
         ],
         "modules-right": [
+            "custom/cpu_temp",
             "tray",
+            "pulseaudio",
             "custom/power-battery"
         ]
     }
