@@ -1,0 +1,30 @@
+module qs
+singleton Paths 1.0 constants/Paths.qml
+singleton Decorations 1.0 constants/Decorations.qml
+singleton Colors 1.0 Colors.qml
+singleton Motion 1.0 components/Motion.qml
+singleton WorkspaceResolver 1.0 components/WorkspaceResolver.qml
+singleton NetworkCenterRouter 1.0 feature/network/NetworkCenterRouter.qml
+singleton NetworkCenterState 1.0 feature/network/NetworkCenterState.qml
+singleton NetworkCommandRunner 1.0 feature/network/NetworkCommandRunner.qml
+singleton NetworkPairingRunner 1.0 feature/network/NetworkPairingRunner.qml
+singleton PowerProfileRouter 1.0 feature/powerprofile/PowerProfileRouter.qml
+singleton PowerProfileService 1.0 feature/powerprofile/PowerProfileService.qml
+singleton StatusBarService 1.0 feature/bar/StatusBarService.qml
+singleton StatusBarPanelCoordinator 1.0 feature/bar/StatusBarPanelCoordinator.qml
+singleton LauncherRouter 1.0 feature/launcher/LauncherRouter.qml
+singleton LauncherService 1.0 feature/launcher/LauncherService.qml
+singleton OsdService 1.0 feature/osd/OsdService.qml
+singleton MediaService 1.0 feature/media/MediaService.qml
+singleton MediaRouter 1.0 feature/media/MediaRouter.qml
+singleton NotificationCenterRouter 1.0 feature/notifications/NotificationCenterRouter.qml
+singleton NotificationService 1.0 feature/notifications/NotificationService.qml
+singleton ThemeService 1.0 feature/theme/ThemeService.qml
+singleton ThemeRouter 1.0 feature/theme/ThemeRouter.qml
+singleton ClipboardRouter 1.0 feature/clipboard/ClipboardRouter.qml
+singleton ClipboardService 1.0 feature/clipboard/ClipboardService.qml
+Poller 1.0 components/Poller.qml
+Pill 1.0 components/Pill.qml
+ThemeStudio 1.0 feature/theme/ThemeStudio.qml
+RightSidebar 1.0 feature/sidebar/RightSidebar.qml
+Clipboard 1.0 feature/clipboard/Clipboard.qml

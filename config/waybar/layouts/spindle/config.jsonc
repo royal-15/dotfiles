@@ -1,0 +1,51 @@
+[
+    {
+        "name": "waybar-spindle",
+        "layer": "top",
+        "position": "left",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "width": 68,
+        "spacing": 7,
+        "margin-top": 10,
+        "margin-bottom": 10,
+        "margin-left": 8,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/tray.jsonc",
+            "modules/cpu_temp.jsonc"
+        ],
+        "hyprland/workspaces": {
+            "workspace-taskbar": {
+                "enable": true,
+                "format": "{icon}",
+                "icon-size": 15,
+                "update-active-window": true,
+                "active-window-position": "last",
+                "orientation": "vertical",
+                "on-click-window": "hyprctl dispatch focuswindow address:{address}"
+            }
+        },
+        "hyprland/windowcount": {
+            "format": "▣ {}",
+            "format-empty": "▣ 0",
+            "separate-outputs": true
+        },
+        "modules-left": [
+            "hyprland/workspaces",
+            "hyprland/windowcount",
+            "custom/cpu_temp"
+        ],
+        "modules-center": [
+            "clock"
+        ],
+        "modules-right": [
+            "tray",
+            "pulseaudio",
+            "custom/power-battery"
+        ]
+    }
+]

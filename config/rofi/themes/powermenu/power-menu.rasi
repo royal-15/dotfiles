@@ -1,0 +1,107 @@
+configuration {
+    show-icons: false;
+}
+
+@import "../../colors.rasi"
+@import "../fonts/font.rasi"
+
+* {
+    overlay-card: rgba(10, 11, 13, 0.88);
+    overlay-row: rgba(23, 24, 26, 0.82);
+}
+
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+    fullscreen: true;
+    background-color: rgba(10, 11, 13, 0.66);
+}
+
+mainbox {
+    spacing: 14px;
+    margin: 0px 31%;
+    padding: 24px;
+    background-color: transparent;
+    children: [ "dummy", "inputbar", "message", "listview", "dummy" ];
+}
+
+dummy {
+    expand: true;
+    background-color: transparent;
+}
+
+inputbar {
+    spacing: 10px;
+    background-color: transparent;
+    text-color: @fg-primary;
+    children: [ "textbox-prompt-colon", "prompt" ];
+}
+
+textbox-prompt-colon {
+    str: "";
+    expand: false;
+    padding: 12px 15px;
+    border-radius: 14px;
+    background-color: @danger-soft;
+    text-color: @fg-primary;
+}
+
+prompt {
+    padding: 12px 16px;
+    border-radius: 14px;
+    background-color: @accent-soft;
+    text-color: @fg-primary;
+}
+
+message {
+    padding: 12px 16px;
+    border-radius: 14px;
+    background-color: var(overlay-card);
+    text-color: @fg-secondary;
+}
+
+textbox {
+    font: "JetBrainsMono Nerd Font 12";
+    background-color: transparent;
+    text-color: inherit;
+    placeholder-color: @fg-muted;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    markup: true;
+}
+
+listview {
+    columns: 1;
+    lines: 4;
+    spacing: 8px;
+    cycle: true;
+    dynamic: true;
+    fixed-height: true;
+    fixed-columns: true;
+    scrollbar: false;
+    background-color: transparent;
+}
+
+element {
+    padding: 14px 18px;
+    border: 1px;
+    border-radius: 14px;
+    border-color: transparent;
+    background-color: var(overlay-row);
+    text-color: @fg-primary;
+    cursor: pointer;
+}
+
+element-text {
+    font: "JetBrainsMono Nerd Font 14";
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element selected.normal {
+    border-color: @accent;
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}

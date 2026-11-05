@@ -1,0 +1,108 @@
+configuration {
+    show-icons: false;
+}
+
+@import "../../colors.rasi"
+@import "../fonts/font.rasi"
+
+* {
+    overlay-card: rgba(10, 11, 13, 0.86);
+    overlay-tile: rgba(23, 24, 26, 0.80);
+}
+
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+    fullscreen: true;
+    background-color: rgba(10, 11, 13, 0.60);
+}
+
+mainbox {
+    spacing: 18px;
+    margin: 0px 17%;
+    padding: 28px;
+    background-color: transparent;
+    children: [ "dummy", "inputbar", "message", "listview", "dummy" ];
+}
+
+dummy {
+    expand: true;
+    background-color: transparent;
+}
+
+inputbar {
+    spacing: 12px;
+    background-color: transparent;
+    text-color: @fg-primary;
+    children: [ "textbox-prompt-colon", "prompt" ];
+}
+
+textbox-prompt-colon {
+    str: "";
+    expand: false;
+    padding: 13px 16px;
+    border-radius: 16px;
+    background-color: @danger-soft;
+    text-color: @fg-primary;
+}
+
+prompt {
+    padding: 13px 18px;
+    border-radius: 16px;
+    background-color: @accent-soft;
+    text-color: @fg-primary;
+}
+
+message {
+    padding: 12px 18px;
+    border-radius: 16px;
+    background-color: var(overlay-card);
+    text-color: @fg-secondary;
+}
+
+textbox {
+    font: "JetBrainsMono Nerd Font 12";
+    background-color: transparent;
+    text-color: inherit;
+    placeholder-color: @fg-muted;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    markup: true;
+}
+
+listview {
+    columns: 2;
+    lines: 2;
+    spacing: 14px;
+    cycle: true;
+    dynamic: true;
+    fixed-height: true;
+    fixed-columns: true;
+    scrollbar: false;
+    background-color: transparent;
+}
+
+element {
+    padding: 28px 13px;
+    border: 1px;
+    border-radius: 20px;
+    border-color: transparent;
+    background-color: var(overlay-tile);
+    text-color: @fg-primary;
+    cursor: pointer;
+}
+
+element-text {
+    font: "JetBrainsMono Nerd Font 13";
+    background-color: transparent;
+    text-color: inherit;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+}
+
+element selected.normal {
+    border-color: @accent;
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}

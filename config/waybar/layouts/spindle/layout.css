@@ -1,0 +1,143 @@
+* {
+    all: unset;
+    font-family: "CaskaydiaCove Nerd Font", "JetBrainsMono Nerd Font", "Symbols Nerd Font";
+    font-size: 12px;
+}
+
+window#waybar {
+    background: @bg-panel;
+    border: 1px solid alpha(@accent, 0.16);
+    border-radius: 14px;
+    color: @txt;
+}
+
+tooltip {
+    background: @bg-tip;
+    border: 1px solid @shadow-tip;
+    border-radius: 8px;
+    color: @txt;
+    padding: 7px 9px;
+}
+
+tooltip label {
+    color: @txt;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    margin: 5px 0;
+}
+
+#workspaces {
+    background: @clear;
+    font-size: 0.65rem;
+}
+
+#workspaces button {
+    background: @clear;
+    border-left: 2px solid @clear;
+    border-radius: 5px;
+    color: @txt-muted;
+    margin: 2px 5px;
+    min-height: 23px;
+    padding: 0 8px;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+#workspaces button.active {
+    background: @accent-soft;
+    border-left-color: @accent;
+    color: @accent;
+}
+
+#workspaces button.visible {
+    color: @txt;
+}
+
+#workspaces button:hover,
+#workspaces .taskbar-window:hover {
+    background: alpha(@accent, 0.12);
+    color: @txt;
+}
+
+#workspaces button.urgent {
+    background: @err;
+    color: @txt-accent;
+}
+
+#workspaces .taskbar-window {
+    border-radius: 4px;
+    margin: 1px 0;
+    padding: 3px;
+}
+
+#workspaces .taskbar-window.active {
+    background: alpha(@accent, 0.15);
+}
+
+#clock {
+    background: @bg-solid;
+    border-radius: 8px;
+    color: @txt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin: 4px 5px;
+    padding: 7px 2px;
+}
+
+#windowcount {
+    background: @bg-solid;
+    border-radius: 8px;
+    color: @accent;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 2px 5px;
+    padding: 5px 3px;
+}
+
+#custom-cpu_temp,
+#tray,
+#custom-notification,
+#pulseaudio,
+#custom-power-battery {
+    background: @bg-solid;
+    border-radius: 8px;
+    color: @txt;
+    margin: 2px 5px;
+    padding: 7px 3px;
+}
+
+#custom-cpu_temp.normal,
+#custom-power-battery.power-saver {
+    color: @ok;
+}
+
+#custom-cpu_temp.warm,
+#pulseaudio.warning,
+#custom-power-battery.warning {
+    color: @warn;
+}
+
+#custom-cpu_temp.hot,
+#custom-cpu_temp.critical,
+#pulseaudio.critical,
+#custom-power-battery.critical {
+    color: @err;
+}
+
+#custom-notification.notification,
+#pulseaudio,
+#custom-power-battery.performance {
+    color: @accent;
+}
+
+#custom-notification.none,
+#pulseaudio.muted,
+#custom-power-battery.unknown {
+    color: @txt-muted;
+}
+
+#custom-power-battery.charging {
+    color: @color10;
+}

@@ -15,26 +15,24 @@ source "$SCRIPT_DIR/state_utils.sh"
 
 CURRENT_WALLPAPER_LINK="$ROOT_DIR/state/current_wallpaper"
 BLURRED_WALLPAPER_LINK="$ROOT_DIR/state/blurred_wallpaper"
+CURRENT_COLORS_JSON_LINK="$ROOT_DIR/state/current_colors.json"
 
 BLUR_CACHE_DIR="$ROOT_DIR/cache/wallpaper-blur"
 
 THEMES_DIR="$ROOT_DIR/themes"
-WAYBAR_LAYOUTS_DIR="$ROOT_DIR/layouts/waybars"
 
 ###############################################################################
-# Config Targets
+# Config Targets (preserved across packages)
 ###############################################################################
 
-HYPR_DECORATIONS_TARGET="$HOME/.config/hypr/modules/decorations.lua"
+HYPR_THEME_DECORATIONS_TARGET="$HOME/.config/hypr/modules/theme_decorations.lua"
 
 KITTY_TARGET="$HOME/.config/kitty/colors.conf"
 ROFI_TARGET="$HOME/.config/rofi/colors.rasi"
 SWAYNC_TARGET="$HOME/.config/swaync/colors.css"
 WAYBAR_COLORS_TARGET="$HOME/.config/waybar/colors.css"
 WLOGOUT_COLORS_TARGET="$HOME/.config/wlogout/colors.css"
-
-WAYBAR_CONFIG_TARGET="$HOME/.config/waybar/config.jsonc"
-WAYBAR_LAYOUT_TARGET="$HOME/.config/waybar/layout.css"
+CAVA_THEME_TARGET="$HOME/.config/cava/themes/current"
 
 ###############################################################################
 # Helpers
@@ -42,20 +40,21 @@ WAYBAR_LAYOUT_TARGET="$HOME/.config/waybar/layout.css"
 
 die() {
     echo "[ERROR] $*" >&2
-
-    notify-send "Theme Switcher" "$*"
-
+    notify-send "Theme Switcher" "$*" || true
     exit 1
 }
 
 ok() {
     echo "[OK] $*"
-
-    notify-send "Theme Switcher" "$*"
+    notify-send "Theme Switcher" "$*" || true
 }
 
 warn() {
     echo "[WARN] $*"
+}
+
+validate_component() {
+    [[ "$1" =~ ^[A-Za-z0-9_.-]+$ && "$1" != . && "$1" != .. ]] || die "Invalid name: $1"
 }
 
 create_symlink() {
@@ -63,60 +62,57 @@ create_symlink() {
     local target="$2"
 
     mkdir -p "$(dirname "$target")"
-
     ln -sfn "$source" "$target"
 }
 
-verify_link() {
-    local expected="$1"
-    local actual="$2"
-    local label="$3"
+generate_cava_theme() {
+    local source="${1:-$CURRENT_COLORS_JSON_LINK}"
+    local target="${2:-$CAVA_THEME_TARGET}"
 
-    if [[ ! -L "$actual" ]]; then
-        echo "[FAIL] $label"
-        echo "  Not a symlink"
-        return 1
-    fi
+    [[ -s "$source" ]] || die "Colors file not found or empty: $source"
 
-    local resolved
-    resolved="$(realpath "$actual")"
-
-    if [[ "$resolved" == "$(realpath "$expected")" ]]; then
-        echo "[OK] $label"
-        return 0
-    fi
-
-    echo "[FAIL] $label"
-    echo "  Expected: $(realpath "$expected")"
-    echo "  Actual:   $resolved"
-    return 1
-}
-
-reload_system() {
-    local reload_script="$SCRIPT_DIR/reload.sh"
-
-    if [[ -x "$reload_script" ]]; then
-        "$reload_script"
-    elif [[ -f "$reload_script" ]]; then
-        bash "$reload_script"
-    fi
+    mkdir -p "$(dirname "$target")"
+    jq -r '
+    "[color]",
+    "gradient = 1",
+    "gradient_count = 6",
+    "gradient_color_1 = '\''" + .accentAlt + "'\''",
+    "gradient_color_2 = '\''" + .accent + "'\''",
+    "gradient_color_3 = '\''" + .success + "'\''",
+    "gradient_color_4 = '\''" + .warning + "'\''",
+    "gradient_color_5 = '\''" + .critical + "'\''",
+    "gradient_color_6 = '\''" + .text + "'\''"
+    ' "$source" > "$target"
 }
 
 ###############################################################################
-# Theme
+# Theme Switching
 ###############################################################################
 
 switch_theme() {
     local theme="$1"
+    validate_component "$theme"
 
     local colors_dir="$THEMES_DIR/$theme/colors"
     local hypr_dir="$THEMES_DIR/$theme/hypr"
 
     [[ -d "$colors_dir" ]] || die "Theme not found: $theme"
+    local required
+    for required in colors.json kitty_colors.conf rofi_colors.rasi swaync_colors.css waybar_colors.css wlogout_colors.css; do
+        [[ -s "$colors_dir/$required" ]] || die "Theme '$theme' is missing colors/$required"
+    done
+    [[ -s "$hypr_dir/theme_decorations.lua" ]] || die "Theme '$theme' is missing Hyprland theme decorations"
+    local default_wallpaper
+    default_wallpaper="$(find "$THEMES_DIR/$theme/wallpapers" -maxdepth 1 -type f ! -name '*_preview*' 2>/dev/null | sort | head -n1)"
+    [[ -n "$default_wallpaper" ]] || die "Theme '$theme' has no wallpapers"
 
     create_symlink \
-        "$hypr_dir/decorations.lua" \
-        "$HYPR_DECORATIONS_TARGET"
+        "$hypr_dir/theme_decorations.lua" \
+        "$HYPR_THEME_DECORATIONS_TARGET"
+
+    create_symlink \
+        "$colors_dir/colors.json" \
+        "$CURRENT_COLORS_JSON_LINK"
 
     create_symlink \
         "$colors_dir/kitty_colors.conf" \
@@ -138,32 +134,28 @@ switch_theme() {
         "$colors_dir/wlogout_colors.css" \
         "$WLOGOUT_COLORS_TARGET"
 
+    generate_cava_theme \
+        "$CURRENT_COLORS_JSON_LINK" \
+        "$CAVA_THEME_TARGET"
+
     local theme_file="$THEMES_DIR/$theme/theme.env"
-    "$SCRIPT_DIR"/theme_helper "$theme_file"
+    if [[ -f "$theme_file" ]]; then
+        "$SCRIPT_DIR"/theme_helper "$theme_file"
+    fi
 
     # Theme default wallpaper
-    local default_wallpaper
-
-    default_wallpaper="$(find "$THEMES_DIR/$theme/wallpapers" \
-        -maxdepth 1 \
-        -type f \
-        | sort \
-        | sed -n '1p')"
-
-    [[ -n "$default_wallpaper" ]] \
-        || die "Theme '$theme' has no wallpapers"
-
     # Theme blurred wallpaper
     local blurred_wallpaper
-
     blurred_wallpaper="$(find "$BLUR_CACHE_DIR/$theme" \
         -maxdepth 1 \
-        -type f \
+        -type f 2>/dev/null \
         | sort \
-        | sed -n '1p')"
+        | sed -n '1p')" || true
 
-    [[ -n "$blurred_wallpaper" ]] \
-        || die "Theme '$theme' has no blurred wallpaper"
+    if [[ -z "$blurred_wallpaper" ]]; then
+        warn "Theme '$theme' has no blurred wallpaper, falling back to original"
+        blurred_wallpaper="$default_wallpaper"
+    fi
 
     create_symlink \
         "$default_wallpaper" \
@@ -178,55 +170,104 @@ switch_theme() {
     ACTIVE_WALLPAPER="$(basename "$default_wallpaper")"
     save_state
 
-    ok "Theme switched to '$theme'" 
-    # ok "Wallpaper switched to '$ACTIVE_WALLPAPER'"
+    # Quickshell in-memory theme update IPC
+    qs -c ashell ipc call theme applyTheme "$theme" >/dev/null 2>&1 || quickshell -c ashell ipc call theme applyTheme "$theme" >/dev/null 2>&1 || true
+
+    ok "Theme switched to '$theme'"
 }
 
 ###############################################################################
-# Wallpaper
+# Wallpaper Switching
 ###############################################################################
 
 find_wallpaper() {
     local wallpaper="$1"
     local theme="$2"
+    validate_component "$theme"
+    [[ "$wallpaper" != /* && "$wallpaper" != *..* && "$wallpaper" != *\\* ]] || return 1
 
-    # Resolve preview names to their GIF counterpart.
     if [[ "$wallpaper" == *_preview* ]]; then
         local gif_name="${wallpaper%%_preview*}.gif"
         wallpaper="gifs/$gif_name"
     fi
 
-    find "$THEMES_DIR/$theme/wallpapers/" \
-        -type f \
-        -path "*/$wallpaper" \
-        | head -n1
+    # 1. Exact path match
+    local match
+    match="$(find "$THEMES_DIR/$theme/wallpapers/" -type f -path "*/$wallpaper" 2>/dev/null | head -n1)"
+    if [[ -n "$match" ]]; then
+        echo "$match"
+        return 0
+    fi
+
+    # 2. Base name match across common image extensions (.png, .jpg, .jpeg, .webp)
+    local base="${wallpaper%.*}"
+    for ext in png jpg jpeg webp PNG JPG JPEG WEBP; do
+        match="$(find "$THEMES_DIR/$theme/wallpapers/" -type f -name "${base}.${ext}" 2>/dev/null | head -n1)"
+        if [[ -n "$match" ]]; then
+            echo "$match"
+            return 0
+        fi
+    done
+
+    return 1
 }
 
 find_blurred_wallpaper() {
     local wallpaper="$1"
     local theme="$2"
 
-    find "$BLUR_CACHE_DIR/$theme/" \
-        -type f \
-        -path "*/$wallpaper" \
-        | head -n1
+    # 1. Exact path match
+    local match
+    match="$(find "$BLUR_CACHE_DIR/$theme/" -type f -path "*/$wallpaper" 2>/dev/null | head -n1)"
+    if [[ -n "$match" ]]; then
+        echo "$match"
+        return 0
+    fi
+
+    # 2. Base name match across common image extensions (.png, .jpg, .jpeg, .webp)
+    local base="${wallpaper%.*}"
+    for ext in png jpg jpeg webp PNG JPG JPEG WEBP; do
+        match="$(find "$BLUR_CACHE_DIR/$theme/" -type f -name "${base}.${ext}" 2>/dev/null | head -n1)"
+        if [[ -n "$match" ]]; then
+            echo "$match"
+            return 0
+        fi
+    done
+
+    # 3. Preview gif fallback
+    if [[ "$wallpaper" == *_preview* ]]; then
+        local pbase="${wallpaper%%_preview*}"
+        match="$(find "$BLUR_CACHE_DIR/$theme/" -type f -name "${pbase}*" 2>/dev/null | head -n1)"
+        if [[ -n "$match" ]]; then
+            echo "$match"
+            return 0
+        fi
+    fi
+
+    return 1
 }
 
 switch_wallpaper() {
     local wallpaper="$1"
 
     load_state
-    theme="$ACTIVE_THEME"
+    local theme="$ACTIVE_THEME"
 
     local wallpaper_path
     wallpaper_path="$(find_wallpaper "$wallpaper" "$theme")"
 
-    [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper_path"
+    [[ -n "$wallpaper_path" ]] || die "Wallpaper not found: $wallpaper"
+
+    local actual_filename
+    actual_filename="$(basename "$wallpaper_path")"
 
     local blurred_wallpaper_path
-    blurred_wallpaper_path="$(find_blurred_wallpaper "$wallpaper" "$theme")"
+    blurred_wallpaper_path="$(find_blurred_wallpaper "$actual_filename" "$theme")" || true
 
-    [[ -n "$blurred_wallpaper_path" ]] || die "Blurred wallpaper not found: $blurred_wallpaper_path"
+    if [[ -z "$blurred_wallpaper_path" ]]; then
+        warn "Blurred wallpaper not found for '$actual_filename' in theme '$theme', using original wallpaper as fallback"
+        blurred_wallpaper_path="$wallpaper_path"
+    fi
 
     create_symlink \
         "$wallpaper_path" \
@@ -236,168 +277,14 @@ switch_wallpaper() {
         "$BLURRED_WALLPAPER_LINK"
 
     load_state
-    ACTIVE_WALLPAPER="$wallpaper"
+    ACTIVE_WALLPAPER="$actual_filename"
     save_state
 
-    local msg="Wallpaper switched to '$wallpaper'"
+    # Quickshell in-memory wallpaper update IPC
+    qs -c ashell ipc call theme applyWallpaper "$actual_filename" >/dev/null 2>&1 || quickshell -c ashell ipc call theme applyWallpaper "$actual_filename" >/dev/null 2>&1 || true
+
+    local msg="Wallpaper switched to '$actual_filename'"
     ok "$msg"
-}
-
-# blur_wallpaper(){
-#     local image_to_blur="${1:-$ROOT_DIR/state/current_wallpaper}"
-#     local blurred_image="$ROOT_DIR/cache/blurred_wallpaper.jpg"
-
-#     # pkill -f "blur_image.sh" 2>/dev/null
-
-#     ~/.local/bin/blur_image.sh "$image_to_blur" "$blurred_image" &
-# }
-
-###############################################################################
-# Waybar Layout
-###############################################################################
-
-switch_waybar() {
-    local layout="$1"
-
-    local layout_dir="$WAYBAR_LAYOUTS_DIR/$layout"
-
-    [[ -d "$layout_dir" ]] || die "Waybar layout not found: $layout"
-
-    create_symlink \
-        "$layout_dir/config.jsonc" \
-        "$WAYBAR_CONFIG_TARGET"
-
-    create_symlink \
-        "$layout_dir/layout.css" \
-        "$WAYBAR_LAYOUT_TARGET"
-
-    load_state
-    ACTIVE_WAYBAR_LAYOUT="$layout"
-    save_state
-
-    ok "Waybar layout switched to '$layout'"
-}
-
-###############################################################################
-# Launcher
-###############################################################################
-
-switch_launcher(){
-    local launcher="$1"
-
-    load_state
-    ACTIVE_LAUNCHER="$launcher"
-    save_state
-}
-
-###############################################################################
-# Spotify
-###############################################################################
-
-switch_spotify()
-{
-    local arg="$1"
-
-    read -r spotify_theme spotify_color_scheme <<< "$arg"
-
-    local changed=0
-
-    # Update theme
-    if [[ "$(spicetify config current_theme | awk '{print $2}')" != "$spotify_theme" ]]; then
-        spicetify config current_theme "$spotify_theme"
-        changed=1
-    fi
-
-    # Update color scheme
-    if [[ -n "$spotify_color_scheme" ]]; then
-        if [[ "$(spicetify config color_scheme | awk '{print $2}')" != "$spotify_color_scheme" ]]; then
-            spicetify config color_scheme "$spotify_color_scheme"
-            changed=1
-        fi
-    fi
-
-    # (( changed )) && spicetify apply >/dev/null 2>&1 &
-    if (( changed )) && pgrep -x spotify >/dev/null; then
-        spicetify apply >/dev/null 2>&1 &
-    fi
-
-    local msg="Spotify theme switched to '$spotify_theme $spotify_color_scheme'"
-    ok "$msg"
-}
-
-###############################################################################
-# Verify
-###############################################################################
-
-verify_theme() {
-    local theme_dir="$THEMES_DIR/$ACTIVE_THEME/colors"
-
-    verify_link \
-        "$theme_dir/kitty_colors.conf" \
-        "$KITTY_TARGET" \
-        "kitty colors"
-
-    verify_link \
-        "$theme_dir/rofi_colors.rasi" \
-        "$ROFI_TARGET" \
-        "rofi colors"
-
-    verify_link \
-        "$theme_dir/swaync_colors.css" \
-        "$SWAYNC_TARGET" \
-        "swaync colors"
-
-    verify_link \
-        "$theme_dir/waybar_colors.css" \
-        "$WAYBAR_COLORS_TARGET" \
-        "waybar colors"
-
-    verify_link \
-        "$theme_dir/wlogout_colors.css" \
-        "$WLOGOUT_COLORS_TARGET" \
-        "waybar colors"
-}
-
-verify_wallpaper() {
-    local wallpaper_path
-    wallpaper_path="$(find_wallpaper "$ACTIVE_WALLPAPER")"
-
-    verify_link \
-        "$wallpaper_path" \
-        "$CURRENT_WALLPAPER_LINK" \
-        "wallpaper"
-}
-
-verify_waybar() {
-    local layout_dir="$WAYBAR_LAYOUTS_DIR/$ACTIVE_WAYBAR_LAYOUT"
-
-    verify_link \
-        "$layout_dir/config.jsonc" \
-        "$WAYBAR_CONFIG_TARGET" \
-        "waybar config"
-
-    verify_link \
-        "$layout_dir/style.css" \
-        "$WAYBAR_LAYOUT_TARGET" \
-        "waybar style"
-}
-
-cmd_verify() {
-    load_state
-
-    local failed=0
-
-    verify_theme || failed=1
-    verify_wallpaper || failed=1
-    verify_waybar || failed=1
-
-    echo
-
-    if (( failed == 0 )); then
-        ok "All symlinks valid"
-    else
-        die "Verification failed"
-    fi
 }
 
 ###############################################################################
@@ -407,18 +294,13 @@ cmd_verify() {
 usage() {
     cat <<EOF
 Usage:
-
-  theme_switcher.sh switch theme <theme>
-  theme_switcher.sh switch wallpaper <wallpaper>
-  theme_switcher.sh switch waybar_layout <layout>
-
-  theme_switcher.sh verify
+  theme_switcher switch theme <theme>
+  theme_switcher switch wallpaper <wallpaper>
 EOF
 }
 
 main() {
     case "${1:-}" in
-
         switch)
             [[ $# -eq 3 ]] || die "Invalid switch arguments"
 
@@ -426,38 +308,16 @@ main() {
                 theme)
                     switch_theme "$3"
                     "$SCRIPT_DIR"/reload all
-                    # blur_wallpaper
                     ;;
                 wallpaper)
-                    local wallpaper_name="$3"
-                    switch_wallpaper "$wallpaper_name"
+                    switch_wallpaper "$3"
                     "$SCRIPT_DIR"/reload wallpaper
-                    # if [[ "$wallpaper_name" == *_preview* ]]; then
-                    #     blur_wallpaper "$THEMES_DIR/$ACTIVE_THEME/wallpapers/$wallpaper_name"
-                    # else
-                    #     blur_wallpaper
-                    # fi
-                    ;;
-                waybar)
-                    switch_waybar "$3"
-                    "$SCRIPT_DIR"/reload waybar
-                    ;;
-                launcher)
-                    switch_launcher "$3"
-                    ;;
-                spotify)
-                    switch_spotify "$3"
                     ;;
                 *)
                     die "Unknown aspect: $2"
                     ;;
             esac
             ;;
-
-        verify)
-            cmd_verify
-            ;;
-
         *)
             usage
             exit 1

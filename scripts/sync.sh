@@ -54,12 +54,14 @@ sync .config/nwg-look config/nwg-look
 
 sync .config/inkscape config/inkscape
 
+sync .config/quickshell config/quickshell
 sync .config/theme-switcher config/theme-switcher
 
 # local
 echo "[*] Syncing local..."
 
 sync .local/bin local/bin
+sync .local/share/easyeffects/ local/share/easyeffects
 
 # home
 echo "[*] Syncing home..."

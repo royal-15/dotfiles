@@ -16,33 +16,49 @@ local mod = "SUPER"
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+-- hl.bind(mainMod .. " + SHIFT + L",
+--         hl.dsp.exec_cmd("wlogout --protocol layer-shell"))
+-- hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({action = "toggle"}))
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd(
-            "$HOME/.config/theme-switcher/scripts/launcher.sh || pkill rofi"))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 
 -- # Custom
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/launch.sh"))
+-- hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("pkill waybar"))
+-- hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/launch.sh"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("google-chrome-stable"))
-hl.bind(mainMod .. " + M",
-        hl.dsp.exec_cmd("$HOME/.local/bin/power-mode-menu.sh || pkill rofi"))
-hl.bind(mainMod .. " + SHIFT + M",
-        hl.dsp.exec_cmd("wlogout --protocol layer-shell"))
-hl.bind(mainMod .. " + B",
-        hl.dsp.exec_cmd("~/.local/bin/bluetooth-menu.sh || pkill rofi"))
+-- hl.bind(mainMod .. " + M",
+--         hl.dsp.exec_cmd("$HOME/.local/bin/power-mode-menu.sh || pkill rofi"))
+-- hl.bind(mainMod .. " + B",
+--         hl.dsp.exec_cmd("~/.local/bin/bluetooth-menu.sh || pkill rofi"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("blueman-manager"))
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("kitty -e htop"))
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
+-- hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("~/.local/bin/night-mode.sh"))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(
-            "$HOME/.config/theme-switcher/scripts/theme_switcher_menu.sh || pkill rofi"))
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("kitty --class \"kew-kitty\" -e kew"))
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("hyprctl kill"))
+
+-- Theme Studio (Quickshell Dynamic Island)
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("qs -c ashell ipc call theme toggle"))
+
+-- Notification center (Quickshell)
+hl.bind(mod .. " + N",
+        hl.dsp.exec_cmd("qs -c ashell ipc call notifications toggle"))
+
+-- Network center (Quickshell)
+hl.bind(mainMod .. " + N",
+        hl.dsp.exec_cmd("qs -c ashell ipc call network openWifi"))
+hl.bind(mainMod .. " + B",
+        hl.dsp.exec_cmd("qs -c ashell ipc call network openBluetooth"))
+hl.bind(mainMod .. " + M",
+        hl.dsp.exec_cmd("qs -c ashell ipc call powerprofile open"))
+hl.bind(mainMod .. " + SHIFT + M",
+        hl.dsp.exec_cmd("qs -c ashell ipc call media toggle"))
+hl.bind(mainMod .. " + D",
+        hl.dsp.exec_cmd("qs -c ashell ipc call launcher toggle"))
 
 -- # Emoji picker
 hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd(
@@ -100,34 +116,46 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), {mouse = true})
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), {mouse = true})
 
 -- Laptop multimedia keys for volume and LCD brightness
+local volumeStep = "3"
+local brightnessStep = "5"
+
 hl.bind("XF86AudioRaiseVolume",
-        hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
+        hl.dsp
+            .exec_cmd(
+            "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ " .. volumeStep .. "%+"),
         {locked = true, repeating = true})
-hl.bind("XF86AudioLowerVolume",
-        hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
+hl.bind("XF86AudioLowerVolume", hl.dsp
+            .exec_cmd(
+            "wpctl set-volume @DEFAULT_AUDIO_SINK@ " .. volumeStep .. "%-"),
         {locked = true, repeating = true})
 hl.bind("XF86AudioMute",
         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
         {locked = true, repeating = true})
 hl.bind("XF86AudioMicMute",
         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+
         {locked = true, repeating = true})
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),
+hl.bind("XF86MonBrightnessUp", hl.dsp
+            .exec_cmd("brightnessctl -e4 -n2 set " .. brightnessStep .. "%+"),
         {locked = true, repeating = true})
-hl.bind("XF86MonBrightnessDown",
-        hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),
+hl.bind("XF86MonBrightnessDown", hl.dsp
+            .exec_cmd("brightnessctl -e4 -n2 set " .. brightnessStep .. "%-"),
         {locked = true, repeating = true})
 
 -- # Volume
 hl.bind(mainMod .. " + F3",
-        hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 3%+"))
-hl.bind(mainMod .. " + F2",
-        hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%-"))
+        hl.dsp
+            .exec_cmd(
+            "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ " .. volumeStep .. "%+"))
+hl.bind(mainMod .. " + F2", hl.dsp
+            .exec_cmd(
+            "wpctl set-volume @DEFAULT_AUDIO_SINK@ " .. volumeStep .. "%-"))
 
 -- # Built-in screen brightness
-hl.bind(mod .. " + SHIFT + up", hl.dsp.exec_cmd("brightnessctl -e4 -n4 set 5%+"))
-hl.bind(mod .. " + SHIFT + down",
-        hl.dsp.exec_cmd("brightnessctl -e4 -n25 set 5%-"))
+hl.bind(mod .. " + SHIFT + up",
+        hl.dsp.exec_cmd("brightnessctl -e4 -n4 set " .. brightnessStep .. "%+"))
+hl.bind(mod .. " + SHIFT + down", hl.dsp
+            .exec_cmd("brightnessctl -e4 -n25 set " .. brightnessStep .. "%-"))
 
 -- Requires playerctl
 function audioctl(key, command)
@@ -170,6 +198,12 @@ hl.bind(mainMod .. " + G", function()
 
     hl.window_rule({
         match = {class = "Spotify"},
+        opacity = "1.0 override 1.0 override"
+        -- workspace = "special:s2"
+    })
+
+    hl.window_rule({
+        match = {class = "md.obsidian.Obsidian"},
         opacity = "1.0 override 1.0 override"
         -- workspace = "special:s2"
     })

@@ -7,7 +7,7 @@ hl.window_rule({
     workspace = "3"
 })
 hl.window_rule({match = {class = "zen", title = "Zen Browser"}, workspace = "3"})
-hl.window_rule({match = {class = "firefox"}, workspace = "3"})
+hl.window_rule({match = {class = "firefox"}, workspace = "special:s2"})
 
 hl.window_rule({
     match = {class = "jetbrains-studio", title = ""},
@@ -75,7 +75,8 @@ hl.window_rule({
 hl.window_rule({
     name = "Waydroid fullscreen",
     match = {class = "Waydroid"},
-    fullscreen = true
+    fullscreen = true,
+    workspace = "4"
 })
 
 -- Layer rules also return a handle.

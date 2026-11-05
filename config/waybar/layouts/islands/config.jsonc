@@ -1,0 +1,47 @@
+[
+    {
+        "name": "waybar-main",
+        "layer": "top",
+        "position": "top",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "spacing": 5,
+        "margin-top": 7,
+        "margin-left": 8,
+        "margin-right": 8,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/tray.jsonc",
+            "modules/notification.jsonc",
+            // "modules/network.jsonc",
+            "modules/media.jsonc",
+            "modules/bt_battery.jsonc"
+        ],
+        "hyprland/windowcount": {
+            "format": "▣ {}",
+            "format-empty": "▣ 0",
+            "separate-outputs": true
+        },
+        "modules-left": [
+            "hyprland/workspaces",
+            "hyprland/windowcount",
+            "custom/cpu_temp",
+            "custom/media"
+        ],
+        "modules-center": [
+            "clock"
+        ],
+        "modules-right": [
+            "tray",
+            "custom/bt-battery",
+            "pulseaudio",
+            // "network",
+            "custom/power-battery",
+            "custom/notification"
+        ]
+    }
+]

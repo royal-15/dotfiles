@@ -14,7 +14,7 @@ hl.config({master = {new_status = "master"}})
 hl.config({
     scrolling = {
         fullscreen_on_one_column = true,
-        column_width = 0.7,
-        explicit_column_widths = "0.333, 0.5, 0.667, 1.0"
+        column_width = 0.8,
+        explicit_column_widths = "0.35, 0.5, 0.7, 1.0"
     }
 })

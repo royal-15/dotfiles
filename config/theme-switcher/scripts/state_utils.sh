@@ -9,8 +9,6 @@ ensure_state_file() {
         cat > "$STATE_FILE" <<EOF
 ACTIVE_THEME=
 ACTIVE_WALLPAPER=
-ACTIVE_WAYBAR_LAYOUT=
-ACTIVE_LAUNCHER=
 EOF
     fi
 }
@@ -24,13 +22,11 @@ load_state() {
 
 save_state() {
     ensure_state_file
-
-    cat > "$STATE_FILE" <<EOF
-ACTIVE_THEME=${ACTIVE_THEME:-}
-ACTIVE_WALLPAPER=${ACTIVE_WALLPAPER:-}
-ACTIVE_WAYBAR_LAYOUT=${ACTIVE_WAYBAR_LAYOUT:-}
-ACTIVE_LAUNCHER=${ACTIVE_LAUNCHER:-}
-EOF
+    local tmp
+    tmp="$(mktemp "${STATE_FILE}.XXXXXX")"
+    printf 'ACTIVE_THEME=%q\nACTIVE_WALLPAPER=%q\n' "${ACTIVE_THEME:-}" "${ACTIVE_WALLPAPER:-}" > "$tmp"
+    chmod 600 "$tmp"
+    mv -f -- "$tmp" "$STATE_FILE"
 }
 
 save_key() {

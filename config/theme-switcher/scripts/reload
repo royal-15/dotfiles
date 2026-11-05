@@ -3,50 +3,46 @@
 set -euo pipefail
 
 reload_hyprland() {
-    hyprctl reload
-}
-
-reload_waybar() {
-    ~/.local/bin/restart-daemon.sh waybar
-}
-
-reload_swaync() {
-    ~/.local/bin/restart-daemon.sh swaync
+    command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true
 }
 
 reload_wallpaper() {
-    transition=$1
-    awww img ~/.config/theme-switcher/state/current_wallpaper --transition-type "$transition" --transition-duration 2
-}
-
-reload_rofi() {
-    # pkill rofi || true
-    :
-}
-
-reload_kitty() {
-    if kitty=$(pgrep -x kitty); then
-        kill -SIGUSR1 "$kitty"
+    local transition="${1:-wipe}"
+    if command -v awww >/dev/null 2>&1; then
+        awww img ~/.config/theme-switcher/state/current_wallpaper --transition-type "$transition" --transition-duration 1 >/dev/null 2>&1 || true
     fi
 }
 
-reload_wlogout() {
-    :
+reload_kitty() {
+    if command -v pgrep >/dev/null 2>&1; then
+        local kitty_pids
+        kitty_pids=$(pgrep -x kitty 2>/dev/null || true)
+        if [[ -n "$kitty_pids" ]]; then
+            echo "$kitty_pids" | xargs -r kill -SIGUSR1 2>/dev/null || true
+        fi
+    fi
+}
+
+reload_cava() {
+    if command -v pgrep >/dev/null 2>&1; then
+        local cava_pids
+        cava_pids=$(pgrep -x cava 2>/dev/null || true)
+        if [[ -n "$cava_pids" ]]; then
+            echo "$cava_pids" | xargs -r kill -SIGUSR1 2>/dev/null || true
+        fi
+    fi
 }
 
 reload_all() {
     reload_hyprland
-    reload_waybar
-    reload_swaync
-    reload_wallpaper center
-    reload_rofi
+    reload_wallpaper fade
     reload_kitty
-    reload_wlogout
+    reload_cava
 }
 
 main() {
     [[ $# -gt 0 ]] || {
-        echo "Usage: reload.sh <aspect>..."
+        echo "Usage: reload <aspect>..."
         exit 1
     }
 
@@ -55,23 +51,14 @@ main() {
             hyprland)
                 reload_hyprland
                 ;;
-            waybar)
-                reload_waybar
-                ;;
-            swaync)
-                reload_swaync
-                ;;
             wallpaper)
-                reload_wallpaper wipe
-                ;;
-            rofi)
-                reload_rofi
+                reload_wallpaper any
                 ;;
             kitty)
                 reload_kitty
                 ;;
-            wlogout)
-                reload_wlogout
+            cava)
+                reload_cava
                 ;;
             all)
                 reload_all

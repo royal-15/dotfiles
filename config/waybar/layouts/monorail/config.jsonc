@@ -1,0 +1,54 @@
+[
+    {
+        "name": "waybar-monorail",
+        "layer": "top",
+        "position": "top",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "spacing": 10,
+        "margin-top": 7,
+        "margin-left": 16,
+        "margin-right": 16,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/tray.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/notification.jsonc",
+            "modules/media.jsonc"
+        ],
+        "hyprland/workspaces": {
+            "workspace-taskbar": {
+                "enable": true,
+                "format": "{icon}",
+                "icon-size": 16,
+                "update-active-window": true,
+                "active-window-position": "last",
+                "orientation": "horizontal",
+                "on-click-window": "hyprctl dispatch focuswindow address:{address}"
+            }
+        },
+        "hyprland/windowcount": {
+            "format": "▣ {}",
+            "format-empty": "▣ 0",
+            "separate-outputs": true
+        },
+        "modules-left": [
+            "hyprland/workspaces",
+            "hyprland/windowcount",
+            "custom/media"
+        ],
+        "modules-center": [
+            "clock"
+        ],
+        "modules-right": [
+            "custom/cpu_temp",
+            "tray",
+            "custom/notification",
+            "pulseaudio",
+            "custom/power-battery"
+        ]
+    }
+]

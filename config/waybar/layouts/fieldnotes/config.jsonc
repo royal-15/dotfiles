@@ -1,0 +1,56 @@
+[
+    {
+        "name": "waybar-fieldnotes",
+        "layer": "bottom",
+        "position": "bottom",
+        "css": "~/.config/waybar/style.css",
+        "reload_style_on_change": false,
+        "spacing": 12,
+        "margin-bottom": 9,
+        "margin-left": 14,
+        "margin-right": 14,
+        "include": [
+            "modules/workspaces.jsonc",
+            "modules/clock.jsonc",
+            "modules/audio.jsonc",
+            "modules/battery.jsonc",
+            "modules/tray.jsonc",
+            "modules/cpu_temp.jsonc",
+            "modules/notification.jsonc",
+            "modules/media.jsonc",
+            "modules/cava.jsonc"
+        ],
+        "hyprland/workspaces": {
+            "workspace-taskbar": {
+                "enable": true,
+                "format": "{icon}",
+                "icon-size": 16,
+                "update-active-window": true,
+                "active-window-position": "last",
+                "orientation": "horizontal",
+                "on-click-window": "hyprctl dispatch focuswindow address:{address}"
+            }
+        },
+        "hyprland/windowcount": {
+            "format": "▣ {}",
+            "format-empty": "▣ 0",
+            "separate-outputs": true
+        },
+        "modules-left": [
+            "clock",
+            "custom/cpu_temp"
+        ],
+        "modules-center": [
+            "hyprland/workspaces",
+            "hyprland/windowcount",
+            "cava"
+        ],
+        "modules-right": [
+            "custom/media",
+            "tray",
+            "custom/notification",
+            "pulseaudio",
+            "custom/power-battery"
+        ]
+    }
+]

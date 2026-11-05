@@ -1,0 +1,1 @@
+/home/rajat/.config/theme-switcher/themes/solstice/hypr/theme_decorations.lua

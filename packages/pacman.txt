@@ -17,6 +17,7 @@ cpupower
 cups
 cups-pk-helper
 ddcutil
+deno
 dolphin
 drawio-desktop
 dunst
@@ -106,8 +107,10 @@ power-profiles-daemon
 pyenv
 qt5-wayland
 qt5ct
+qt6-languageserver
 qt6-wayland
 qt6ct
+quickshell
 rclone
 ristretto
 rofi
@@ -120,7 +123,6 @@ sof-firmware
 strawberry
 sudo
 swappy
-swaync
 system-config-printer
 telegram-desktop
 thunar
@@ -129,8 +131,11 @@ thunar-media-tags-plugin
 thunar-volman
 tk
 tree
+ttc-iosevka
 ttf-cascadia-code-nerd
+ttf-iosevka-nerd
 ttf-jetbrains-mono-nerd
+ttf-material-symbols-variable
 tumbler
 udiskie
 uwsm
@@ -142,6 +147,7 @@ virtualbox-host-dkms
 vlc
 vulkan-intel
 vulkan-radeon
+vulkan-tools
 waydroid
 wget
 wine
