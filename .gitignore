@@ -6,3 +6,4 @@ machine/*
 .env*
 
 config/theme-switcher/cache/*
+config/theme-switcher/themes/*/wallpapers/*
