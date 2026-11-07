@@ -20,6 +20,10 @@ Item {
     property var searchResults: []
     property var pendingLaunchEntry: null
 
+    readonly property real targetW: 500
+    readonly property real targetH: 460
+    readonly property real targetR: Decorations.cornerRadius
+
     readonly property bool isOpen: islandSurface.expanded
     readonly property bool isExpanded: islandSurface.expanded
     readonly property bool closingWithAnimation: islandSurface.closingWithAnimation
@@ -76,11 +80,28 @@ Item {
         if (iconCache[iconName] !== undefined)
             return iconCache[iconName];
 
-        // Prefer bitmap/PNG icons from theme to avoid QtSvg buffer size warnings
-        const resolved = Quickshell.iconPath(iconName, false);
+        // Prefer bitmap/PNG icons from theme to avoid QtSvg buffer size warnings, fallback to SVG if unavailable
+        let resolved = Quickshell.iconPath(iconName, false);
+        if (!resolved) {
+            resolved = Quickshell.iconPath(iconName, true);
+        }
         const result = resolved ? (resolved.startsWith("/") ? ("file://" + resolved) : resolved) : "";
         iconCache[iconName] = result;
         return result;
+    }
+
+    Connections {
+        target: LauncherService
+        function onAllApplicationsChanged() {
+            root.updateSearch();
+        }
+        function onRecentAppIdsChanged() {
+            root.updateSearch();
+        }
+    }
+
+    Component.onCompleted: {
+        root.updateSearch();
     }
 
     function updateSearch() {
@@ -175,7 +196,7 @@ Item {
     }
 
     function launchCurrentSelection() {
-        if (!searchResults || searchResults.length === 0)
+        if (islandSurface.isLaunching || !searchResults || searchResults.length === 0)
             return;
         if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
             const entry = searchResults[selectedIndex];
@@ -238,9 +259,9 @@ Item {
         readonly property real compactH: Decorations.pillHeight
         readonly property real compactR: compactH / 2 // 12.5
 
-        readonly property real targetW: 500
-        readonly property real targetH: 460
-        readonly property real targetR: Decorations.cornerRadius
+        readonly property real targetW: root.targetW
+        readonly property real targetH: root.targetH
+        readonly property real targetR: root.targetR
 
         readonly property real currentW: Math.round(compactW + (targetW - compactW) * morphProgress)
         readonly property real currentH: Math.round(compactH + (targetH - compactH) * morphProgress)
@@ -325,27 +346,43 @@ Item {
         // EXPANDED STATE: Application Launcher
         // ==========================================
 
-        // Header: Search Bar Container
+        // Header: Search Bar Container (takes all available width, centered)
         Item {
             id: searchHeader
             anchors.top: parent.top
             anchors.topMargin: 12
-            anchors.left: parent.left
-            anchors.leftMargin: 12
-            anchors.right: parent.right
-            anchors.rightMargin: 12
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: root.targetW - 24
             height: 44
             z: 5
 
             visible: islandSurface.morphProgress > 0.15
             opacity: Math.max(0, Math.min(1, (islandSurface.morphProgress - 0.15) / 0.35))
 
+            // Apple Focus Ring Halo around search input
+            Rectangle {
+                anchors.fill: searchInputBox
+                anchors.margins: -2
+                radius: searchInputBox.radius + 2
+                color: Colors.accentSoft
+                opacity: searchField.activeFocus ? 0.75 : 0.0
+                visible: opacity > 0.01
+                z: -1
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Motion.durationFast
+                        easing.type: Motion.easingStandard
+                    }
+                }
+            }
+
             Rectangle {
                 id: searchInputBox
                 anchors.fill: parent
                 radius: 13
                 color: searchField.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
-                border.width: 1
+                border.width: searchField.activeFocus ? 1.5 : 1
                 border.color: searchField.activeFocus ? Colors.accent : Colors.border
 
                 Behavior on color {
@@ -487,6 +524,17 @@ Item {
                             anchors.fill: parent
                             radius: 13
                             color: clearMouse.containsMouse ? Colors.hover : Colors.clear
+                            scale: clearMouse.pressed
+                                ? Motion.scalePress
+                                : (clearMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
+                            transformOrigin: Item.Center
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: clearMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                    easing.type: clearMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                                }
+                            }
 
                             Text {
                                 anchors.centerIn: parent
@@ -519,10 +567,8 @@ Item {
             id: sectionLabel
             anchors.top: searchHeader.bottom
             anchors.topMargin: 8
-            anchors.left: parent.left
-            anchors.leftMargin: 18
-            anchors.right: parent.right
-            anchors.rightMargin: 18
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: root.targetW - 36
             height: 16
             z: 5
 
@@ -531,9 +577,16 @@ Item {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.searchQuery.trim() === ""
-                    ? "RECENT APPLICATIONS"
-                    : (root.searchResults.length > 0 ? "SEARCH RESULTS" : "NO MATCHING APPLICATIONS")
+                text: {
+                    if (root.searchQuery.trim() === "") {
+                        if (root.searchResults.length === 0)
+                            return LauncherService.isLoaded ? "NO RECENT APPLICATIONS" : "LOADING APPLICATIONS...";
+                        return "RECENT APPLICATIONS";
+                    }
+                    return root.searchResults.length > 0
+                        ? `SEARCH RESULTS (${root.searchResults.length})`
+                        : "NO MATCHING APPLICATIONS";
+                }
                 color: Colors.textDim
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 10
@@ -548,23 +601,55 @@ Item {
             anchors.topMargin: 4
             anchors.bottom: dockDivider.top
             anchors.bottomMargin: 4
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.right: parent.right
-            anchors.rightMargin: 10
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: root.targetW - 20
             clip: true
             z: 5
 
             visible: islandSurface.morphProgress > 0.35
             opacity: Math.max(0, Math.min(1, (islandSurface.morphProgress - 0.35) / 0.35))
 
+            // Empty state display
+            Item {
+                anchors.centerIn: parent
+                visible: root.searchResults.length === 0
+                width: parent.width - 40
+                height: 120
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 8
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.searchQuery.trim() === "" ? "apps" : "search_off"
+                        color: Colors.textFaint
+                        font.family: "Material Symbols Rounded"
+                        font.pixelSize: 32
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.searchQuery.trim() === ""
+                            ? (LauncherService.isLoaded ? "No applications found" : "Loading applications...")
+                            : `No results for "${root.searchQuery}"`
+                        color: Colors.textDim
+                        font.family: "JetBrainsMono Nerd Font"
+                        font.pixelSize: 12
+                    }
+                }
+            }
+
             ListView {
                 id: appListView
                 anchors.fill: parent
+                topMargin: 2
+                bottomMargin: 2
                 spacing: 4
                 model: root.searchResults
                 currentIndex: root.selectedIndex
                 boundsBehavior: Flickable.StopAtBounds
+                visible: root.searchResults.length > 0
 
                 delegate: Item {
                     id: appDelegate
@@ -575,13 +660,42 @@ Item {
                     readonly property bool isHovered: itemMouse.containsMouse
                     readonly property bool isLaunchingThis: islandSurface.isLaunching && islandSurface.launchingIndex === index
 
+                    z: appDelegate.isSelected ? 5 : (appDelegate.isHovered ? 2 : 1)
                     width: appListView.width
-                    height: 48
+                    height: 50
+
+                    // Focus halo for selected result with anti-cropping margin headroom
+                    Rectangle {
+                        anchors.fill: resultCard
+                        anchors.margins: -1
+                        radius: resultCard.radius + 1
+                        color: Colors.accentSoft
+                        scale: resultCard.scale
+                        transformOrigin: Item.Center
+                        opacity: appDelegate.isSelected ? 0.65 : 0.0
+                        visible: opacity > 0.01
+                        z: -1
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
+                        }
+                    }
 
                     Rectangle {
+                        id: resultCard
                         anchors.fill: parent
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
+                        anchors.topMargin: 2
+                        anchors.bottomMargin: 2
                         radius: 12
-                        scale: appDelegate.isLaunchingThis ? 0.96 : 1.0
+                        scale: (itemMouse.pressed || appDelegate.isLaunchingThis)
+                            ? Motion.scalePress
+                            : (appDelegate.isSelected ? Motion.scaleTileHover : Motion.scaleNormal)
+                        transformOrigin: Item.Center
                         color: appDelegate.isLaunchingThis
                             ? Colors.accent
                             : (appDelegate.isSelected ? Colors.accentSoft : (appDelegate.isHovered ? Colors.hover : Colors.clear))
@@ -590,8 +704,8 @@ Item {
 
                         Behavior on scale {
                             NumberAnimation {
-                                duration: Motion.durationFast
-                                easing.type: Motion.easingStandard
+                                duration: (itemMouse.pressed || appDelegate.isLaunchingThis) ? Motion.durationPressDown : Motion.durationPressRelease
+                                easing.type: (itemMouse.pressed || appDelegate.isLaunchingThis) ? Motion.easingPressDown : Motion.easingPressRelease
                             }
                         }
 
@@ -707,9 +821,6 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onEntered: {
-                                root.setSelectedIndex(appDelegate.index);
-                            }
                             onClicked: {
                                 root.setSelectedIndex(appDelegate.index);
                                 root.launchCurrentSelection();

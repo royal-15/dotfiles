@@ -36,15 +36,15 @@ Item {
     height: islandSurface.height
 
     readonly property real targetStageW: {
-        if (currentStage === "themes") return 540;
-        if (currentStage === "wallpapers") return 640;
+        if (currentStage === "themes") return 560;
+        if (currentStage === "wallpapers") return 700;
         return 420; // "hub"
     }
 
     readonly property real targetStageH: {
-        if (currentStage === "themes") return 380;
-        if (currentStage === "wallpapers") return 260;
-        return 180; // "hub"
+        if (currentStage === "themes") return 400;
+        if (currentStage === "wallpapers") return 290;
+        return 190; // "hub"
     }
 
     readonly property real targetStageR: Decorations.cornerRadius
@@ -93,6 +93,26 @@ Item {
         autoRepeat: false
         enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
         onActivated: root.navigateBack()
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Tab"
+        context: Qt.WindowShortcut
+        autoRepeat: false
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation && (root.currentStage === "themes" || root.currentStage === "wallpapers")
+        onActivated: {
+            root.setStage(root.currentStage === "themes" ? "wallpapers" : "themes");
+        }
+    }
+
+    Shortcut {
+        sequences: ["Ctrl+Shift+Tab", "Ctrl+Backtab"]
+        context: Qt.WindowShortcut
+        autoRepeat: false
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation && (root.currentStage === "themes" || root.currentStage === "wallpapers")
+        onActivated: {
+            root.setStage(root.currentStage === "themes" ? "wallpapers" : "themes");
+        }
     }
 
     function openNow(argument) {
@@ -234,9 +254,12 @@ Item {
             // Stage 1: Hub View
             ThemeHubView {
                 id: hubView
-                anchors.fill: parent
-                visible: root.currentStage === "hub"
-                opacity: visible ? 1.0 : 0.0
+                width: 420
+                height: 190
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: root.currentStage === "hub" ? 1.0 : 0.0
+                visible: opacity > 0.01
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -253,9 +276,12 @@ Item {
             // Stage 2A: Themes View
             ThemesGridView {
                 id: themesView
-                anchors.fill: parent
-                visible: root.currentStage === "themes"
-                opacity: visible ? 1.0 : 0.0
+                width: 560
+                height: 400
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: root.currentStage === "themes" ? 1.0 : 0.0
+                visible: opacity > 0.01
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -265,14 +291,18 @@ Item {
                 }
 
                 onBackRequested: root.setStage("hub")
+                onOpenWallpapersRequested: root.setStage("wallpapers")
             }
 
             // Stage 2B: Wallpapers View
             WallpaperCarouselView {
                 id: wallpapersView
-                anchors.fill: parent
-                visible: root.currentStage === "wallpapers"
-                opacity: visible ? 1.0 : 0.0
+                width: 700
+                height: 290
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: root.currentStage === "wallpapers" ? 1.0 : 0.0
+                visible: opacity > 0.01
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -282,6 +312,7 @@ Item {
                 }
 
                 onBackRequested: root.setStage("hub")
+                onOpenThemesRequested: root.setStage("themes")
             }
         }
     }

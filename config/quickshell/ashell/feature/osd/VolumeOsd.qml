@@ -102,12 +102,12 @@ Item {
             Item {
                 id: sliderContainer
                 Layout.fillWidth: true
-                Layout.preferredHeight: osdMouseArea.containsMouse ? 10 : 8
+                Layout.preferredHeight: (osdMouseArea.containsMouse || osdMouseArea.pressed) ? 10 : 8
 
                 Behavior on Layout.preferredHeight {
                     NumberAnimation {
                         duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
+                        easing.type: Motion.easingFluid
                     }
                 }
 
@@ -117,6 +117,23 @@ Item {
                     radius: height / 2
                     color: Colors.surfaceMuted
                     border.width: 0
+
+                    // Ambient glow halo behind slider fill
+                    Rectangle {
+                        anchors.fill: sliderFill
+                        anchors.margins: -1
+                        radius: height / 2
+                        color: Colors.accentSoft
+                        opacity: (osdMouseArea.containsMouse || osdMouseArea.pressed) && !OsdService.liveMuted ? 0.75 : 0.0
+                        visible: opacity > 0.01
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
+                        }
+                    }
 
                     Rectangle {
                         id: sliderFill

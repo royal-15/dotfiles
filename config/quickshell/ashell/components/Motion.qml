@@ -31,6 +31,12 @@ QtObject {
     readonly property real scalePress: 0.96
     readonly property real scalePanelAnchor: 0.10
 
+    // Tactile Asymmetric Micro-Interaction Curves
+    readonly property int durationPressDown: durationInstant   // 75ms snappy compression
+    readonly property int durationPressRelease: durationFast   // 140ms fluid return
+    readonly property int easingPressDown: easingPress         // Easing.OutQuad
+    readonly property int easingPressRelease: easingStandard   // Easing.OutCubic
+
     // Elevation & Low-Contrast Borders (preserved for backwards compatibility; borderless design uses 0 width)
     readonly property int borderWidth: 0
     readonly property color subtleBorder: Colors.border

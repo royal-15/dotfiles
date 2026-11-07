@@ -177,12 +177,22 @@ Dialog {
                 Layout.preferredWidth: 84
                 implicitHeight: 38
                 text: "Cancel"
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: cancelButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: cancelButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: root.close()
                 background: Rectangle {
                     color: parent.down ? Colors.surface : parent.hovered ? Colors.surface : Colors.surfaceSoft
                     radius: 11
-                    border.width: parent.hovered ? 1 : 0
-                    border.color: Colors.border
+                    border.width: cancelButton.activeFocus ? 1.5 : (parent.hovered ? 1 : 0)
+                    border.color: cancelButton.activeFocus ? Colors.accent : Colors.border
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast
@@ -201,9 +211,20 @@ Dialog {
             }
 
             Button {
+                id: confirmButton
                 Layout.fillWidth: true
                 implicitHeight: 38
                 text: root.itemKind === "wifi" ? "Forget network" : "Unpair device"
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: confirmButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: confirmButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: {
                     root.close();
                     root.confirmed();
@@ -211,7 +232,8 @@ Dialog {
                 background: Rectangle {
                     color: parent.down ? Colors.critical : parent.hovered ? Colors.critical : Colors.criticalSoft
                     radius: 11
-                    border.width: 0
+                    border.width: confirmButton.activeFocus ? 1.5 : 0
+                    border.color: Colors.critical
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast

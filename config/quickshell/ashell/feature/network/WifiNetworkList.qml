@@ -39,36 +39,57 @@ ListView {
 
         width: view.width
         height: 64
+        z: rowItem.isSelected ? 5 : (wifiRowMouse.containsMouse ? 2 : 1)
 
+        // Apple Focus Ring Halo for keyboard selection with anti-cropping headroom
         Rectangle {
-            id: rowSurface
-            anchors.centerIn: parent
-            width: parent.width - 6
-            height: 58
-            radius: 12
-
-            scale: wifiRowMouse.pressed
-                ? Motion.scalePress
-                : (wifiRowMouse.containsMouse || isSelected)
-                    ? 1.014
-                    : Motion.scaleNormal
+            anchors.fill: rowSurface
+            anchors.margins: -1
+            radius: rowSurface.radius + 1
+            color: Colors.accentSoft
+            scale: rowSurface.scale
             transformOrigin: Item.Center
+            opacity: rowItem.isSelected ? 0.65 : 0.0
+            visible: opacity > 0.01
+            z: -1
 
-            Behavior on scale {
+            Behavior on opacity {
                 NumberAnimation {
                     duration: Motion.durationFast
                     easing.type: Motion.easingStandard
                 }
             }
+        }
 
-            color: (isSelected || isInUse)
+        Rectangle {
+            id: rowSurface
+            anchors.centerIn: parent
+            width: parent.width - 12
+            height: 56
+            radius: 12
+
+            scale: wifiRowMouse.pressed
+                ? Motion.scalePress
+                : (rowItem.isSelected || wifiRowMouse.containsMouse)
+                    ? Motion.scaleTileHover
+                    : Motion.scaleNormal
+            transformOrigin: Item.Center
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: wifiRowMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                    easing.type: wifiRowMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                }
+            }
+
+            color: rowItem.isSelected
                 ? Colors.accentSoft
-                : (wifiRowMouse.containsMouse
-                    ? Colors.surface
-                    : Colors.surfaceSoft)
+                : (rowItem.isInUse
+                    ? Colors.surfaceSoft
+                    : (wifiRowMouse.containsMouse ? Colors.surface : Colors.surfaceSoft))
 
-            border.width: (isSelected || isInUse || wifiRowMouse.containsMouse) ? 1 : 0
-            border.color: (isSelected || isInUse) ? Colors.accent : Colors.border
+            border.width: rowItem.isSelected ? 1.5 : (rowItem.isInUse ? 1 : (wifiRowMouse.containsMouse ? 1 : 0))
+            border.color: rowItem.isSelected ? Colors.accent : (rowItem.isInUse ? Colors.border : Colors.border)
 
             Behavior on color {
                 ColorAnimation {
@@ -178,13 +199,15 @@ ListView {
                 height: 28
                 radius: 8
                 color: forgetWifiMouse.containsMouse ? Colors.hover : Colors.clear
-                scale: forgetWifiMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
+                scale: forgetWifiMouse.pressed
+                    ? Motion.scalePress
+                    : (forgetWifiMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
                 border.width: 0
 
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
+                        duration: forgetWifiMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: forgetWifiMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
                     }
                 }
 

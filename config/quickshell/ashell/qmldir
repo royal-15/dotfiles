@@ -23,8 +23,11 @@ singleton ThemeService 1.0 feature/theme/ThemeService.qml
 singleton ThemeRouter 1.0 feature/theme/ThemeRouter.qml
 singleton ClipboardRouter 1.0 feature/clipboard/ClipboardRouter.qml
 singleton ClipboardService 1.0 feature/clipboard/ClipboardService.qml
+singleton CommandPaletteRouter 1.0 feature/commandpalette/CommandPaletteRouter.qml
+singleton CommandPaletteService 1.0 feature/commandpalette/CommandPaletteService.qml
 Poller 1.0 components/Poller.qml
 Pill 1.0 components/Pill.qml
 ThemeStudio 1.0 feature/theme/ThemeStudio.qml
 RightSidebar 1.0 feature/sidebar/RightSidebar.qml
 Clipboard 1.0 feature/clipboard/Clipboard.qml
+CommandPalette 1.0 feature/commandpalette/CommandPalette.qml

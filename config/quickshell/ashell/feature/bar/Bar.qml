@@ -15,6 +15,7 @@ import qs.feature.osd
 import qs.feature.media
 import qs.feature.theme
 import qs.feature.clipboard
+import qs.feature.commandpalette
 
 PanelWindow {
     id: bar
@@ -22,13 +23,13 @@ PanelWindow {
     property var modelData
 
     readonly property bool anyRightPanelOpen: rightSidebar.isOpen
-    readonly property bool anyPanelOpen: launcher.isOpen || themeStudio.isOpen || rightSidebar.isOpen || mediaIsland.isOpen || clipboard.isOpen
+    readonly property bool anyPanelOpen: launcher.isOpen || themeStudio.isOpen || rightSidebar.isOpen || mediaIsland.isOpen || clipboard.isOpen || commandPalette.isOpen
 
     screen: modelData
-    implicitHeight: 480
+    implicitHeight: 490
     exclusiveZone: Decorations.exclusiveZoneHeight
     color: Colors.clear
-    focusable: (launcher.isOpen && !launcher.closingWithAnimation) || (themeStudio.isOpen && !themeStudio.closingWithAnimation) || (clipboard.isOpen && !clipboard.closingWithAnimation) || (mediaIsland.isOpen && !mediaIsland.closingWithAnimation) || StatusBarPanelCoordinator.isSwitching
+    focusable: (launcher.isOpen && !launcher.closingWithAnimation) || (themeStudio.isOpen && !themeStudio.closingWithAnimation) || (clipboard.isOpen && !clipboard.closingWithAnimation) || (commandPalette.isOpen && !commandPalette.closingWithAnimation) || (mediaIsland.isOpen && !mediaIsland.closingWithAnimation) || StatusBarPanelCoordinator.isSwitching
 
     anchors {
         top: true
@@ -46,12 +47,16 @@ PanelWindow {
     mask: Region {
         Region { item: leftGroup }
         Region {
-            item: (clipboard.isOpen || clipboard.closingWithAnimation)
-                ? clipboard.islandSurface
-                : ((themeStudio.isOpen || themeStudio.closingWithAnimation) ? themeStudio.islandSurface : launcher.islandSurface)
-            radius: (clipboard.isOpen || clipboard.closingWithAnimation)
-                ? clipboard.islandSurface.currentR
-                : ((themeStudio.isOpen || themeStudio.closingWithAnimation) ? themeStudio.islandSurface.currentR : launcher.islandSurface.currentR)
+            item: (commandPalette.isOpen || commandPalette.closingWithAnimation)
+                ? commandPalette.islandSurface
+                : ((clipboard.isOpen || clipboard.closingWithAnimation)
+                    ? clipboard.islandSurface
+                    : ((themeStudio.isOpen || themeStudio.closingWithAnimation) ? themeStudio.islandSurface : launcher.islandSurface))
+            radius: (commandPalette.isOpen || commandPalette.closingWithAnimation)
+                ? commandPalette.islandSurface.currentR
+                : ((clipboard.isOpen || clipboard.closingWithAnimation)
+                    ? clipboard.islandSurface.currentR
+                    : ((themeStudio.isOpen || themeStudio.closingWithAnimation) ? themeStudio.islandSurface.currentR : launcher.islandSurface.currentR))
         }
         Region { item: mediaIsland.islandSurface; radius: mediaIsland.islandSurface.currentR }
         Region { item: rightGroup }
@@ -96,6 +101,20 @@ PanelWindow {
         onCleared: {
             if (clipboard.isOpen && !clipboard.closingWithAnimation)
                 clipboard.requestClose();
+        }
+    }
+
+    HyprlandFocusGrab {
+        id: commandPaletteFocusGrab
+        windows: [bar]
+        active: commandPalette.isOpen && !commandPalette.closingWithAnimation
+        onActiveChanged: {
+            if (active)
+                commandPalette.focusSearch();
+        }
+        onCleared: {
+            if (commandPalette.isOpen && !commandPalette.closingWithAnimation)
+                commandPalette.requestClose();
         }
     }
 
@@ -148,7 +167,7 @@ PanelWindow {
                 id: launcher
                 monitor: modelData ? Hyprland.monitorFor(modelData) : null
                 workspaceIds: WorkspaceResolver.resolve(modelData ? modelData.name : "")
-                externalDimProgress: Math.max(mediaIsland.workspaceDimProgress, themeStudio.workspaceDimProgress, clipboard.workspaceDimProgress)
+                externalDimProgress: Math.max(mediaIsland.workspaceDimProgress, themeStudio.workspaceDimProgress, clipboard.workspaceDimProgress, commandPalette.workspaceDimProgress)
                 anchors.top: parent.top
                 anchors.topMargin: Decorations.barItemMarginVertical
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -175,6 +194,17 @@ PanelWindow {
                 enabled: isOpen || closingWithAnimation
                 visible: isOpen || closingWithAnimation
             }
+
+            CommandPalette {
+                id: commandPalette
+                compactW: launcher.compactW
+                anchors.top: parent.top
+                anchors.topMargin: Decorations.barItemMarginVertical
+                anchors.horizontalCenter: parent.horizontalCenter
+                z: 43
+                enabled: isOpen || closingWithAnimation
+                visible: isOpen || closingWithAnimation
+            }
         }
 
         // Satellite Media Island (Equalizer Bubble <-> Morphing Now Playing Card)
@@ -184,6 +214,7 @@ PanelWindow {
             launcherItem: launcher
             themeStudioItem: themeStudio
             clipboardItem: clipboard
+            commandPaletteItem: commandPalette
             monitor: modelData ? Hyprland.monitorFor(modelData) : null
             z: mediaIsland.isOpen ? 50 : 5
         }
@@ -291,11 +322,13 @@ PanelWindow {
             LauncherRouter.registerPanel(screen, launcher);
             ThemeRouter.registerPanel(screen, themeStudio);
             ClipboardRouter.registerPanel(screen, clipboard);
+            CommandPaletteRouter.registerPanel(screen, commandPalette);
             MediaRouter.registerPanel(screen, mediaIsland);
             StatusBarPanelCoordinator.registerPanel(screen, rightSidebar);
             StatusBarPanelCoordinator.registerPanel(screen, launcher);
             StatusBarPanelCoordinator.registerPanel(screen, themeStudio);
             StatusBarPanelCoordinator.registerPanel(screen, clipboard);
+            StatusBarPanelCoordinator.registerPanel(screen, commandPalette);
             StatusBarPanelCoordinator.registerPanel(screen, mediaIsland);
         }
     }
@@ -307,11 +340,13 @@ PanelWindow {
         LauncherRouter.registerPanel(bar.screen, launcher);
         ThemeRouter.registerPanel(bar.screen, themeStudio);
         ClipboardRouter.registerPanel(bar.screen, clipboard);
+        CommandPaletteRouter.registerPanel(bar.screen, commandPalette);
         MediaRouter.registerPanel(bar.screen, mediaIsland);
         StatusBarPanelCoordinator.registerPanel(bar.screen, rightSidebar);
         StatusBarPanelCoordinator.registerPanel(bar.screen, launcher);
         StatusBarPanelCoordinator.registerPanel(bar.screen, themeStudio);
         StatusBarPanelCoordinator.registerPanel(bar.screen, clipboard);
+        StatusBarPanelCoordinator.registerPanel(bar.screen, commandPalette);
         StatusBarPanelCoordinator.registerPanel(bar.screen, mediaIsland);
     }
     Component.onDestruction: {
@@ -321,11 +356,13 @@ PanelWindow {
         LauncherRouter.unregisterPanel(launcher);
         ThemeRouter.unregisterPanel(themeStudio);
         ClipboardRouter.unregisterPanel(clipboard);
+        CommandPaletteRouter.unregisterPanel(commandPalette);
         MediaRouter.unregisterPanel(mediaIsland);
         StatusBarPanelCoordinator.unregisterPanel(rightSidebar);
         StatusBarPanelCoordinator.unregisterPanel(launcher);
         StatusBarPanelCoordinator.unregisterPanel(themeStudio);
         StatusBarPanelCoordinator.unregisterPanel(clipboard);
+        StatusBarPanelCoordinator.unregisterPanel(commandPalette);
         StatusBarPanelCoordinator.unregisterPanel(mediaIsland);
     }
 }

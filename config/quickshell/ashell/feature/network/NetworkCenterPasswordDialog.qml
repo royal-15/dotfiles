@@ -168,26 +168,62 @@ Dialog {
             Layout.fillWidth: true
         }
 
-        TextField {
-            id: passwordField
+        Item {
             visible: root.security !== "" && root.security !== "--"
-            placeholderText: "Network password"
-            echoMode: TextInput.Password
             Layout.fillWidth: true
             implicitHeight: 40
-            color: Colors.text
-            background: Rectangle {
-                color: passwordField.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
-                radius: 11
-                border.width: 0
-                Behavior on color {
-                    ColorAnimation {
+
+            // Apple Focus Ring Halo around password input
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -2
+                radius: 13
+                color: Colors.accentSoft
+                opacity: passwordField.activeFocus ? 0.75 : 0.0
+                visible: opacity > 0.01
+                z: -1
+
+                Behavior on opacity {
+                    NumberAnimation {
                         duration: Motion.durationFast
                         easing.type: Motion.easingStandard
                     }
                 }
             }
-            onAccepted: if (connectButton.enabled) connectButton.clicked()
+
+            TextField {
+                id: passwordField
+                anchors.fill: parent
+                placeholderText: "Network password"
+                echoMode: TextInput.Password
+                color: Colors.text
+                selectionColor: Colors.selectedBackground
+                selectedTextColor: Colors.selectedText
+                verticalAlignment: TextInput.AlignVCenter
+                leftPadding: 12
+                rightPadding: 12
+                background: Rectangle {
+                    color: passwordField.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
+                    radius: 11
+                    border.width: passwordField.activeFocus ? 1.5 : 1
+                    border.color: passwordField.activeFocus ? Colors.accent : Colors.border
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+
+                    Behavior on border.color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+                }
+                onAccepted: if (connectButton.enabled) connectButton.clicked()
+            }
         }
 
         RowLayout {
@@ -201,6 +237,16 @@ Dialog {
                 implicitHeight: 38
                 text: "Connect"
                 enabled: !root.busy && (!passwordField.visible || passwordField.text.length > 0)
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: connectButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: connectButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: {
                     root.connectRequested(passwordField.text);
                     passwordField.clear();
@@ -211,7 +257,8 @@ Dialog {
                         ? (parent.down ? Colors.accentAlt : Colors.accent)
                         : Colors.surfaceMuted
                     radius: 11
-                    border.width: 0
+                    border.width: connectButton.activeFocus ? 1.5 : 0
+                    border.color: Colors.accent
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast
@@ -231,15 +278,26 @@ Dialog {
             }
 
             Button {
+                id: cancelButton
                 Layout.preferredWidth: 84
                 implicitHeight: 38
                 text: "Cancel"
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: cancelButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: cancelButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: root.close()
                 background: Rectangle {
                     color: parent.down ? Colors.surface : parent.hovered ? Colors.surface : Colors.surfaceSoft
                     radius: 11
-                    border.width: parent.hovered ? 1 : 0
-                    border.color: Colors.border
+                    border.width: cancelButton.activeFocus ? 1.5 : (parent.hovered ? 1 : 0)
+                    border.color: cancelButton.activeFocus ? Colors.accent : Colors.border
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast

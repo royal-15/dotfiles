@@ -14,6 +14,7 @@ Item {
     property var launcherItem: null
     property var themeStudioItem: null
     property var clipboardItem: null
+    property var commandPaletteItem: null
     property var monitor: null
 
     readonly property bool isOpen: islandSurface.expanded
@@ -32,8 +33,11 @@ Item {
     readonly property real clipboardMorphProgress: (clipboardItem && clipboardItem.islandSurface) ? clipboardItem.islandSurface.morphProgress : 0.0
     readonly property bool clipboardActive: clipboardItem ? (clipboardItem.isOpen || clipboardItem.islandSurface.expanded || clipboardMorphProgress > 0) : false
 
-    readonly property real centerMorphProgress: Math.max(launcherMorphProgress, themeStudioMorphProgress, clipboardMorphProgress)
-    readonly property bool centerActive: launcherActive || themeStudioActive || clipboardActive
+    readonly property real commandPaletteMorphProgress: (commandPaletteItem && commandPaletteItem.islandSurface) ? commandPaletteItem.islandSurface.morphProgress : 0.0
+    readonly property bool commandPaletteActive: commandPaletteItem ? (commandPaletteItem.isOpen || commandPaletteItem.islandSurface.expanded || commandPaletteMorphProgress > 0) : false
+
+    readonly property real centerMorphProgress: Math.max(launcherMorphProgress, themeStudioMorphProgress, clipboardMorphProgress, commandPaletteMorphProgress)
+    readonly property bool centerActive: launcherActive || themeStudioActive || clipboardActive || commandPaletteActive
 
     // Immediate fade and shrink cutoff (reaches full 1.0 within the first 10% of morphing)
     readonly property real centerShrinkProgress: {

@@ -36,24 +36,57 @@ Scope {
     function refreshApplications() {
         const appsModel = DesktopEntries.applications;
         const rawList = (appsModel && appsModel.values) ? appsModel.values : [];
+        if (!rawList || rawList.length === 0)
+            return;
+
         const filtered = [];
 
         for (let i = 0; i < rawList.length; i++) {
             const entry = rawList[i];
-            if (!entry || entry.noDisplay || !entry.name || entry.name.trim() === "")
+            if (!entry || entry.noDisplay)
                 continue;
-            entry._normName = (entry.name || "").toLowerCase();
-            entry._normGeneric = (entry.genericName || "").toLowerCase();
-            entry._normComment = (entry.comment || "").toLowerCase();
-            entry._normId = (entry.id || "").toLowerCase();
-            entry._normKeywords = (entry.keywords && Array.isArray(entry.keywords))
-                ? entry.keywords.map(k => (k || "").toLowerCase())
-                : [];
-            filtered.push(entry);
+
+            const name = (entry.name || "").trim();
+            if (name === "")
+                continue;
+
+            const generic = (entry.genericName || "").trim();
+            const comment = (entry.comment || "").trim();
+            const id = (entry.id || "").trim();
+            const icon = entry.icon || "";
+
+            let normKeywords = [];
+            if (entry.keywords) {
+                if (Array.isArray(entry.keywords)) {
+                    normKeywords = entry.keywords.map(k => (k || "").toLowerCase().trim()).filter(k => k.length > 0);
+                } else if (typeof entry.keywords === "string") {
+                    normKeywords = entry.keywords.split(";").map(k => k.toLowerCase().trim()).filter(k => k.length > 0);
+                }
+            }
+
+            const appItem = {
+                rawEntry: entry,
+                id: id,
+                name: name,
+                genericName: generic,
+                comment: comment,
+                icon: icon,
+                normName: name.toLowerCase(),
+                normGeneric: generic.toLowerCase(),
+                normComment: comment.toLowerCase(),
+                normId: id.toLowerCase(),
+                normKeywords: normKeywords,
+                execute: () => {
+                    if (typeof entry.execute === "function") {
+                        entry.execute();
+                    }
+                }
+            };
+            filtered.push(appItem);
         }
 
         filtered.sort((a, b) => {
-            return (a._normName || "").localeCompare(b._normName || "");
+            return (a.normName || "").localeCompare(b.normName || "");
         });
 
         allApplications = filtered;
@@ -70,6 +103,9 @@ Scope {
         recentAppIds = trimmed;
 
         // Persist recent applications asynchronously
+        if (saveRecentProcess.running) {
+            saveRecentProcess.terminate();
+        }
         const jsonStr = JSON.stringify(trimmed);
         saveRecentProcess.command = [
             "sh",
@@ -86,23 +122,29 @@ Scope {
         recordLaunch(entry.id);
         if (typeof entry.execute === "function") {
             entry.execute();
+        } else if (entry.rawEntry && typeof entry.rawEntry.execute === "function") {
+            entry.rawEntry.execute();
         }
     }
 
     function getRecentApplications(limit = 8) {
+        if (!allApplications || allApplications.length === 0) {
+            return [];
+        }
+
         if (!recentAppIds || recentAppIds.length === 0) {
             return allApplications.slice(0, limit);
         }
 
         const result = [];
-        const seenIds = new Set();
+        const seenIds = {};
 
         for (let i = 0; i < recentAppIds.length; i++) {
             const id = recentAppIds[i];
             const app = allApplications.find(a => a.id === id);
-            if (app && !seenIds.has(app.id)) {
+            if (app && !seenIds[app.id]) {
                 result.push(app);
-                seenIds.add(app.id);
+                seenIds[app.id] = true;
                 if (result.length >= limit)
                     break;
             }
@@ -111,9 +153,9 @@ Scope {
         if (result.length < limit) {
             for (let i = 0; i < allApplications.length; i++) {
                 const app = allApplications[i];
-                if (!seenIds.has(app.id)) {
+                if (!seenIds[app.id]) {
                     result.push(app);
-                    seenIds.add(app.id);
+                    seenIds[app.id] = true;
                     if (result.length >= limit)
                         break;
                 }
@@ -133,10 +175,10 @@ Scope {
 
         for (let i = 0; i < allApplications.length; i++) {
             const app = allApplications[i];
-            const name = app._normName || "";
-            const generic = app._normGeneric || "";
-            const comment = app._normComment || "";
-            const id = app._normId || "";
+            const name = app.normName || "";
+            const generic = app.normGeneric || "";
+            const comment = app.normComment || "";
+            const id = app.normId || "";
             let score = 0;
 
             if (name === q) {
@@ -155,9 +197,9 @@ Scope {
                 score = 100;
             } else if (comment.includes(q)) {
                 score = 70;
-            } else if (app._normKeywords && app._normKeywords.length > 0) {
-                for (let k = 0; k < app._normKeywords.length; k++) {
-                    if (app._normKeywords[k].includes(q)) {
+            } else if (app.normKeywords && app.normKeywords.length > 0) {
+                for (let k = 0; k < app.normKeywords.length; k++) {
+                    if (app.normKeywords[k].includes(q)) {
                         score = 80;
                         break;
                     }
@@ -186,6 +228,27 @@ Scope {
         target: DesktopEntries
         function onApplicationsChanged() {
             root.refreshApplications();
+        }
+    }
+
+    Connections {
+        target: DesktopEntries.applications
+        function onValuesChanged() {
+            root.refreshApplications();
+        }
+    }
+
+    Timer {
+        id: initRetryTimer
+        interval: 300
+        repeat: true
+        running: root.allApplications.length === 0
+        triggeredOnStart: true
+        onTriggered: {
+            root.refreshApplications();
+            if (root.allApplications.length > 0) {
+                initRetryTimer.running = false;
+            }
         }
     }
 

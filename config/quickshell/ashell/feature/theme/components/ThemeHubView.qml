@@ -14,7 +14,7 @@ FocusScope {
     signal closeRequested()
 
     implicitWidth: 420
-    implicitHeight: 180
+    implicitHeight: 190
 
     function drillDown() {
         if (selectedIndex === 0)
@@ -29,6 +29,7 @@ FocusScope {
     Keys.onBacktabPressed: (event) => { selectedIndex = (selectedIndex + 1) % 2; event.accepted = true; }
     Keys.onReturnPressed: (event) => { drillDown(); event.accepted = true; }
     Keys.onEnterPressed: (event) => { drillDown(); event.accepted = true; }
+    Keys.onSpacePressed: (event) => { drillDown(); event.accepted = true; }
     Keys.onEscapePressed: (event) => { root.closeRequested(); event.accepted = true; }
     Keys.onBackPressed: (event) => { root.closeRequested(); event.accepted = true; }
 
@@ -38,230 +39,120 @@ FocusScope {
                 root.closeRequested();
             event.accepted = true;
         } else if (event.key === Qt.Key_1 || event.text.toLowerCase() === "t") {
+            root.selectedIndex = 0;
             root.openThemesRequested();
             event.accepted = true;
         } else if (event.key === Qt.Key_2 || event.text.toLowerCase() === "w") {
+            root.selectedIndex = 1;
             root.openWallpapersRequested();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_H) {
+            selectedIndex = 0;
+            event.accepted = true;
+        } else if (event.key === Qt.Key_L) {
+            selectedIndex = 1;
             event.accepted = true;
         }
     }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 14
-        spacing: 12
+        anchors.margins: 16
+        spacing: 14
 
-        // Header
+        // Minimal Header Row: Title on left, subtle hint on right
         RowLayout {
             Layout.fillWidth: true
 
             Text {
                 text: "Theme Studio"
                 color: Colors.text
-                font.pixelSize: 14
-                font.weight: Font.Bold
+                font.pixelSize: 13
+                font.weight: Font.DemiBold
                 Layout.fillWidth: true
             }
 
-            Rectangle {
-                implicitWidth: escLabel.implicitWidth + 10
-                implicitHeight: 20
-                radius: 10
-                color: Colors.surfaceSoft
-                border.width: 1
-                border.color: Colors.border
-
-                Text {
-                    id: escLabel
-                    anchors.centerIn: parent
-                    text: "Esc: Close"
-                    color: Colors.textDim
-                    font.pixelSize: 10
-                }
+            Text {
+                text: "Esc to dismiss"
+                color: Colors.textDim
+                font.pixelSize: 11
+                font.weight: Font.Normal
             }
         }
 
-        // Two Cards Row
+        // Two Elevated Action Cards
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 12
+            spacing: 14
 
-            // Themes Card
-            Rectangle {
-                id: themesCard
+            // 1. Themes Card
+            ThemeHubCard {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                radius: 14
-                color: root.selectedIndex === 0 || themesMouse.containsMouse ? Colors.surfaceSoft : Colors.surface
-                border.width: root.selectedIndex === 0 ? 2 : 1
-                border.color: root.selectedIndex === 0 ? Colors.accent : Colors.border
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
-                    }
+                title: "Themes"
+                subtitle: ThemeService.activeTheme ? ThemeService.activeTheme : "Default"
+                isSelected: root.selectedIndex === 0
+                onClicked: {
+                    root.selectedIndex = 0;
+                    root.openThemesRequested();
                 }
 
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
-                    }
-                }
-
-                MouseArea {
-                    id: themesMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.selectedIndex = 0;
-                        root.openThemesRequested();
-                    }
-                }
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 6
+                Rectangle {
+                    implicitWidth: 44
+                    implicitHeight: 6
+                    radius: 3
+                    color: Colors.clear
+                    clip: true
 
                     RowLayout {
-                        Layout.fillWidth: true
+                        anchors.fill: parent
+                        spacing: 1
 
-                        Text {
-                            text: "palette"
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: 22
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: Colors.background
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: Colors.surfaceSoft
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             color: Colors.accent
                         }
 
-                        Item { Layout.fillWidth: true }
-
                         Rectangle {
-                            implicitWidth: 24
-                            implicitHeight: 20
-                            radius: 6
-                            color: Colors.surfaceMuted
-                            border.width: 1
-                            border.color: Colors.border
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "1"
-                                color: Colors.text
-                                font.pixelSize: 11
-                                font.weight: Font.Bold
-                            }
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: Colors.accentAlt
                         }
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    Text {
-                        text: "Themes"
-                        color: Colors.text
-                        font.pixelSize: 14
-                        font.weight: Font.DemiBold
-                    }
-
-                    Text {
-                        text: ThemeService.activeTheme ? ThemeService.activeTheme : "Default"
-                        color: Colors.textDim
-                        font.pixelSize: 11
-                        elide: Text.ElideRight
-                        Layout.fillWidth: true
                     }
                 }
             }
 
-            // Wallpapers Card
-            Rectangle {
-                id: wallpapersCard
+            // 2. Wallpapers Card
+            ThemeHubCard {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                radius: 14
-                color: root.selectedIndex === 1 || wallpapersMouse.containsMouse ? Colors.surfaceSoft : Colors.surface
-                border.width: root.selectedIndex === 1 ? 2 : 1
-                border.color: root.selectedIndex === 1 ? Colors.accent : Colors.border
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
-                    }
+                title: "Wallpapers"
+                subtitle: ThemeService.activeWallpaper ? ThemeService.activeWallpaper : "None"
+                isSelected: root.selectedIndex === 1
+                onClicked: {
+                    root.selectedIndex = 1;
+                    root.openWallpapersRequested();
                 }
 
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
-                    }
-                }
-
-                MouseArea {
-                    id: wallpapersMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.selectedIndex = 1;
-                        root.openWallpapersRequested();
-                    }
-                }
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 6
-
-                    RowLayout {
-                        Layout.fillWidth: true
-
-                        Text {
-                            text: "wallpaper"
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: 22
-                            color: Colors.accentAlt
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        Rectangle {
-                            implicitWidth: 24
-                            implicitHeight: 20
-                            radius: 6
-                            color: Colors.surfaceMuted
-                            border.width: 1
-                            border.color: Colors.border
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "2"
-                                color: Colors.text
-                                font.pixelSize: 11
-                                font.weight: Font.Bold
-                            }
-                        }
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    Text {
-                        text: "Wallpapers"
-                        color: Colors.text
-                        font.pixelSize: 14
-                        font.weight: Font.DemiBold
-                    }
-
-                    Text {
-                        text: ThemeService.activeWallpaper ? ThemeService.activeWallpaper : "None"
-                        color: Colors.textDim
-                        font.pixelSize: 11
-                        elide: Text.ElideRight
-                        Layout.fillWidth: true
-                    }
+                Text {
+                    text: (ThemeService.availableWallpapers ? ThemeService.availableWallpapers.length : 0) + " items"
+                    color: Colors.textDim
+                    font.pixelSize: 11
+                    font.weight: Font.Normal
                 }
             }
         }

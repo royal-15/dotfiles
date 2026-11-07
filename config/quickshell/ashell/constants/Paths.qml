@@ -14,4 +14,5 @@ QtObject {
     readonly property string themesDir: themeSwitcherDir + "/themes"
     readonly property string themeSwitcherBin: themeSwitcherDir + "/scripts/theme_switcher"
     readonly property string wallpaperPreprocessorBin: themeSwitcherDir + "/scripts/wallpaper_preprocess"
+    readonly property string commandPaletteJson: homeDir + "/.local/share/ashell/command_palette.json"
 }

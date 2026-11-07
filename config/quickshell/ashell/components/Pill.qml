@@ -119,17 +119,18 @@ Item {
 
     Behavior on scale {
         NumberAnimation {
-            duration: Motion.durationFast
-            easing.type: Motion.easingStandard
+            duration: (root.interactive && root.isPressed) ? Motion.durationPressDown : Motion.durationPressRelease
+            easing.type: (root.interactive && root.isPressed) ? Motion.easingPressDown : Motion.easingPressRelease
         }
     }
 
-    // Multi-layer ambient drop shadow for borderless depth
+    // Multi-layer ambient drop shadow and Apple-caliber focus ring halo
     Rectangle {
         anchors.fill: pillSurface
-        anchors.topMargin: 2
-        anchors.bottomMargin: -1
-        radius: pillSurface.radius
+        anchors.margins: root.highlighted ? -2 : 0
+        anchors.topMargin: root.highlighted ? -2 : 2
+        anchors.bottomMargin: root.highlighted ? -2 : -1
+        radius: pillSurface.radius + (root.highlighted ? 2 : 0)
         color: root.highlighted ? Colors.accentSoft : Colors.shadow
         opacity: (root.highlighted ? 0.90 : (root.interactive && root.isHovered) ? 0.75 : 0.40) * root.openProgress
         z: -1
@@ -299,6 +300,17 @@ Item {
         onReleased: root.isPressed = false
         onCanceled: root.isPressed = false
         onClicked: root.clicked()
-        onWheel: wheel => root.wheel(wheel)
+        onWheel: wheel => {
+            root.isPressed = true;
+            wheelPressResetTimer.restart();
+            root.wheel(wheel);
+        }
+    }
+
+    Timer {
+        id: wheelPressResetTimer
+        interval: 100
+        repeat: false
+        onTriggered: root.isPressed = false
     }
 }

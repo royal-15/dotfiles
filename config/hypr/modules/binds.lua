@@ -34,7 +34,7 @@ hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("google-chrome-stable"))
 -- hl.bind(mainMod .. " + B",
 --         hl.dsp.exec_cmd("~/.local/bin/bluetooth-menu.sh || pkill rofi"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("blueman-manager"))
-hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("kitty -e htop"))
 -- hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("~/.local/bin/night-mode.sh"))
@@ -59,6 +59,10 @@ hl.bind(mainMod .. " + SHIFT + M",
         hl.dsp.exec_cmd("qs -c ashell ipc call media toggle"))
 hl.bind(mainMod .. " + D",
         hl.dsp.exec_cmd("qs -c ashell ipc call launcher toggle"))
+
+-- Command pelette (Quickshell)
+hl.bind(mainMod .. " + P",
+        hl.dsp.exec_cmd("qs -c ashell ipc call commandpalette toggle"))
 
 -- # Emoji picker
 hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd(

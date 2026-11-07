@@ -179,26 +179,62 @@ Dialog {
             Layout.fillWidth: true
         }
 
-        TextField {
-            id: pairingPin
+        Item {
             visible: root.inputRequired
-            placeholderText: "PIN or passkey"
-            echoMode: TextInput.Normal
             Layout.fillWidth: true
             implicitHeight: 40
-            color: Colors.text
-            background: Rectangle {
-                color: pairingPin.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
-                radius: 11
-                border.width: 0
-                Behavior on color {
-                    ColorAnimation {
+
+            // Apple Focus Ring Halo around pairing pin input
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -2
+                radius: 13
+                color: Colors.accentSoft
+                opacity: pairingPin.activeFocus ? 0.75 : 0.0
+                visible: opacity > 0.01
+                z: -1
+
+                Behavior on opacity {
+                    NumberAnimation {
                         duration: Motion.durationFast
                         easing.type: Motion.easingStandard
                     }
                 }
             }
-            onAccepted: if (actionButton.enabled) actionButton.clicked()
+
+            TextField {
+                id: pairingPin
+                anchors.fill: parent
+                placeholderText: "PIN or passkey"
+                echoMode: TextInput.Normal
+                color: Colors.text
+                selectionColor: Colors.selectedBackground
+                selectedTextColor: Colors.selectedText
+                verticalAlignment: TextInput.AlignVCenter
+                leftPadding: 12
+                rightPadding: 12
+                background: Rectangle {
+                    color: pairingPin.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
+                    radius: 11
+                    border.width: pairingPin.activeFocus ? 1.5 : 1
+                    border.color: pairingPin.activeFocus ? Colors.accent : Colors.border
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+
+                    Behavior on border.color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+                }
+                onAccepted: if (actionButton.enabled) actionButton.clicked()
+            }
         }
 
         RowLayout {
@@ -211,12 +247,22 @@ Dialog {
                 Layout.preferredWidth: 84
                 implicitHeight: 38
                 text: "Cancel"
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: cancelButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: cancelButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: root.cancelRequested()
                 background: Rectangle {
                     color: parent.down ? Colors.surface : parent.hovered ? Colors.surface : Colors.surfaceSoft
                     radius: 11
-                    border.width: parent.hovered ? 1 : 0
-                    border.color: Colors.border
+                    border.width: cancelButton.activeFocus ? 1.5 : (parent.hovered ? 1 : 0)
+                    border.color: cancelButton.activeFocus ? Colors.accent : Colors.border
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast
@@ -240,6 +286,16 @@ Dialog {
                 implicitHeight: 38
                 text: !root.started ? "Pair" : root.inputRequired ? "Submit" : "Confirm"
                 enabled: !root.started || (root.inputRequired ? pairingPin.text.length > 0 : !!root.passkey || /confirm passkey|authorize service/i.test(root.prompt))
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: actionButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: actionButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
                 onClicked: {
                     if (!root.started)
                         root.pairRequested();
@@ -251,7 +307,8 @@ Dialog {
                         ? (parent.down ? Colors.accentAlt : Colors.accent)
                         : Colors.surfaceMuted
                     radius: 11
-                    border.width: 0
+                    border.width: actionButton.activeFocus ? 1.5 : 0
+                    border.color: Colors.accent
                     Behavior on color {
                         ColorAnimation {
                             duration: Motion.durationFast

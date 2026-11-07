@@ -43,32 +43,57 @@ ListView {
 
         width: view.width
         height: 64
+        z: btRowItem.isSelected ? 5 : (btRowMouse.containsMouse ? 2 : 1)
 
+        // Apple Focus Ring Halo for keyboard selection with anti-cropping headroom
         Rectangle {
-            id: btRowSurface
-            anchors.centerIn: parent
-            width: parent.width - 6
-            height: 58
-            radius: 12
-
-            scale: (btRowMouse.containsMouse || isSelected) ? 1.014 : Motion.scaleNormal
+            anchors.fill: btRowSurface
+            anchors.margins: -1
+            radius: btRowSurface.radius + 1
+            color: Colors.accentSoft
+            scale: btRowSurface.scale
             transformOrigin: Item.Center
+            opacity: btRowItem.isSelected ? 0.65 : 0.0
+            visible: opacity > 0.01
+            z: -1
 
-            Behavior on scale {
+            Behavior on opacity {
                 NumberAnimation {
                     duration: Motion.durationFast
                     easing.type: Motion.easingStandard
                 }
             }
+        }
 
-            color: (isSelected || connected)
+        Rectangle {
+            id: btRowSurface
+            anchors.centerIn: parent
+            width: parent.width - 12
+            height: 56
+            radius: 12
+
+            scale: btRowMouse.pressed
+                ? Motion.scalePress
+                : (btRowItem.isSelected || btRowMouse.containsMouse)
+                    ? Motion.scaleTileHover
+                    : Motion.scaleNormal
+            transformOrigin: Item.Center
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: btRowMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                    easing.type: btRowMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                }
+            }
+
+            color: btRowItem.isSelected
                 ? Colors.accentSoft
-                : (btRowMouse.containsMouse
-                    ? Colors.surface
-                    : Colors.surfaceSoft)
+                : (btRowItem.connected
+                    ? Colors.surfaceSoft
+                    : (btRowMouse.containsMouse ? Colors.surface : Colors.surfaceSoft))
 
-            border.width: (isSelected || connected || btRowMouse.containsMouse) ? 1 : 0
-            border.color: (isSelected || connected) ? Colors.accent : Colors.border
+            border.width: btRowItem.isSelected ? 1.5 : (btRowItem.connected ? 1 : (btRowMouse.containsMouse ? 1 : 0))
+            border.color: btRowItem.isSelected ? Colors.accent : Colors.border
 
             Behavior on color {
                 ColorAnimation {
@@ -212,13 +237,15 @@ ListView {
                     implicitHeight: 28
                     radius: 8
                     color: removeMouse.containsMouse ? Colors.hover : Colors.clear
-                    scale: removeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
+                    scale: removeMouse.pressed
+                        ? Motion.scalePress
+                        : (removeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
                     border.width: 0
 
                     Behavior on scale {
                         NumberAnimation {
-                            duration: Motion.durationFast
-                            easing.type: Motion.easingStandard
+                            duration: removeMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                            easing.type: removeMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
                         }
                     }
 

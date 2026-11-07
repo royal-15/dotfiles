@@ -28,12 +28,30 @@ Item {
         }
     }
 
+    // Apple Focus Ring Halo around clipboard search input
+    Rectangle {
+        anchors.fill: searchInputBox
+        anchors.margins: -2
+        radius: searchInputBox.radius + 2
+        color: Colors.accentSoft
+        opacity: searchField.activeFocus ? 0.75 : 0.0
+        visible: opacity > 0.01
+        z: -1
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+    }
+
     Rectangle {
         id: searchInputBox
         anchors.fill: parent
         radius: 12
         color: searchField.activeFocus ? Colors.surfaceMuted : Colors.surfaceSoft
-        border.width: 1
+        border.width: searchField.activeFocus ? 1.5 : 1
         border.color: searchField.activeFocus ? Colors.accent : Colors.border
 
         Behavior on color {

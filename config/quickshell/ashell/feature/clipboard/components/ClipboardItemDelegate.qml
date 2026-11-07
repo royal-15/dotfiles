@@ -13,31 +13,61 @@ Item {
     signal deleteRequested()
 
     implicitWidth: ListView.view ? ListView.view.width : 500
-    implicitHeight: 44
-    height: 44
+    width: ListView.view ? ListView.view.width : 500
+    implicitHeight: 46
+    height: 46
+    z: root.isCurrent ? 5 : (delegateHover.hovered ? 2 : 1)
+
+    // Focus halo for current clipboard item with anti-cropping margin headroom
+    Rectangle {
+        anchors.fill: delegateSurface
+        anchors.margins: -1
+        radius: delegateSurface.radius + 1
+        color: Colors.accentSoft
+        scale: delegateSurface.scale
+        transformOrigin: Item.Center
+        opacity: root.isCurrent ? 0.65 : 0.0
+        visible: opacity > 0.01
+        z: -1
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+    }
 
     Rectangle {
         id: delegateSurface
         anchors.fill: parent
-        anchors.leftMargin: 2
-        anchors.rightMargin: 2
+        anchors.leftMargin: 6
+        anchors.rightMargin: 6
+        anchors.topMargin: 2
+        anchors.bottomMargin: 2
         radius: 8
         color: root.isCurrent
-            ? Colors.selectedBackground
+            ? Colors.accentSoft
             : (delegateHover.hovered ? Colors.surfaceSoft : Colors.clear)
 
-        scale: tapArea.pressed ? Motion.scalePress : Motion.scaleNormal
+        border.width: root.isCurrent ? 1 : 0
+        border.color: Colors.accent
+
+        scale: tapArea.pressed
+            ? Motion.scalePress
+            : (root.isCurrent ? Motion.scaleTileHover : Motion.scaleNormal)
+        transformOrigin: Item.Center
 
         Behavior on scale {
             NumberAnimation {
-                duration: Motion.durationFast
-                easing.type: Motion.easingPress
+                duration: tapArea.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: tapArea.pressed ? Motion.easingPressDown : Motion.easingPressRelease
             }
         }
 
         Behavior on color {
             ColorAnimation {
-                duration: Motion.durationInstant
+                duration: Motion.durationFast
                 easing.type: Motion.easingStandard
             }
         }
@@ -89,7 +119,7 @@ Item {
                     text: "image"
                     font.family: "Material Symbols Rounded"
                     font.pixelSize: 16
-                    color: root.isCurrent ? Colors.selectedText : Colors.accentAlt
+                    color: root.isCurrent ? Colors.accent : Colors.accentAlt
                     Layout.alignment: Qt.AlignVCenter
                 }
 
@@ -105,7 +135,7 @@ Item {
                     }
                     font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 12
-                    color: root.isCurrent ? Colors.selectedText : Colors.text
+                    color: Colors.text
                     elide: Text.ElideRight
                     maximumLineCount: 1
                 }

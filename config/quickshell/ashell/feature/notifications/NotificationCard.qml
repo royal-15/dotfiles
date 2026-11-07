@@ -243,6 +243,17 @@ Item {
                     Item {
                         implicitWidth: 20
                         implicitHeight: 20
+                        scale: closeMouse.pressed
+                            ? Motion.scalePress
+                            : (closeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
+                        transformOrigin: Item.Center
+
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: closeMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                easing.type: closeMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                            }
+                        }
 
                         Text {
                             anchors.centerIn: parent
@@ -302,11 +313,24 @@ Item {
                             required property var modelData
                             implicitWidth: actionLabel.implicitWidth + 14
                             implicitHeight: 22
+                            scale: actionMouse.pressed
+                                ? Motion.scalePress
+                                : (actionMouse.containsMouse ? Motion.scaleTileHover : Motion.scaleNormal)
+                            transformOrigin: Item.Center
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: actionMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                    easing.type: actionMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                                }
+                            }
 
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 11
                                 color: actionMouse.containsMouse ? Colors.accentSoft : Colors.surfaceMuted
+                                border.width: actionMouse.containsMouse ? 1 : 0
+                                border.color: Colors.accent
 
                                 Behavior on color {
                                     ColorAnimation {

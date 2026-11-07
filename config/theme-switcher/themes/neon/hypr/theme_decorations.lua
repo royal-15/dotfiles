@@ -2,13 +2,12 @@ hl.config({
     general = {
         col = {
             active_border = {
-                colors = {"rgba(5c59a5ee)"},
-                -- colors = {"rgba(33ccffee)", "rgba(00ff99ee)"},
+                colors = {"rgba(00e5ffee)", "rgba(ff2e88ee)"},
                 angle = 45
             },
-            inactive_border = "rgba(595959aa)"
+            inactive_border = "rgba(273a5299)"
         }
     },
 
-    decoration = {shadow = {color = 0xee121212}}
+    decoration = {shadow = {color = 0xee040608}}
 })

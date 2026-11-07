@@ -134,6 +134,17 @@ Item {
                     Layout.alignment: Qt.AlignTop
                     radius: 13
                     color: closeHover.hovered ? Colors.hover : Colors.clear
+                    scale: closeTap.pressed
+                        ? Motion.scalePress
+                        : (closeHover.hovered ? Motion.scaleHover : Motion.scaleNormal)
+                    transformOrigin: Item.Center
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: closeTap.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                            easing.type: closeTap.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                        }
+                    }
 
                     Behavior on color {
                         ColorAnimation {
@@ -156,6 +167,7 @@ Item {
                     }
 
                     TapHandler {
+                        id: closeTap
                         onTapped: root.requestClose()
                     }
                 }
@@ -204,7 +216,7 @@ Item {
                         Behavior on height {
                             NumberAnimation {
                                 duration: Motion.durationFast
-                                easing.type: Motion.easingStandard
+                                easing.type: Motion.easingFluid
                             }
                         }
 
@@ -219,12 +231,30 @@ Item {
                         }
                     }
 
+                    // Handle Ambient Glow Halo
+                    Rectangle {
+                        anchors.centerIn: scrubHandle
+                        width: scrubHandle.width + 4
+                        height: width
+                        radius: width / 2
+                        color: Colors.accentSoft
+                        opacity: scrubHandle.width > 0 ? 0.75 : 0.0
+                        visible: opacity > 0.01
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
+                        }
+                    }
+
                     // Handle Dot
                     Rectangle {
                         id: scrubHandle
                         x: Math.max(0, Math.min(scrubberContainer.width - width, (scrubberContainer.width * root.progressRatio) - (width / 2)))
                         anchors.verticalCenter: parent.verticalCenter
-                        width: scrubberHover.hovered || root.isScrubbing ? 10 : 0
+                        width: scrubberHover.hovered || root.isScrubbing ? 11 : 0
                         height: width
                         radius: width / 2
                         color: Colors.accent
@@ -233,7 +263,7 @@ Item {
                         Behavior on width {
                             NumberAnimation {
                                 duration: Motion.durationFast
-                                easing.type: Motion.easingStandard
+                                easing.type: Motion.easingFluid
                             }
                         }
                     }

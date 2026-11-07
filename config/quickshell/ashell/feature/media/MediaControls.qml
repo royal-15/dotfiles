@@ -17,6 +17,17 @@ RowLayout {
         Layout.preferredHeight: 30
         radius: 15
         color: shuffleHover.hovered ? Colors.hover : Colors.clear
+        scale: shufflePress.pressed
+            ? Motion.scalePress
+            : (shuffleHover.hovered ? Motion.scaleHover : Motion.scaleNormal)
+        transformOrigin: Item.Center
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: shufflePress.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: shufflePress.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+            }
+        }
 
         HoverHandler {
             id: shuffleHover
@@ -32,6 +43,7 @@ RowLayout {
         }
 
         TapHandler {
+            id: shufflePress
             onTapped: MediaService.toggleShuffle()
         }
     }
@@ -42,6 +54,17 @@ RowLayout {
         Layout.preferredHeight: 32
         radius: 16
         color: prevHover.hovered && MediaService.canGoPrevious ? Colors.hover : Colors.clear
+        scale: prevPress.pressed
+            ? Motion.scalePress
+            : (prevHover.hovered && MediaService.canGoPrevious ? Motion.scaleHover : Motion.scaleNormal)
+        transformOrigin: Item.Center
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: prevPress.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: prevPress.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+            }
+        }
 
         HoverHandler {
             id: prevHover
@@ -57,43 +80,69 @@ RowLayout {
         }
 
         TapHandler {
+            id: prevPress
             enabled: MediaService.canGoPrevious
             onTapped: MediaService.previous()
         }
     }
 
     // Play / Pause Prominent Capsule Button
-    Rectangle {
-        id: playPauseBtn
+    Item {
         Layout.preferredWidth: 40
         Layout.preferredHeight: 40
-        radius: 20
-        color: Colors.accent
-        scale: playPauseHover.hovered ? (playPausePress.pressed ? Motion.scalePress : Motion.scaleHover) : Motion.scaleNormal
 
-        Behavior on scale {
-            NumberAnimation {
-                duration: Motion.durationFast
-                easing.type: Motion.easingStandard
+        // Soft ambient glow halo
+        Rectangle {
+            anchors.fill: playPauseBtn
+            anchors.margins: -1
+            radius: 21
+            color: Colors.accentSoft
+            opacity: playPauseHover.hovered ? 0.85 : 0.40
+            scale: playPauseBtn.scale
+            z: -1
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Motion.durationFast
+                    easing.type: Motion.easingStandard
+                }
             }
         }
 
-        HoverHandler {
-            id: playPauseHover
-            cursorShape: Qt.PointingHandCursor
-        }
+        Rectangle {
+            id: playPauseBtn
+            anchors.fill: parent
+            radius: 20
+            color: Colors.accent
+            scale: playPausePress.pressed
+                ? Motion.scalePress
+                : (playPauseHover.hovered ? Motion.scaleHover : Motion.scaleNormal)
+            transformOrigin: Item.Center
 
-        TapHandler {
-            id: playPausePress
-            onTapped: MediaService.togglePlaying()
-        }
+            Behavior on scale {
+                NumberAnimation {
+                    duration: playPausePress.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                    easing.type: playPausePress.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                }
+            }
 
-        Text {
-            anchors.centerIn: parent
-            text: MediaService.isPlaying ? "pause" : "play_arrow"
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 22
-            color: Colors.textAccent
+            HoverHandler {
+                id: playPauseHover
+                cursorShape: Qt.PointingHandCursor
+            }
+
+            TapHandler {
+                id: playPausePress
+                onTapped: MediaService.togglePlaying()
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: MediaService.isPlaying ? "pause" : "play_arrow"
+                font.family: "Material Symbols Rounded"
+                font.pixelSize: 22
+                color: Colors.textAccent
+            }
         }
     }
 
@@ -103,6 +152,17 @@ RowLayout {
         Layout.preferredHeight: 32
         radius: 16
         color: nextHover.hovered && MediaService.canGoNext ? Colors.hover : Colors.clear
+        scale: nextPress.pressed
+            ? Motion.scalePress
+            : (nextHover.hovered && MediaService.canGoNext ? Motion.scaleHover : Motion.scaleNormal)
+        transformOrigin: Item.Center
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: nextPress.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: nextPress.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+            }
+        }
 
         HoverHandler {
             id: nextHover
@@ -118,6 +178,7 @@ RowLayout {
         }
 
         TapHandler {
+            id: nextPress
             enabled: MediaService.canGoNext
             onTapped: MediaService.next()
         }

@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs
 import qs.components
 
-Rectangle {
+Item {
     id: root
 
     property string themeName: ""
@@ -13,113 +13,205 @@ Rectangle {
 
     signal activated()
 
-    implicitWidth: 236
-    implicitHeight: 74
-    radius: 12
+    implicitWidth: 264
+    implicitHeight: 88
+    width: GridView.view ? GridView.view.cellWidth : implicitWidth
+    height: GridView.view ? GridView.view.cellHeight : implicitHeight
 
-    color: isHighlighted || mouseArea.containsMouse
-        ? Colors.surfaceSoft
-        : Colors.surface
-    border.width: isActive ? 2 : (isHighlighted ? 1 : 0)
-    border.color: isActive ? Colors.accent : Colors.border
+    z: isHighlighted ? 10 : (mouseArea.containsMouse ? 5 : 1)
 
-    Behavior on color {
-        ColorAnimation {
-            duration: Motion.durationFast
-            easing.type: Motion.easingStandard
-        }
-    }
+    // Ambient Drop Shadow on Elevation
+    Rectangle {
+        anchors.fill: cardBody
+        anchors.topMargin: 2
+        anchors.bottomMargin: -2
+        radius: 12
+        color: Colors.shadow
+        scale: cardBody.scale
+        transformOrigin: Item.Center
+        opacity: root.isHighlighted ? 0.40 : (mouseArea.containsMouse ? 0.20 : 0.0)
+        visible: opacity > 0.01
+        z: -2
 
-    Behavior on border.color {
-        ColorAnimation {
-            duration: Motion.durationFast
-            easing.type: Motion.easingStandard
-        }
-    }
-
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.activated()
-    }
-
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 10
-        spacing: 6
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 6
-
-            Text {
-                text: root.themeName
-                color: root.isActive ? Colors.accent : Colors.text
-                font.pixelSize: 13
-                font.weight: Font.DemiBold
-                elide: Text.ElideRight
-                Layout.fillWidth: true
+        Behavior on scale {
+            NumberAnimation {
+                duration: mouseArea.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: mouseArea.pressed ? Motion.easingPressDown : Motion.easingPressRelease
             }
+        }
 
-            Rectangle {
-                visible: root.isActive
-                implicitWidth: activeLabel.implicitWidth + 10
-                implicitHeight: 18
-                radius: 9
-                color: Colors.accentSoft
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+    }
+
+    // Ambient Focus Halo on Keyboard/Hover Highlight
+    Rectangle {
+        anchors.fill: cardBody
+        anchors.margins: -1
+        radius: cardBody.radius + 1
+        color: Colors.accentSoft
+        scale: cardBody.scale
+        transformOrigin: Item.Center
+        opacity: root.isHighlighted ? 0.65 : 0.0
+        visible: opacity > 0.01
+        z: -1
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: mouseArea.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: mouseArea.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+    }
+
+    Rectangle {
+        id: cardBody
+        anchors.fill: parent
+        anchors.leftMargin: 6
+        anchors.rightMargin: 6
+        anchors.topMargin: 4
+        anchors.bottomMargin: 4
+        radius: 12
+
+        color: root.isHighlighted || mouseArea.containsMouse
+            ? Colors.surfaceSoft
+            : Colors.surface
+
+        border.width: root.isHighlighted ? 1.5 : (root.isActive ? 1 : 1)
+        border.color: root.isHighlighted
+            ? Colors.accent
+            : (root.isActive ? Colors.accent : Colors.border)
+
+        scale: mouseArea.pressed
+            ? Motion.scalePress
+            : (root.isHighlighted
+                ? Motion.scaleHover
+                : (mouseArea.containsMouse ? Motion.scaleTileHover : Motion.scaleNormal))
+        transformOrigin: Item.Center
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: mouseArea.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                easing.type: mouseArea.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+            }
+        }
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+
+        Behavior on border.color {
+            ColorAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.activated()
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 12
+            spacing: 0
+
+            // Top Row: Theme Name + Prominent Active Checkmark Badge
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
 
                 Text {
-                    id: activeLabel
-                    anchors.centerIn: parent
-                    text: "ACTIVE"
-                    color: Colors.accent
-                    font.pixelSize: 9
-                    font.weight: Font.Bold
+                    text: root.themeName
+                    color: root.isActive ? Colors.accent : Colors.text
+                    font.pixelSize: 13
+                    font.weight: root.isActive ? Font.DemiBold : Font.Medium
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                }
+
+                // Apple Glass Checkmark Badge for Active Theme
+                Rectangle {
+                    visible: root.isActive
+                    implicitWidth: 18
+                    implicitHeight: 18
+                    radius: 9
+                    color: Colors.accentSoft
+                    border.width: 1
+                    border.color: Colors.accent
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "check"
+                        font.family: "Material Symbols Rounded"
+                        font.pixelSize: 12
+                        color: Colors.accent
+                    }
                 }
             }
-        }
 
-        // 4 Static Color Preview Balls in a row (zero delegate allocation churn)
-        RowLayout {
-            spacing: 8
-            Layout.alignment: Qt.AlignLeft
+            Item { Layout.fillHeight: true }
 
-            Rectangle {
-                implicitWidth: 16
-                implicitHeight: 16
-                radius: 8
-                color: root.previewColors ? root.previewColors.background : Colors.background
-                border.width: 1
-                border.color: Colors.border
-            }
+            // Bottom Row: Seamless Continuous 4-Color Palette Strip
+            RowLayout {
+                Layout.fillWidth: true
 
-            Rectangle {
-                implicitWidth: 16
-                implicitHeight: 16
-                radius: 8
-                color: root.previewColors ? root.previewColors.surfaceSoft : Colors.surfaceSoft
-                border.width: 1
-                border.color: Colors.border
-            }
+                Rectangle {
+                    implicitWidth: 110
+                    implicitHeight: 6
+                    radius: 3
+                    color: Colors.clear
+                    clip: true
 
-            Rectangle {
-                implicitWidth: 16
-                implicitHeight: 16
-                radius: 8
-                color: root.previewColors ? root.previewColors.accent : Colors.accent
-                border.width: 1
-                border.color: Colors.border
-            }
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 1
 
-            Rectangle {
-                implicitWidth: 16
-                implicitHeight: 16
-                radius: 8
-                color: root.previewColors ? root.previewColors.accentAlt : Colors.accentAlt
-                border.width: 1
-                border.color: Colors.border
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: root.previewColors ? root.previewColors.background : Colors.background
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: root.previewColors ? root.previewColors.surfaceSoft : Colors.surfaceSoft
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: root.previewColors ? root.previewColors.accent : Colors.accent
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: root.previewColors ? root.previewColors.accentAlt : Colors.accentAlt
+                        }
+                    }
+                }
+
+                Item { Layout.fillWidth: true }
             }
         }
     }

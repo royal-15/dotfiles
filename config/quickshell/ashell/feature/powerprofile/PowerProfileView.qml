@@ -15,6 +15,7 @@ Item {
     property string hoveredActionKey: ""
     property bool isCurrentTab: false
     signal closeRequested()
+    signal closeImmediateRequested()
 
     onIsCurrentTabChanged: {
         if (isCurrentTab)
@@ -157,9 +158,8 @@ Item {
             closeAfterAction = true;
 
         if (key === "lock") {
+            root.closeImmediateRequested();
             PowerProfileService.executeSessionAction("lock");
-            if (closeAfterAction)
-                root.closeRequested();
             return;
         }
 
@@ -381,32 +381,55 @@ Item {
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        z: profileTile.isSelected ? 5 : (tileMouse.containsMouse ? 2 : 1)
 
-                        scale: tileMouse.pressed
-                            ? Motion.scalePress
-                            : (tileMouse.containsMouse || isSelected)
-                                ? Motion.scaleTileHover
-                                : Motion.scaleNormal
-                        transformOrigin: Item.Center
+                        // Apple Focus Ring Halo for profile selection with anti-cropping margin
+                        Rectangle {
+                            anchors.fill: tileSurface
+                            anchors.margins: -1
+                            radius: tileSurface.radius + 1
+                            color: Colors.accentSoft
+                            scale: tileSurface.scale
+                            transformOrigin: Item.Center
+                            opacity: profileTile.isSelected ? 0.65 : 0.0
+                            visible: opacity > 0.01
+                            z: -1
 
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Motion.durationFast
-                                easing.type: Motion.easingStandard
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Motion.durationFast
+                                    easing.type: Motion.easingStandard
+                                }
                             }
                         }
 
                         Rectangle {
+                            id: tileSurface
                             anchors.fill: parent
+                            anchors.margins: 2
                             radius: 12
 
-                            color: (profileTile.isSelected || profileTile.isActive)
+                            scale: tileMouse.pressed
+                                ? Motion.scalePress
+                                : (tileMouse.containsMouse || isSelected)
+                                    ? Motion.scaleTileHover
+                                    : Motion.scaleNormal
+                            transformOrigin: Item.Center
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: tileMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                    easing.type: tileMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                                }
+                            }
+
+                            color: profileTile.isSelected
                                 ? Colors.accentSoft
-                                : tileMouse.containsMouse
-                                    ? Colors.surface
-                                    : Colors.surfaceSoft
-                            border.width: (profileTile.isSelected || profileTile.isActive || tileMouse.containsMouse) ? 1 : 0
-                            border.color: (profileTile.isSelected || profileTile.isActive) ? Colors.accent : Colors.border
+                                : (profileTile.isActive
+                                    ? Colors.surfaceSoft
+                                    : (tileMouse.containsMouse ? Colors.surface : Colors.surfaceSoft))
+                            border.width: profileTile.isSelected ? 1.5 : (profileTile.isActive ? 1 : (tileMouse.containsMouse ? 1 : 0))
+                            border.color: profileTile.isSelected ? Colors.accent : (profileTile.isActive ? profileTile.profileAccent : Colors.border)
 
                             Behavior on color {
                                 ColorAnimation {
@@ -526,24 +549,47 @@ Item {
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        z: actionItem.isSelected ? 5 : (actionMouse.containsMouse ? 2 : 1)
 
-                        scale: actionMouse.pressed
-                            ? Motion.scalePress
-                            : (actionMouse.containsMouse || isSelected)
-                                ? Motion.scaleTileHover
-                                : Motion.scaleNormal
-                        transformOrigin: Item.Center
+                        // Focus halo for session action buttons with anti-cropping margin
+                        Rectangle {
+                            anchors.fill: actionSurface
+                            anchors.margins: -1
+                            radius: actionSurface.radius + 1
+                            color: actionItem.isDestructive ? Colors.criticalSoft : Colors.accentSoft
+                            scale: actionSurface.scale
+                            transformOrigin: Item.Center
+                            opacity: actionItem.isSelected ? 0.65 : 0.0
+                            visible: opacity > 0.01
+                            z: -1
 
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Motion.durationFast
-                                easing.type: Motion.easingStandard
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Motion.durationFast
+                                    easing.type: Motion.easingStandard
+                                }
                             }
                         }
 
                         Rectangle {
+                            id: actionSurface
                             anchors.fill: parent
+                            anchors.margins: 2
                             radius: 12
+
+                            scale: actionMouse.pressed
+                                ? Motion.scalePress
+                                : (actionMouse.containsMouse || isSelected)
+                                    ? Motion.scaleTileHover
+                                    : Motion.scaleNormal
+                            transformOrigin: Item.Center
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: actionMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                    easing.type: actionMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                                }
+                            }
 
                             color: actionItem.isConfirming
                                 ? Colors.critical
@@ -554,7 +600,7 @@ Item {
                                         : actionMouse.containsMouse
                                             ? Colors.surface
                                             : Colors.surfaceSoft
-                            border.width: (actionItem.isSelected || actionMouse.containsMouse) ? 1 : 0
+                            border.width: actionItem.isSelected ? 1.5 : (actionMouse.containsMouse ? 1 : 0)
                             border.color: actionItem.isConfirming ? Colors.critical : (actionItem.isSelected ? (actionItem.isDestructive ? Colors.critical : Colors.accent) : Colors.border)
 
                             Behavior on color {

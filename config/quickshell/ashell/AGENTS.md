@@ -352,9 +352,9 @@ Ensure every singleton referenced in code is registered with the correct path in
 ### 4. IPC & Runtime Validation
 When testing against a running Quickshell instance:
 ```bash
-quickshell ipc call <target> <method>
+qs -c ashell ipc call <target> <method>
 ```
 Review logs for QML warnings, binding loops, or unresolved imports:
 ```bash
-quickshell log
+qs -c ashell log
 ```

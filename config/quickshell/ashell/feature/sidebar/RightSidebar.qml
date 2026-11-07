@@ -322,8 +322,8 @@ PanelWindow {
 
         Behavior on height {
             NumberAnimation {
-                duration: Motion.durationNormal
-                easing.type: Motion.easingStandard
+                duration: Motion.durationMorph
+                easing.type: Motion.easingFluid
             }
         }
 
@@ -415,6 +415,7 @@ PanelWindow {
                         anchors.fill: parent
                         isCurrentTab: root.isOpen && root.currentTabIndex === 1
                         onCloseRequested: root.requestClose()
+                        onCloseImmediateRequested: root.closeImmediate()
                     }
                 }
 

@@ -58,6 +58,17 @@ Item {
         Item {
             implicitWidth: 30
             implicitHeight: 26
+            scale: dndMouse.pressed
+                ? Motion.scalePress
+                : (dndMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
+            transformOrigin: Item.Center
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: dndMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                    easing.type: dndMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                }
+            }
 
             Rectangle {
                 anchors.fill: parent
@@ -95,6 +106,17 @@ Item {
             implicitWidth: clearText.implicitWidth + 14
             implicitHeight: 26
             visible: root.count > 0
+            scale: clearMouse.pressed
+                ? Motion.scalePress
+                : (clearMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
+            transformOrigin: Item.Center
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: clearMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                    easing.type: clearMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                }
+            }
 
             Rectangle {
                 anchors.fill: parent

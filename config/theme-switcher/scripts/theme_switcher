@@ -28,11 +28,8 @@ THEMES_DIR="$ROOT_DIR/themes"
 HYPR_THEME_DECORATIONS_TARGET="$HOME/.config/hypr/modules/theme_decorations.lua"
 
 KITTY_TARGET="$HOME/.config/kitty/colors.conf"
-ROFI_TARGET="$HOME/.config/rofi/colors.rasi"
-SWAYNC_TARGET="$HOME/.config/swaync/colors.css"
-WAYBAR_COLORS_TARGET="$HOME/.config/waybar/colors.css"
-WLOGOUT_COLORS_TARGET="$HOME/.config/wlogout/colors.css"
 CAVA_THEME_TARGET="$HOME/.config/cava/themes/current"
+HYPRLOCK_COLORS_TARGET="$HOME/.config/hypr/hyprlock_colors.conf"
 
 ###############################################################################
 # Helpers
@@ -85,6 +82,24 @@ generate_cava_theme() {
     ' "$source" > "$target"
 }
 
+generate_hyprlock_theme() {
+    local source="${1:-$CURRENT_COLORS_JSON_LINK}"
+    local target="${2:-$HYPRLOCK_COLORS_TARGET}"
+
+    [[ -s "$source" ]] || die "Colors file not found or empty: $source"
+
+    mkdir -p "$(dirname "$target")"
+    jq -r '
+    to_entries[] | "$" + .key + " = " + (
+        if (.value | startswith("#")) then
+            (if (.value | length) > 7 then "rgba(" + (.value | ltrimstr("#")) + ")" else "rgb(" + (.value | ltrimstr("#")) + ")" end)
+        else
+            .value
+        end
+    )
+    ' "$source" > "$target"
+}
+
 ###############################################################################
 # Theme Switching
 ###############################################################################
@@ -98,7 +113,7 @@ switch_theme() {
 
     [[ -d "$colors_dir" ]] || die "Theme not found: $theme"
     local required
-    for required in colors.json kitty_colors.conf rofi_colors.rasi swaync_colors.css waybar_colors.css wlogout_colors.css; do
+    for required in colors.json kitty_colors.conf; do
         [[ -s "$colors_dir/$required" ]] || die "Theme '$theme' is missing colors/$required"
     done
     [[ -s "$hypr_dir/theme_decorations.lua" ]] || die "Theme '$theme' is missing Hyprland theme decorations"
@@ -118,25 +133,13 @@ switch_theme() {
         "$colors_dir/kitty_colors.conf" \
         "$KITTY_TARGET"
 
-    create_symlink \
-        "$colors_dir/rofi_colors.rasi" \
-        "$ROFI_TARGET"
-
-    create_symlink \
-        "$colors_dir/swaync_colors.css" \
-        "$SWAYNC_TARGET"
-
-    create_symlink \
-        "$colors_dir/waybar_colors.css" \
-        "$WAYBAR_COLORS_TARGET"
-
-    create_symlink \
-        "$colors_dir/wlogout_colors.css" \
-        "$WLOGOUT_COLORS_TARGET"
-
     generate_cava_theme \
         "$CURRENT_COLORS_JSON_LINK" \
         "$CAVA_THEME_TARGET"
+
+    generate_hyprlock_theme \
+        "$CURRENT_COLORS_JSON_LINK" \
+        "$HYPRLOCK_COLORS_TARGET"
 
     local theme_file="$THEMES_DIR/$theme/theme.env"
     if [[ -f "$theme_file" ]]; then
@@ -296,6 +299,8 @@ usage() {
 Usage:
   theme_switcher switch theme <theme>
   theme_switcher switch wallpaper <wallpaper>
+  theme_switcher generate hyprlock
+  theme_switcher generate all
 EOF
 }
 
@@ -315,6 +320,26 @@ main() {
                     ;;
                 *)
                     die "Unknown aspect: $2"
+                    ;;
+            esac
+            ;;
+        generate)
+            case "${2:-}" in
+                hyprlock)
+                    generate_hyprlock_theme
+                    ok "Hyprlock colors generated"
+                    ;;
+                cava)
+                    generate_cava_theme
+                    ok "Cava theme generated"
+                    ;;
+                all)
+                    generate_cava_theme
+                    generate_hyprlock_theme
+                    ok "All generated themes updated"
+                    ;;
+                *)
+                    die "Unknown generate target: ${2:-}"
                     ;;
             esac
             ;;

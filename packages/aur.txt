@@ -18,7 +18,6 @@ tlauncher-installer
 visual-studio-code-bin
 vscodium-bin
 vscodium-bin-marketplace
-waybar-cava-git
 waydroid-image
 wlogout
 yay

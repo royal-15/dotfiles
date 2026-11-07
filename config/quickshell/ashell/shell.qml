@@ -14,6 +14,7 @@ import qs.feature.osd
 import qs.feature.media
 import qs.feature.theme
 import qs.feature.clipboard
+import qs.feature.commandpalette
 
 ShellRoot {
     IpcHandler {
@@ -281,6 +282,46 @@ ShellRoot {
 
         function refresh() {
             ClipboardService.refresh();
+        }
+    }
+
+    IpcHandler {
+        target: "commandpalette"
+
+        function open() {
+            CommandPaletteRouter.open();
+        }
+
+        function close() {
+            CommandPaletteRouter.close();
+        }
+
+        function toggle() {
+            CommandPaletteRouter.toggle();
+        }
+
+        function refresh() {
+            CommandPaletteService.loadData();
+        }
+    }
+
+    IpcHandler {
+        target: "palette"
+
+        function open() {
+            CommandPaletteRouter.open();
+        }
+
+        function close() {
+            CommandPaletteRouter.close();
+        }
+
+        function toggle() {
+            CommandPaletteRouter.toggle();
+        }
+
+        function refresh() {
+            CommandPaletteService.loadData();
         }
     }
 

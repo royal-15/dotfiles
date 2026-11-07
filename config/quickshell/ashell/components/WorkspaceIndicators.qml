@@ -35,6 +35,7 @@ Item {
             delegate: Item {
                 id: wsDelegate
                 required property int modelData
+                property bool isPressed: wsMouse.pressed
 
                 readonly property bool isActive:
                     !!root.monitor
@@ -46,13 +47,42 @@ Item {
                 implicitWidth: indicatorWidth + 2
                 implicitHeight: 25
 
-                scale: wsHover.hovered ? Motion.scaleHover : Motion.scaleNormal
+                scale: (root.interactive && isPressed)
+                    ? Motion.scalePress
+                    : (root.interactive && wsHover.hovered)
+                        ? Motion.scaleHover
+                        : Motion.scaleNormal
                 transformOrigin: Item.Center
 
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
+                        duration: wsDelegate.isPressed ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: wsDelegate.isPressed ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
+                // Subtle ambient glow behind active workspace indicator
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: parent.indicatorWidth + 4
+                    height: 12
+                    radius: height / 2
+                    color: Colors.accentSoft
+                    opacity: parent.isActive ? 0.75 : 0.0
+                    visible: opacity > 0.01
+
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Motion.durationMorph
+                            easing.type: Motion.easingFluid
+                        }
+                    }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
                     }
                 }
 
@@ -73,8 +103,8 @@ Item {
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: Motion.durationNormal
-                            easing.type: Motion.easingStandard
+                            duration: Motion.durationMorph
+                            easing.type: Motion.easingFluid
                         }
                     }
 
@@ -106,8 +136,8 @@ Item {
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: Motion.durationNormal
-                            easing.type: Motion.easingStandard
+                            duration: Motion.durationMorph
+                            easing.type: Motion.easingFluid
                         }
                     }
 
@@ -126,6 +156,7 @@ Item {
                 }
 
                 MouseArea {
+                    id: wsMouse
                     anchors.fill: parent
                     enabled: root.interactive
                     cursorShape: Qt.PointingHandCursor

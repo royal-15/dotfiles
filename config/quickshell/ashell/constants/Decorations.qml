@@ -28,7 +28,7 @@ QtObject {
     readonly property int barItemMarginVertical: 5
     // Vertical margin centering pills and islands within the bar capsule ((35 - 25) / 2).
 
-    readonly property int barItemMarginHorizontal: 0
+    readonly property int barItemMarginHorizontal: 6
     // Horizontal inset of pill groups from the bar capsule edges.
 
     // ─── Unified Surface Rounding ────────────────────────────────────────────

@@ -10,9 +10,10 @@ FocusScope {
 
     property int selectedIndex: 0
     signal backRequested()
+    signal openWallpapersRequested()
 
-    implicitWidth: 540
-    implicitHeight: 380
+    implicitWidth: 560
+    implicitHeight: 400
 
     function moveSelection(dx, dy) {
         const count = ThemeService.availableThemes ? ThemeService.availableThemes.length : 0;
@@ -20,10 +21,11 @@ FocusScope {
             return;
         const cols = 2;
         let next = selectedIndex + dx + (dy * cols);
-        if (next < 0)
+        if (next < 0) {
+            next = (count - 1);
+        } else if (next >= count) {
             next = 0;
-        if (next >= count)
-            next = count - 1;
+        }
         selectedIndex = next;
         gridView.positionViewAtIndex(selectedIndex, GridView.Contain);
     }
@@ -39,15 +41,33 @@ FocusScope {
     Keys.onRightPressed: (event) => { moveSelection(1, 0); event.accepted = true; }
     Keys.onUpPressed: (event) => { moveSelection(0, -1); event.accepted = true; }
     Keys.onDownPressed: (event) => { moveSelection(0, 1); event.accepted = true; }
-    Keys.onTabPressed: (event) => { moveSelection(1, 0); event.accepted = true; }
-    Keys.onBacktabPressed: (event) => { moveSelection(-1, 0); event.accepted = true; }
+    Keys.onTabPressed: (event) => {
+        if (event.modifiers & Qt.ControlModifier) {
+            root.openWallpapersRequested();
+        } else {
+            moveSelection(1, 0);
+        }
+        event.accepted = true;
+    }
+    Keys.onBacktabPressed: (event) => {
+        if (event.modifiers & Qt.ControlModifier) {
+            root.openWallpapersRequested();
+        } else {
+            moveSelection(-1, 0);
+        }
+        event.accepted = true;
+    }
     Keys.onReturnPressed: (event) => { applySelected(); event.accepted = true; }
     Keys.onEnterPressed: (event) => { applySelected(); event.accepted = true; }
+    Keys.onSpacePressed: (event) => { applySelected(); event.accepted = true; }
     Keys.onEscapePressed: (event) => { root.backRequested(); event.accepted = true; }
     Keys.onBackPressed: (event) => { root.backRequested(); event.accepted = true; }
 
     Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Backspace) {
+        if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)) {
+            root.openWallpapersRequested();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Backspace) {
             if (!event.isAutoRepeat)
                 root.backRequested();
             event.accepted = true;
@@ -63,6 +83,9 @@ FocusScope {
         } else if (event.key === Qt.Key_J) {
             moveSelection(0, 1);
             event.accepted = true;
+        } else if (event.key === Qt.Key_2 || event.text.toLowerCase() === "w") {
+            root.openWallpapersRequested();
+            event.accepted = true;
         }
     }
 
@@ -71,78 +94,28 @@ FocusScope {
         anchors.margins: 14
         spacing: 12
 
-        // Header Row: Back button + Title
-        RowLayout {
+        // Top Navigation Header
+        ThemeStudioHeader {
             Layout.fillWidth: true
-            spacing: 8
-
-            Rectangle {
-                implicitWidth: backRow.implicitWidth + 14
-                implicitHeight: 28
-                radius: 14
-                color: backMouse.containsMouse ? Colors.surface : Colors.surfaceSoft
-                border.width: 1
-                border.color: backMouse.containsMouse ? Colors.accent : Colors.border
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                        easing.type: Motion.easingStandard
-                    }
-                }
-
-                MouseArea {
-                    id: backMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.backRequested()
-                }
-
-                RowLayout {
-                    id: backRow
-                    anchors.centerIn: parent
-                    spacing: 4
-
-                    Text {
-                        text: "arrow_back"
-                        font.family: "Material Symbols Outlined"
-                        font.pixelSize: 15
-                        color: Colors.accent
-                    }
-
-                    Text {
-                        text: "Back (Esc)"
-                        color: backMouse.containsMouse ? Colors.text : Colors.textDim
-                        font.pixelSize: 11
-                        font.weight: Font.Medium
-                    }
-                }
-            }
-
-            Text {
-                text: "Themes"
-                color: Colors.text
-                font.pixelSize: 15
-                font.weight: Font.Bold
-                Layout.fillWidth: true
-            }
-
-            Text {
-                text: ThemeService.availableThemes ? (ThemeService.availableThemes.length + " available") : ""
-                color: Colors.textDim
-                font.pixelSize: 11
+            activeStage: "themes"
+            infoText: ThemeService.availableThemes ? (ThemeService.availableThemes.length + " themes") : "0 themes"
+            onBackRequested: root.backRequested()
+            onSwitchStageRequested: (stage) => {
+                if (stage === "wallpapers")
+                    root.openWallpapersRequested();
             }
         }
 
-        // Grid View of Themes with automatic contain scrolling
+        // Themes Grid View
         GridView {
             id: gridView
             Layout.fillWidth: true
             Layout.fillHeight: true
+            topMargin: 2
+            bottomMargin: 2
             clip: true
-            cellWidth: 256
-            cellHeight: 84
+            cellWidth: 266
+            cellHeight: 88
             model: ThemeService.availableThemes
             currentIndex: root.selectedIndex
 
@@ -191,5 +164,11 @@ FocusScope {
 
     Component.onCompleted: {
         root.syncActiveSelection();
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            root.syncActiveSelection();
+        }
     }
 }

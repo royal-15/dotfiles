@@ -57,6 +57,8 @@ Item {
         id: listView
         anchors.fill: parent
         anchors.rightMargin: 6
+        topMargin: 2
+        bottomMargin: 2
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         spacing: 4

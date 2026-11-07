@@ -179,8 +179,11 @@ Item {
         }
 
         Item {
-            anchors.fill: parent
-            anchors.margins: 12
+            width: root.targetW - 24
+            height: root.targetH - 24
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 12
             opacity: Math.max(0, (islandSurface.morphProgress - 0.25) / 0.75)
             visible: opacity > 0.01
 
