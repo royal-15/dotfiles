@@ -29,5 +29,7 @@ Poller 1.0 components/Poller.qml
 Pill 1.0 components/Pill.qml
 ThemeStudio 1.0 feature/theme/ThemeStudio.qml
 RightSidebar 1.0 feature/sidebar/RightSidebar.qml
+NotificationPill 1.0 feature/bar/NotificationPill.qml
+StatusCapsule 1.0 feature/bar/StatusCapsule.qml
 Clipboard 1.0 feature/clipboard/Clipboard.qml
 CommandPalette 1.0 feature/commandpalette/CommandPalette.qml

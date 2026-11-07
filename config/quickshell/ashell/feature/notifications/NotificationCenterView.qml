@@ -41,6 +41,20 @@ Item {
         cascadeClearTimer.restart();
     }
 
+    function dismissTopNotification() {
+        if (NotificationService.notificationCount === 0 || isClearingAll)
+            return;
+        const item = notifListView.itemAtIndex(0);
+        if (item && typeof item.dismissCard === "function") {
+            item.dismissCard(1);
+        } else if (NotificationService.serverTrackedNotifications && NotificationService.serverTrackedNotifications.values) {
+            const list = NotificationService.serverTrackedNotifications.values;
+            if (list.length > 0 && list[0] && typeof list[0].dismiss === "function") {
+                list[0].dismiss();
+            }
+        }
+    }
+
     function markAllChecked() {
         NotificationService.markAllAsChecked();
     }
@@ -55,6 +69,25 @@ Item {
         if (event.key === Qt.Key_Escape) {
             root.closeRequested();
             return true;
+        }
+        const hasModifier = (event.modifiers & (Qt.ControlModifier | Qt.AltModifier)) !== 0;
+        if (!hasModifier) {
+            if (event.key === Qt.Key_C) {
+                root.startCascadeClear();
+                return true;
+            }
+            if (event.key === Qt.Key_D) {
+                NotificationService.toggleDnd();
+                return true;
+            }
+            if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
+                if (event.modifiers & Qt.ShiftModifier) {
+                    root.startCascadeClear();
+                } else {
+                    root.dismissTopNotification();
+                }
+                return true;
+            }
         }
         return false;
     }
@@ -71,115 +104,108 @@ Item {
 
         ColumnLayout {
             anchors.fill: parent
-            spacing: 0
+            anchors.margins: 10
+            spacing: 8
 
-        // Header
-        NotificationCenterHeader {
-            Layout.fillWidth: true
-            count: NotificationService.notificationCount
-            onClearAllRequested: root.startCascadeClear()
-        }
-
-        // Divider line
-        Rectangle {
-            Layout.fillWidth: true
-            height: 1
-            color: Colors.border
-        }
-
-        // Notification List or Empty State
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            ListView {
-                id: notifListView
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
-                clip: true
-                visible: NotificationService.notificationCount > 0 || root.isClearingAll
-                model: NotificationService.serverTrackedNotifications
-
-                add: Transition {
-                    ParallelAnimation {
-                        NumberAnimation {
-                            property: "opacity"
-                            from: 0
-                            to: 1
-                            duration: Motion.durationNormal
-                            easing.type: Motion.easingStandard
-                        }
-                        NumberAnimation {
-                            property: "x"
-                            from: 40
-                            to: 0
-                            duration: Motion.durationNormal
-                            easing.type: Motion.easingStandard
-                        }
-                    }
-                }
-
-                displaced: Transition {
-                    NumberAnimation {
-                        property: "y"
-                        duration: Motion.durationNormal
-                        easing.type: Motion.easingStandard
-                    }
-                }
-
-                delegate: NotificationCard {
-                    required property var modelData
-                    width: notifListView.width
-                    isToast: false
-                    notification: modelData
-                    onDismissed: {
-                        if (modelData && typeof modelData.dismiss === "function")
-                            modelData.dismiss();
-                    }
-                }
+            // Header
+            NotificationCenterHeader {
+                Layout.fillWidth: true
+                count: NotificationService.notificationCount
+                onClearAllRequested: root.startCascadeClear()
             }
 
-            // Empty State View
-            ColumnLayout {
-                id: emptyStateLayout
-                anchors.centerIn: parent
-                spacing: 10
-                visible: NotificationService.notificationCount === 0 && !root.isClearingAll
-                opacity: visible ? 1.0 : 0.0
-                scale: visible ? 1.0 : 0.92
+            // Notification List or Empty State
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Motion.durationNormal
-                        easing.type: Motion.easingStandard
+                ListView {
+                    id: notifListView
+                    anchors.fill: parent
+                    spacing: 8
+                    clip: true
+                    visible: NotificationService.notificationCount > 0 || root.isClearingAll
+                    model: NotificationService.serverTrackedNotifications
+
+                    add: Transition {
+                        ParallelAnimation {
+                            NumberAnimation {
+                                property: "opacity"
+                                from: 0
+                                to: 1
+                                duration: Motion.durationNormal
+                                easing.type: Motion.easingStandard
+                            }
+                            NumberAnimation {
+                                property: "x"
+                                from: 40
+                                to: 0
+                                duration: Motion.durationNormal
+                                easing.type: Motion.easingStandard
+                            }
+                        }
+                    }
+
+                    displaced: Transition {
+                        NumberAnimation {
+                            property: "y"
+                            duration: Motion.durationNormal
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+
+                    delegate: NotificationCard {
+                        required property var modelData
+                        width: notifListView.width
+                        isToast: false
+                        notification: modelData
+                        onDismissed: {
+                            if (modelData && typeof modelData.dismiss === "function")
+                                modelData.dismiss();
+                        }
                     }
                 }
 
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: Motion.durationNormal
-                        easing.type: Motion.easingBounce
+                // Apple-Inspired Centered Quiet Empty State View
+                ColumnLayout {
+                    id: emptyStateLayout
+                    anchors.centerIn: parent
+                    spacing: 8
+                    visible: NotificationService.notificationCount === 0 && !root.isClearingAll
+                    opacity: visible ? 1.0 : 0.0
+                    scale: visible ? 1.0 : 0.94
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Motion.durationNormal
+                            easing.type: Motion.easingStandard
+                        }
                     }
-                }
 
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "notifications_paused"
-                    font.family: "Material Symbols Outlined"
-                    font.pixelSize: 36
-                    color: Colors.textDim
-                }
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: Motion.durationNormal
+                            easing.type: Motion.easingBounce
+                        }
+                    }
 
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "No Notifications"
-                    font.pixelSize: 13
-                    font.weight: Font.Medium
-                    color: Colors.textDim
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: "notifications_none"
+                        font.family: "Material Symbols Rounded"
+                        font.pixelSize: 32
+                        color: Colors.textFaint
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: "No Notifications"
+                        font.pixelSize: 12
+                        font.weight: Font.Medium
+                        color: Colors.textDim
+                    }
                 }
             }
         }
     }
-}
 }

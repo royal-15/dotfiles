@@ -14,6 +14,33 @@ Scope {
     property int trackRevision: 0
     signal trackChanged(string title, string artist)
 
+    // Feedback Message State (unified across expanded MediaCard and compact Dynamic Island)
+    property bool feedbackActive: false
+    property string feedbackIcon: ""
+    property string feedbackText: ""
+    property bool feedbackIsError: false
+    signal feedbackTriggered(string icon, string text, bool isError)
+
+    Timer {
+        id: feedbackTimer
+        interval: 2200
+        repeat: false
+        onTriggered: {
+            root.feedbackActive = false;
+        }
+    }
+
+    function showFeedback(icon, text, isError = false) {
+        if (!text || text === "")
+            return;
+        root.feedbackIcon = icon || "info";
+        root.feedbackText = text;
+        root.feedbackIsError = Boolean(isError);
+        root.feedbackActive = true;
+        feedbackTimer.restart();
+        root.feedbackTriggered(root.feedbackIcon, root.feedbackText, root.feedbackIsError);
+    }
+
     property var activePlayer: null
 
     function recalculateActivePlayer() {
@@ -140,31 +167,80 @@ Scope {
     }
 
     function togglePlaying() {
-        if (activePlayer)
-            activePlayer.togglePlaying();
+        if (!activePlayer) {
+            showFeedback("music_off", "No media player", true);
+            return;
+        }
+        if (!canTogglePlaying) {
+            showFeedback("info", "Play/Pause unsupported", true);
+            return;
+        }
+        const willPlay = !isPlaying;
+        activePlayer.togglePlaying();
+        showFeedback(willPlay ? "play_arrow" : "pause", willPlay ? "Playing" : "Paused");
     }
 
     function next() {
-        if (activePlayer && activePlayer.canGoNext)
-            activePlayer.next();
+        if (!activePlayer) {
+            showFeedback("music_off", "No media player", true);
+            return;
+        }
+        if (!canGoNext) {
+            showFeedback("info", "End of queue", true);
+            return;
+        }
+        activePlayer.next();
+        showFeedback("skip_next", "Next track");
     }
 
     function previous() {
-        if (activePlayer && activePlayer.canGoPrevious)
-            activePlayer.previous();
+        if (!activePlayer) {
+            showFeedback("music_off", "No media player", true);
+            return;
+        }
+        if (!canGoPrevious) {
+            showFeedback("info", "Start of queue", true);
+            return;
+        }
+        activePlayer.previous();
+        showFeedback("skip_previous", "Previous track");
     }
 
     function toggleShuffle() {
-        if (activePlayer && activePlayer.shuffleSupported)
-            activePlayer.shuffle = !activePlayer.shuffle;
+        if (!activePlayer || !activePlayer.shuffleSupported) {
+            showFeedback("info", "Shuffle unsupported", true);
+            return;
+        }
+        const nextState = !activePlayer.shuffle;
+        activePlayer.shuffle = nextState;
+        showFeedback("shuffle", nextState ? "Shuffle On" : "Shuffle Off");
     }
 
-    function seekTo(targetSeconds) {
-        if (!activePlayer || !activePlayer.canSeek)
+    function seekBy(deltaSeconds) {
+        if (!activePlayer) {
+            showFeedback("music_off", "No media player", true);
+            return;
+        }
+        if (!canSeek) {
+            showFeedback("info", "Seeking unsupported", true);
+            return;
+        }
+        const target = Math.max(0, Math.min(trackLength, currentPosition + deltaSeconds));
+        seekTo(target, false);
+        const icon = deltaSeconds >= 0 ? "fast_forward" : "fast_rewind";
+        const sign = deltaSeconds >= 0 ? `+${Math.round(deltaSeconds)}s` : `${Math.round(deltaSeconds)}s`;
+        showFeedback(icon, `Seek ${sign} (${formatTime(target)})`);
+    }
+
+    function seekTo(targetSeconds, showNotice = false) {
+        if (!activePlayer || !canSeek)
             return;
         const bounded = Math.max(0, Math.min(trackLength, targetSeconds));
         activePlayer.position = bounded;
         root.currentPosition = bounded;
+        if (showNotice) {
+            showFeedback("fast_forward", `Seeked to ${formatTime(bounded)}`);
+        }
     }
 
     function formatTime(totalSeconds) {

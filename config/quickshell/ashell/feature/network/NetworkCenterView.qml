@@ -1131,81 +1131,144 @@ Item {
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
+                    anchors.margins: 14
+                    spacing: 10
 
+                    // 1. Sleek Apple Header Row
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 8
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
-                            Text { text: "Connections"; color: Colors.text; font.pixelSize: 18; font.weight: Font.DemiBold }
+                            spacing: 1
+
+                            Text {
+                                text: "Connections"
+                                color: Colors.text
+                                font.pixelSize: 16
+                                font.weight: Font.DemiBold
+                            }
+
                             RowLayout {
                                 spacing: 5
                                 Rectangle {
-                                    width: 6; height: 6; radius: 3
+                                    width: 6
+                                    height: 6
+                                    radius: 3
                                     color: root.activeError ? Colors.critical : root.activeEnabled ? Colors.success : Colors.textFaint
                                     Behavior on color { ColorAnimation { duration: Motion.durationNormal; easing.type: Motion.easingStandard } }
                                 }
-                                Text { text: root.activeError ? "Connection issue" : root.activeStatus; color: root.activeError ? Colors.critical : Colors.textDim; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true }
+                                Text {
+                                    text: root.activeError ? "Connection issue" : root.activeStatus
+                                    color: root.activeError ? Colors.critical : Colors.textDim
+                                    font.pixelSize: 11
+                                    elide: Text.ElideRight
+                                    Layout.fillWidth: true
+                                }
                             }
                         }
 
+                        // Refresh button
                         Rectangle {
-                            implicitWidth: 32; implicitHeight: 32; radius: 10
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            radius: 8
                             color: refreshMouse.containsMouse ? Colors.hover : Colors.surfaceSoft
                             border.width: 0
                             scale: refreshMouse.pressed ? Motion.scalePress : refreshMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
                             Behavior on scale { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
                             Behavior on color { ColorAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
-                            Text { id: refreshGlyph; anchors.centerIn: parent; text: root.activeSearching ? "sync" : "refresh"; color: Colors.accent; font.family: "Material Symbols Rounded"; font.pixelSize: 18; RotationAnimation on rotation { from: 0; to: 360; duration: 1100; loops: Animation.Infinite; running: root.activeSearching; onStopped: refreshGlyph.rotation = 0 } }
-                            MouseArea { id: refreshMouse; anchors.fill: parent; hoverEnabled: true; enabled: !root.activeBusy && root.activeEnabled; cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor; onClicked: root.activeTab === "wifi" ? root.scanWifi() : root.scanBluetooth() }
+                            Text {
+                                id: refreshGlyph
+                                anchors.centerIn: parent
+                                text: root.activeSearching ? "sync" : "refresh"
+                                color: Colors.accent
+                                font.family: "Material Symbols Rounded"
+                                font.pixelSize: 16
+                                RotationAnimation on rotation {
+                                    from: 0
+                                    to: 360
+                                    duration: 1100
+                                    loops: Animation.Infinite
+                                    running: root.activeSearching
+                                    onStopped: refreshGlyph.rotation = 0
+                                }
+                            }
+                            MouseArea {
+                                id: refreshMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                enabled: !root.activeBusy && root.activeEnabled
+                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                onClicked: root.activeTab === "wifi" ? root.scanWifi() : root.scanBluetooth()
+                            }
                         }
 
+                        // Dismiss button
                         Rectangle {
-                            implicitWidth: 32; implicitHeight: 32; radius: 10
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            radius: 8
                             color: closeMouse.containsMouse ? Colors.hover : Colors.surfaceSoft
                             border.width: 0
                             scale: closeMouse.pressed ? Motion.scalePress : closeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
                             Behavior on scale { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
                             Behavior on color { ColorAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
-                            Text { anchors.centerIn: parent; text: "close"; color: closeMouse.containsMouse ? Colors.text : Colors.textDim; font.family: "Material Symbols Rounded"; font.pixelSize: 18 }
-                            MouseArea { id: closeMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.closeRequested() }
+                            Text {
+                                anchors.centerIn: parent
+                                text: "close"
+                                color: closeMouse.containsMouse ? Colors.text : Colors.textDim
+                                font.family: "Material Symbols Rounded"
+                                font.pixelSize: 16
+                            }
+                            MouseArea {
+                                id: closeMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.closeRequested()
+                            }
                         }
                     }
 
+                    // 2. Segmented Tab Switcher (Wi-Fi / Bluetooth)
                     NetworkCenterTabs {
                         activeTab: root.activeTab
                         onTabSelected: tab => root.setKeyboardTab(tab)
                     }
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 8
-                        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Colors.border; border.width: 0 }
-                        Text { text: root.activeTab === "wifi" ? "NETWORKS" : "DEVICES"; color: Colors.textFaint; font.pixelSize: 10; font.letterSpacing: 1.2 }
-                        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Colors.border; border.width: 0 }
-                    }
-
+                    // 3. Apple Inset Master Toggle Card (Wi-Fi)
                     Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 34
+                        implicitHeight: 38
                         radius: 10
                         visible: root.activeTab === "wifi"
-                        color: wifiRowToggleMouse.containsMouse ? Colors.hover : Colors.clear
-                        scale: wifiRowToggleMouse.pressed ? Motion.scalePress : Motion.scaleNormal
+                        color: wifiRowToggleMouse.containsMouse ? Colors.surfaceMuted : Colors.surfaceSoft
+                        border.width: 0
                         Behavior on color { ColorAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
-                        Behavior on scale { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 6
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 10
                             spacing: 8
-                            Text { text: "Wi‑Fi"; color: Colors.text; font.pixelSize: 13; Layout.fillWidth: true }
-                            Text { text: wifiToggle.checked ? "On" : "Off"; color: wifiToggle.checked ? Colors.success : Colors.textDim; font.pixelSize: 12 }
+
+                            Text {
+                                text: "wifi"
+                                color: root.wifiEnabled ? Colors.accent : Colors.textDim
+                                font.family: "Material Symbols Rounded"
+                                font.pixelSize: 16
+                            }
+
+                            Text {
+                                text: "Wi‑Fi"
+                                color: Colors.text
+                                font.pixelSize: 13
+                                font.weight: Font.Medium
+                                Layout.fillWidth: true
+                            }
+
                             Item {
                                 implicitWidth: 38
                                 implicitHeight: 22
@@ -1217,10 +1280,20 @@ Item {
                                     enabled: false
                                     focusPolicy: Qt.NoFocus
                                     indicator: Rectangle {
-                                        implicitWidth: 38; implicitHeight: 22; radius: 11
+                                        implicitWidth: 38
+                                        implicitHeight: 22
+                                        radius: 11
                                         color: wifiToggle.checked ? Colors.accent : Colors.surfaceMuted
                                         border.width: 0
-                                        Rectangle { x: wifiToggle.checked ? parent.width - width - 3 : 3; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: 8; color: wifiToggle.checked ? Colors.selectedText : Colors.text; Behavior on x { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } } }
+                                        Rectangle {
+                                            x: wifiToggle.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: 16
+                                            height: 16
+                                            radius: 8
+                                            color: wifiToggle.checked ? Colors.selectedText : Colors.text
+                                            Behavior on x { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
+                                        }
                                     }
                                 }
                             }
@@ -1236,23 +1309,37 @@ Item {
                         }
                     }
 
+                    // 3. Apple Inset Master Toggle Card (Bluetooth)
                     Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 34
+                        implicitHeight: 38
                         radius: 10
                         visible: root.activeTab === "bluetooth"
-                        color: btRowToggleMouse.containsMouse ? Colors.hover : Colors.clear
-                        scale: btRowToggleMouse.pressed ? Motion.scalePress : Motion.scaleNormal
+                        color: btRowToggleMouse.containsMouse ? Colors.surfaceMuted : Colors.surfaceSoft
+                        border.width: 0
                         Behavior on color { ColorAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
-                        Behavior on scale { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 6
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 10
                             spacing: 8
-                            Text { text: "Bluetooth"; color: Colors.text; font.pixelSize: 13; Layout.fillWidth: true }
-                            Text { text: bluetoothToggle.checked ? "On" : "Off"; color: bluetoothToggle.checked ? Colors.success : Colors.textDim; font.pixelSize: 12 }
+
+                            Text {
+                                text: "bluetooth"
+                                color: root.bluetoothEnabled ? Colors.accent : Colors.textDim
+                                font.family: "Material Symbols Rounded"
+                                font.pixelSize: 16
+                            }
+
+                            Text {
+                                text: "Bluetooth"
+                                color: Colors.text
+                                font.pixelSize: 13
+                                font.weight: Font.Medium
+                                Layout.fillWidth: true
+                            }
+
                             Item {
                                 implicitWidth: 38
                                 implicitHeight: 22
@@ -1264,10 +1351,20 @@ Item {
                                     enabled: false
                                     focusPolicy: Qt.NoFocus
                                     indicator: Rectangle {
-                                        implicitWidth: 38; implicitHeight: 22; radius: 11
+                                        implicitWidth: 38
+                                        implicitHeight: 22
+                                        radius: 11
                                         color: bluetoothToggle.checked ? Colors.accent : Colors.surfaceMuted
                                         border.width: 0
-                                        Rectangle { x: bluetoothToggle.checked ? parent.width - width - 3 : 3; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; radius: 8; color: bluetoothToggle.checked ? Colors.selectedText : Colors.text; Behavior on x { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } } }
+                                        Rectangle {
+                                            x: bluetoothToggle.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: 16
+                                            height: 16
+                                            radius: 8
+                                            color: bluetoothToggle.checked ? Colors.selectedText : Colors.text
+                                            Behavior on x { NumberAnimation { duration: Motion.durationFast; easing.type: Motion.easingStandard } }
+                                        }
                                     }
                                 }
                             }
@@ -1283,11 +1380,12 @@ Item {
                         }
                     }
 
+                    // 4. Compact Scanning Indicator
                     Item {
                         id: scanningBannerContainer
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Math.round(28 * root.bannerProgress)
-                        Layout.topMargin: Math.round(-12 * (1.0 - root.bannerProgress))
+                        Layout.preferredHeight: Math.round(24 * root.bannerProgress)
+                        Layout.topMargin: Math.round(-8 * (1.0 - root.bannerProgress))
                         visible: root.bannerProgress > 0.01
                         clip: true
                         opacity: root.bannerProgress
@@ -1296,52 +1394,38 @@ Item {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.top: parent.top
-                            height: 28
-                            radius: 9
+                            height: 24
+                            radius: 8
                             color: Colors.accentSoft
                             border.width: 0
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 10
-                            anchors.rightMargin: 10
-                            spacing: 8
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                spacing: 6
 
-                            BusyIndicator {
-                                running: root.activeSearching
-                                implicitWidth: 14
-                                implicitHeight: 14
-                            }
-
-                            Text {
-                                text: root.activeTab === "wifi" ? "Scanning nearby networks…" : "Searching for nearby devices…"
-                                color: Colors.text
-                                font.pixelSize: 11
-                                font.weight: Font.Medium
-                                Layout.fillWidth: true
-                            }
-
-                            Text {
-                                id: bannerSpinGlyph
-                                text: "sync"
-                                color: Colors.accent
-                                font.family: "Material Symbols Rounded"
-                                font.pixelSize: 15
-                                RotationAnimation on rotation {
-                                    from: 0
-                                    to: 360
-                                    duration: 1100
-                                    loops: Animation.Infinite
+                                BusyIndicator {
                                     running: root.activeSearching
-                                    onStopped: bannerSpinGlyph.rotation = 0
+                                    implicitWidth: 12
+                                    implicitHeight: 12
+                                }
+
+                                Text {
+                                    text: root.activeTab === "wifi" ? "Scanning nearby networks…" : "Searching for nearby devices…"
+                                    color: Colors.text
+                                    font.pixelSize: 11
+                                    font.weight: Font.Medium
+                                    Layout.fillWidth: true
                                 }
                             }
                         }
                     }
-                }
 
                 WifiNetworkList {
                     id: wifiList
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     visible: root.activeTab === "wifi"
                     networks: root.wifiNetworks
                     busy: root.wifiBusy
@@ -1365,6 +1449,8 @@ Item {
 
                 BluetoothDeviceList {
                     id: bluetoothList
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     visible: root.activeTab === "bluetooth"
                     devicesModel: bluetoothListModel
                     deviceCount: root.pairedDevices.length + root.nearbyDevices.length

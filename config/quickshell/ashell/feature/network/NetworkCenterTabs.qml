@@ -11,51 +11,28 @@ Rectangle {
     signal tabSelected(string tab)
 
     readonly property int activeIndex: activeTab === "bluetooth" ? 1 : 0
-    readonly property real margin: 4
-    readonly property real spacing: 6
+    readonly property real margin: 3
+    readonly property real spacing: 4
     readonly property real availableWidth: Math.max(0, width - (margin * 2))
     readonly property real tabWidth: Math.max(0, (availableWidth - spacing) / 2)
 
     Layout.fillWidth: true
-    implicitHeight: 44
-    radius: 14
-    color: Colors.surface
+    implicitHeight: 34
+    radius: 10
+    color: Colors.surfaceMuted
     border.width: 0
 
-    // Ambient glow halo underlying the sliding capsule
-    Rectangle {
-        anchors.fill: slidingCapsule
-        anchors.margins: -1
-        radius: slidingCapsule.radius + 1
-        color: Colors.accentSoft
-        opacity: 0.55
-        z: 1
-
-        Behavior on x {
-            NumberAnimation {
-                duration: Motion.durationNormal
-                easing.type: Motion.easingFluid
-            }
-        }
-        Behavior on width {
-            NumberAnimation {
-                duration: Motion.durationNormal
-                easing.type: Motion.easingFluid
-            }
-        }
-    }
-
-    // Single physical sliding capsule gliding behind the active tab
+    // Single physical sliding capsule gliding behind the active tab (Apple Control Center style)
     Rectangle {
         id: slidingCapsule
         y: root.margin
         x: root.margin + (root.activeIndex * (root.tabWidth + root.spacing))
         width: root.tabWidth
         height: root.height - (root.margin * 2)
-        radius: 11
-        color: Colors.accentSoft
+        radius: 8
+        color: Colors.surfaceSoft
         border.width: 1
-        border.color: Colors.accent
+        border.color: Colors.border
         z: 2
 
         Behavior on x {
@@ -94,23 +71,9 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                scale: tabMouse.pressed
-                    ? Motion.scalePress
-                    : (tabMouse.containsMouse && !tabItem.isActive)
-                        ? Motion.scaleTileHover
-                        : Motion.scaleNormal
-                transformOrigin: Item.Center
-
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: tabMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
-                        easing.type: tabMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
-                    }
-                }
-
                 Rectangle {
                     anchors.fill: parent
-                    radius: 11
+                    radius: 8
                     border.width: 0
                     color: (tabMouse.containsMouse && !tabItem.isActive)
                         ? Colors.hover
@@ -125,7 +88,7 @@ Rectangle {
 
                     RowLayout {
                         anchors.centerIn: parent
-                        spacing: 7
+                        spacing: 6
 
                         Text {
                             text: modelData.icon
@@ -135,7 +98,7 @@ Rectangle {
                                     ? Colors.text
                                     : Colors.textDim
                             font.family: "Material Symbols Rounded"
-                            font.pixelSize: 16
+                            font.pixelSize: 15
 
                             Behavior on color {
                                 ColorAnimation {
@@ -152,7 +115,7 @@ Rectangle {
                                 : tabMouse.containsMouse
                                     ? Colors.text
                                     : Colors.textDim
-                            font.pixelSize: 13
+                            font.pixelSize: 12
                             font.weight: tabItem.isActive ? Font.DemiBold : Font.Medium
 
                             Behavior on color {

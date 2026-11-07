@@ -78,6 +78,42 @@ Item {
                     border.width: 1
                     border.color: Colors.border
                 }
+
+                // Ambient feedback HUD overlay over album art
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 52
+                    height: 52
+                    radius: 26
+                    color: Colors.panel
+                    border.color: Colors.border
+                    border.width: 1
+                    opacity: MediaService.feedbackActive ? 0.95 : 0.0
+                    scale: MediaService.feedbackActive ? 1.0 : 0.75
+                    visible: opacity > 0.01
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingBounce
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: MediaService.feedbackIcon
+                        font.family: "Material Symbols Rounded"
+                        font.pixelSize: 26
+                        color: MediaService.feedbackIsError ? Colors.critical : Colors.accent
+                    }
+                }
             }
         }
 
@@ -116,14 +152,63 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    Text {
+                    Item {
                         Layout.fillWidth: true
-                        text: MediaService.trackAlbum
-                        color: Colors.textFaint
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 10
-                        elide: Text.ElideRight
-                        visible: text !== ""
+                        Layout.preferredHeight: 14
+
+                        // Album subtitle (resting state)
+                        Text {
+                            anchors.fill: parent
+                            text: MediaService.trackAlbum
+                            color: Colors.textFaint
+                            font.family: "JetBrainsMono Nerd Font"
+                            font.pixelSize: 10
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignVCenter
+                            opacity: MediaService.feedbackActive ? 0.0 : 1.0
+                            visible: opacity > 0.01
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Motion.durationFast
+                                    easing.type: Motion.easingStandard
+                                }
+                            }
+                        }
+
+                        // Feedback Notice Banner (active state)
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 5
+                            opacity: MediaService.feedbackActive ? 1.0 : 0.0
+                            visible: opacity > 0.01
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Motion.durationFast
+                                    easing.type: Motion.easingStandard
+                                }
+                            }
+
+                            Text {
+                                text: MediaService.feedbackIcon !== "" ? MediaService.feedbackIcon : (MediaService.feedbackIsError ? "info" : "check_circle")
+                                color: MediaService.feedbackIsError ? Colors.critical : Colors.accent
+                                font.family: "Material Symbols Rounded"
+                                font.pixelSize: 13
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: MediaService.feedbackText
+                                color: MediaService.feedbackIsError ? Colors.critical : Colors.text
+                                font.family: "JetBrainsMono Nerd Font"
+                                font.pixelSize: 10
+                                font.weight: Font.Medium
+                                elide: Text.ElideRight
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+                        }
                     }
                 }
 
@@ -293,7 +378,7 @@ Item {
                         onReleased: mouse => {
                             if (root.isScrubbing) {
                                 updateScrub(mouse);
-                                MediaService.seekTo(root.scrubSeconds);
+                                MediaService.seekTo(root.scrubSeconds, true);
                                 root.isScrubbing = false;
                             }
                         }

@@ -140,6 +140,12 @@ Item {
                 flashTimer.restart();
             }
         }
+        function onFeedbackTriggered(icon, text, isError) {
+            if (!islandSurface.expanded && !root.centerActive) {
+                root.isFlashing = true;
+                flashTimer.restart();
+            }
+        }
     }
 
     Connections {
@@ -230,6 +236,42 @@ Item {
         onActivated: root.requestClose()
     }
 
+    // Media playback keyboard controls
+    Shortcut {
+        sequence: "Space"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: MediaService.togglePlaying()
+    }
+
+    Shortcut {
+        sequence: "Left"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: MediaService.previous()
+    }
+
+    Shortcut {
+        sequence: "Right"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: MediaService.next()
+    }
+
+    Shortcut {
+        sequence: "Shift+Left"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: MediaService.seekBy(-5)
+    }
+
+    Shortcut {
+        sequence: "Shift+Right"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: MediaService.seekBy(5)
+    }
+
     // Ambient drop shadow tracking morphing geometry
     Rectangle {
         anchors.fill: islandSurface
@@ -311,13 +353,15 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
                 }
 
-                // Transient track info during flash
+                // Transient track info / feedback during flash
                 Text {
                     Layout.alignment: Qt.AlignVCenter
                     visible: root.flashDimProgress > 0.02
                     opacity: Math.max(0, Math.min(1, (root.flashDimProgress - 0.1) / 0.8))
-                    text: `${MediaService.trackTitle} — ${MediaService.trackArtist}`
-                    color: Colors.text
+                    text: (MediaService.feedbackActive && MediaService.feedbackText !== "")
+                        ? MediaService.feedbackText
+                        : `${MediaService.trackTitle} — ${MediaService.trackArtist}`
+                    color: (MediaService.feedbackActive && MediaService.feedbackIsError) ? Colors.critical : Colors.text
                     font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 11
                     Layout.maximumWidth: 180

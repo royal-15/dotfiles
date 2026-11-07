@@ -20,14 +20,8 @@ Item {
         if (!modelData || modelData.length === 0)
             return;
 
-        const maxIdx = modelData.length - 1;
-        let next = currentIndex + delta;
-        if (next < 0)
-            next = 0;
-        else if (next > maxIdx)
-            next = maxIdx;
-
-        currentIndex = next;
+        const count = modelData.length;
+        currentIndex = (currentIndex + delta + count) % count;
         listView.positionViewAtIndex(currentIndex, ListView.Contain);
     }
 

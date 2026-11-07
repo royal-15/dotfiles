@@ -1,1 +1,1 @@
-/home/rajat/.config/theme-switcher/themes/cornerstore/hypr/theme_decorations.lua
+/home/rajat/.config/theme-switcher/themes/moonlit/hypr/theme_decorations.lua

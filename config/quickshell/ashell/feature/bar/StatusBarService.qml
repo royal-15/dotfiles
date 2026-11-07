@@ -127,6 +127,97 @@ Scope {
         : NetworkCenterState.wifiEnabled
     readonly property bool wifiConnected: wifiRadioEnabled && activeConnection !== "" && wifiSignal > 0
     readonly property var bluetoothReading: bluetoothState.split("|")
+    readonly property bool bluetoothPowered: bluetoothReading.length > 0 && bluetoothReading[0] === "yes"
+    readonly property int bluetoothConnectedCount: bluetoothReading.length > 1 ? Math.max(0, numericValue(bluetoothReading[1])) : 0
+    readonly property string bluetoothDeviceName: bluetoothReading.length > 2 ? bluetoothReading[2] : ""
+
+    signal networkStatusEvent(string icon, string label)
+
+    property string lastActiveConnection: ""
+    property bool lastWifiRadioEnabled: true
+    property int lastBtConnectedCount: 0
+    property string lastBtDeviceName: ""
+    property bool lastBtPowered: true
+    property bool networkEventsInitialized: false
+
+    Timer {
+        id: startupGraceTimer
+        interval: 3500
+        running: true
+        repeat: false
+        onTriggered: {
+            root.lastActiveConnection = root.activeConnection;
+            root.lastWifiRadioEnabled = root.wifiRadioEnabled;
+            root.lastBtConnectedCount = root.bluetoothConnectedCount;
+            root.lastBtDeviceName = root.bluetoothDeviceName;
+            root.lastBtPowered = root.bluetoothPowered;
+            root.networkEventsInitialized = true;
+        }
+    }
+
+    function checkNetworkEvents() {
+        if (!networkEventsInitialized || startupGraceTimer.running) {
+            lastActiveConnection = activeConnection;
+            lastWifiRadioEnabled = wifiRadioEnabled;
+            lastBtConnectedCount = bluetoothConnectedCount;
+            lastBtDeviceName = bluetoothDeviceName;
+            lastBtPowered = bluetoothPowered;
+            return;
+        }
+
+        if (activeConnection !== lastActiveConnection) {
+            if (activeConnection !== "") {
+                networkStatusEvent("wifi", activeConnection);
+            } else if (lastActiveConnection !== "" && wifiRadioEnabled) {
+                networkStatusEvent("wifi_find", "Wi-Fi Disconnected");
+            }
+            lastActiveConnection = activeConnection;
+        }
+
+        if (wifiRadioEnabled !== lastWifiRadioEnabled) {
+            if (!wifiRadioEnabled) {
+                networkStatusEvent("wifi_off", "Wi-Fi Off");
+            } else {
+                networkStatusEvent("wifi", "Wi-Fi On");
+            }
+            lastWifiRadioEnabled = wifiRadioEnabled;
+        }
+
+        if (bluetoothConnectedCount !== lastBtConnectedCount || bluetoothDeviceName !== lastBtDeviceName) {
+            if (bluetoothConnectedCount > lastBtConnectedCount) {
+                const name = bluetoothDeviceName !== "" ? bluetoothDeviceName : "Bluetooth Connected";
+                networkStatusEvent("bluetooth_connected", name);
+            } else if (bluetoothConnectedCount < lastBtConnectedCount) {
+                networkStatusEvent("bluetooth", "Device Disconnected");
+            }
+            lastBtConnectedCount = bluetoothConnectedCount;
+            lastBtDeviceName = bluetoothDeviceName;
+        }
+
+        if (bluetoothPowered !== lastBtPowered) {
+            if (!bluetoothPowered) {
+                networkStatusEvent("bluetooth_disabled", "Bluetooth Off");
+            } else {
+                networkStatusEvent("bluetooth", "Bluetooth On");
+            }
+            lastBtPowered = bluetoothPowered;
+        }
+    }
+
+    onActiveConnectionChanged: checkNetworkEvents()
+    onWifiRadioEnabledChanged: checkNetworkEvents()
+    onBluetoothConnectedCountChanged: checkNetworkEvents()
+    onBluetoothDeviceNameChanged: checkNetworkEvents()
+    onBluetoothPoweredChanged: checkNetworkEvents()
+
+    Connections {
+        target: NetworkCenterState
+        function onGlobalNoticeChanged() {
+            if (NetworkCenterState.globalNotice !== "") {
+                root.networkStatusEvent("info", NetworkCenterState.globalNotice);
+            }
+        }
+    }
 
     function numericValue(value) {
         const reading = parseFloat(value);
@@ -177,6 +268,50 @@ Scope {
         if (powerProfile === "balanced")
             return "speed";
         return "bolt";
+    }
+
+    function batteryIcon() {
+        if (!hasBattery)
+            return powerProfileIcon();
+
+        const pct = numericValue(batteryPercent);
+
+        if (isAcConnected || isCharging) {
+            if (pct >= 95 || isCharged)
+                return "battery_charging_full";
+            if (pct >= 85)
+                return "battery_charging_90";
+            if (pct >= 70)
+                return "battery_charging_80";
+            if (pct >= 55)
+                return "battery_charging_60";
+            if (pct >= 40)
+                return "battery_charging_50";
+            if (pct >= 25)
+                return "battery_charging_30";
+            return "battery_charging_20";
+        }
+
+        if (pct >= 90)
+            return "battery_full";
+        if (pct >= 65)
+            return "battery_horiz_075";
+        if (pct >= 30)
+            return "battery_horiz_050";
+        if (pct > 15)
+            return "battery_horiz_000";
+        return "battery_alert";
+    }
+
+    function batteryColor() {
+        if (isAcConnected || isCharging)
+            return Colors.accent;
+        const pct = numericValue(batteryPercent);
+        if (pct > 0 && pct <= 15)
+            return Colors.critical;
+        if (pct > 0 && pct <= 25)
+            return Colors.warning;
+        return Colors.text;
     }
 
     Process {
@@ -284,7 +419,7 @@ Scope {
     }
     Poller {
         id: bluetoothStatePoller
-        command: "powered=$(bluetoothctl show 2>/dev/null | awk '/Powered:/ {print $2; exit}'); connected=$(bluetoothctl devices Connected 2>/dev/null | wc -l); printf '%s|%s' \"${powered:-unknown}\" \"$connected\""
+        command: "powered=$(bluetoothctl show 2>/dev/null | awk '/Powered:/ {print $2; exit}'); connected=$(bluetoothctl devices Connected 2>/dev/null | wc -l); devName=$(bluetoothctl devices Connected 2>/dev/null | head -n1 | cut -d ' ' -f 3-); printf '%s|%s|%s' \"${powered:-unknown}\" \"$connected\" \"$devName\""
         interval: 5000
     }
 }

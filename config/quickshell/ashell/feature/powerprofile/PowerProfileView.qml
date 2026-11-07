@@ -34,7 +34,7 @@ Item {
     readonly property string selectedProfile: selectedIndex >= 0 && selectedIndex < totalProfiles ? PowerProfileService.profiles[selectedIndex] : ""
 
     implicitWidth: 360
-    implicitHeight: 240
+    implicitHeight: 216
 
     Timer {
         id: confirmResetTimer
@@ -175,16 +175,6 @@ Item {
         }
     }
 
-    function profileSubtitle(profile) {
-        if (profile === "power-saver")
-            return "Saves battery";
-        if (profile === "balanced")
-            return "Standard mode";
-        if (profile === "performance")
-            return "Max clock speed";
-        return "System mode";
-    }
-
     function actionLabel(key) {
         if (key === "lock") return "Lock";
         if (key === "logout") return "Log Out";
@@ -215,20 +205,23 @@ Item {
             if (action)
                 return root.actionSubtitle(action.key);
         }
+
+        const uptimePart = PowerProfileService.awakeTime !== "" ? ` · ${PowerProfileService.awakeTime}` : "";
         if (StatusBarService.isAcConnected) {
             if (StatusBarService.batteryPercent !== "") {
                 if (StatusBarService.isCharging)
-                    return `AC Connected · ${StatusBarService.batteryPercent}% (Charging)`;
+                    return `AC Connected · ${StatusBarService.batteryPercent}% (Charging)${uptimePart}`;
                 if (StatusBarService.isBatteryFull)
-                    return `AC Connected · ${StatusBarService.batteryPercent}% (Fully Charged)`;
-                if (StatusBarService.batteryStatus === "Not charging")
-                    return `AC Connected · ${StatusBarService.batteryPercent}% (Not Charging)`;
-                return `AC Connected · ${StatusBarService.batteryPercent}%`;
+                    return `AC Connected · ${StatusBarService.batteryPercent}% (Charged)${uptimePart}`;
+                return `AC Connected · ${StatusBarService.batteryPercent}%${uptimePart}`;
             }
-            return "AC Connected";
+            return `AC Connected${uptimePart}`;
         }
         if (StatusBarService.batteryPercent !== "") {
-            return `Battery · ${StatusBarService.batteryPercent}%`;
+            return `Battery · ${StatusBarService.batteryPercent}%${uptimePart}`;
+        }
+        if (PowerProfileService.awakeTime !== "") {
+            return `Uptime · ${PowerProfileService.awakeTime}`;
         }
         return "Performance and session controls";
     }
@@ -248,7 +241,7 @@ Item {
             anchors.margins: 14
             spacing: 10
 
-            // 1. Header Group
+            // 1. Sleek Apple Telemetry Header Row
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
@@ -257,44 +250,11 @@ Item {
                     Layout.fillWidth: true
                     spacing: 2
 
-                    RowLayout {
-                        spacing: 8
-
-                        Text {
-                            text: "Power"
-                            color: Colors.text
-                            font.pixelSize: 16
-                            font.weight: Font.DemiBold
-                        }
-
-                        Rectangle {
-                            visible: PowerProfileService.awakeTime !== ""
-                            implicitHeight: 20
-                            implicitWidth: uptimeLayout.implicitWidth + 12
-                            radius: 10
-                            color: Colors.surfaceMuted
-                            border.width: 0
-
-                            RowLayout {
-                                id: uptimeLayout
-                                anchors.centerIn: parent
-                                spacing: 4
-
-                                Text {
-                                    text: "schedule"
-                                    font.family: "Material Symbols Rounded"
-                                    font.pixelSize: 12
-                                    color: Colors.accent
-                                }
-
-                                Text {
-                                    text: `Awake ${PowerProfileService.awakeTime}`
-                                    font.pixelSize: 10
-                                    color: Colors.textDim
-                                    font.weight: Font.Medium
-                                }
-                            }
-                        }
+                    Text {
+                        text: "Power"
+                        color: Colors.text
+                        font.pixelSize: 16
+                        font.weight: Font.DemiBold
                     }
 
                     Text {
@@ -317,13 +277,14 @@ Item {
                     }
                 }
 
+                // Close button
                 Rectangle {
                     implicitWidth: 28
                     implicitHeight: 28
-                    radius: 9
-                    color: closeMouse.containsMouse ? Colors.hover : Colors.clear
-                    scale: closeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
+                    radius: 8
+                    color: closeMouse.containsMouse ? Colors.hover : Colors.surfaceSoft
                     border.width: 0
+                    scale: closeMouse.pressed ? Motion.scalePress : closeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal
 
                     Behavior on scale {
                         NumberAnimation {
@@ -343,7 +304,7 @@ Item {
                         text: "close"
                         color: closeMouse.containsMouse ? Colors.text : Colors.textDim
                         font.family: "Material Symbols Rounded"
-                        font.pixelSize: 18
+                        font.pixelSize: 16
                     }
 
                     MouseArea {
@@ -356,62 +317,42 @@ Item {
                 }
             }
 
-            // 2. Power Profiles Row
-            RowLayout {
+            // 2. Apple 3-Way Segmented Power Profile Selector
+            Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 68
-                spacing: 8
+                implicitHeight: 36
+                radius: 10
+                color: Colors.surfaceMuted
+                border.width: 0
                 visible: PowerProfileService.profiles.length > 0
 
-                Repeater {
-                    model: PowerProfileService.profiles
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 3
+                    spacing: 4
 
-                    delegate: Item {
-                        id: profileTile
-                        required property string modelData
-                        required property int index
+                    Repeater {
+                        model: PowerProfileService.profiles
 
-                        readonly property bool isSelected: root.selectedIndex === index
-                        readonly property bool isActive: modelData === StatusBarService.powerProfile
-                        readonly property color profileAccent: modelData === "power-saver"
-                            ? Colors.success
-                            : modelData === "performance"
-                                ? Colors.critical
-                                : Colors.accent
+                        delegate: Item {
+                            id: profileSegment
+                            required property string modelData
+                            required property int index
 
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        z: profileTile.isSelected ? 5 : (tileMouse.containsMouse ? 2 : 1)
+                            readonly property bool isSelected: root.selectedIndex === index
+                            readonly property bool isActive: modelData === StatusBarService.powerProfile
+                            readonly property color profileAccent: modelData === "power-saver"
+                                ? Colors.success
+                                : modelData === "performance"
+                                    ? Colors.critical
+                                    : Colors.accent
 
-                        // Apple Focus Ring Halo for profile selection with anti-cropping margin
-                        Rectangle {
-                            anchors.fill: tileSurface
-                            anchors.margins: -1
-                            radius: tileSurface.radius + 1
-                            color: Colors.accentSoft
-                            scale: tileSurface.scale
-                            transformOrigin: Item.Center
-                            opacity: profileTile.isSelected ? 0.65 : 0.0
-                            visible: opacity > 0.01
-                            z: -1
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Motion.durationFast
-                                    easing.type: Motion.easingStandard
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            id: tileSurface
-                            anchors.fill: parent
-                            anchors.margins: 2
-                            radius: 12
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
 
                             scale: tileMouse.pressed
                                 ? Motion.scalePress
-                                : (tileMouse.containsMouse || isSelected)
+                                : (tileMouse.containsMouse || profileSegment.isSelected)
                                     ? Motion.scaleTileHover
                                     : Motion.scaleNormal
                             transformOrigin: Item.Center
@@ -423,69 +364,36 @@ Item {
                                 }
                             }
 
-                            color: profileTile.isSelected
-                                ? Colors.accentSoft
-                                : (profileTile.isActive
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 8
+                                color: profileSegment.isActive
                                     ? Colors.surfaceSoft
-                                    : (tileMouse.containsMouse ? Colors.surface : Colors.surfaceSoft))
-                            border.width: profileTile.isSelected ? 1.5 : (profileTile.isActive ? 1 : (tileMouse.containsMouse ? 1 : 0))
-                            border.color: profileTile.isSelected ? Colors.accent : (profileTile.isActive ? profileTile.profileAccent : Colors.border)
+                                    : profileSegment.isSelected
+                                        ? Colors.accentSoft
+                                        : (tileMouse.containsMouse ? Colors.hover : Colors.clear)
+                                border.width: profileSegment.isActive ? 1 : (profileSegment.isSelected ? 1.5 : 0)
+                                border.color: profileSegment.isSelected ? Colors.accent : (profileSegment.isActive ? Colors.border : Colors.clear)
 
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Motion.durationFast
-                                    easing.type: Motion.easingStandard
-                                }
-                            }
-
-                            ColumnLayout {
-                                anchors.centerIn: parent
-                                spacing: 3
-
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: PowerProfileService.iconFor(modelData)
-                                    color: profileTile.isActive ? profileAccent : profileTile.isSelected ? Colors.accent : Colors.textDim
-                                    font.family: "Material Symbols Rounded"
-                                    font.pixelSize: 22
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Motion.durationFast
-                                            easing.type: Motion.easingStandard
-                                        }
-                                    }
-                                }
-
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: PowerProfileService.labelFor(modelData)
-                                    color: profileTile.isActive ? Colors.text : profileTile.isSelected ? Colors.accent : Colors.textDim
-                                    font.pixelSize: 11
-                                    font.weight: (profileTile.isSelected || profileTile.isActive) ? Font.DemiBold : Font.Medium
-                                    elide: Text.ElideRight
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Motion.durationFast
-                                            easing.type: Motion.easingStandard
-                                        }
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Motion.durationFast
+                                        easing.type: Motion.easingStandard
                                     }
                                 }
 
                                 RowLayout {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    spacing: 4
+                                    anchors.centerIn: parent
+                                    spacing: 5
 
-                                    Rectangle {
-                                        width: 5
-                                        height: 5
-                                        radius: 2.5
-                                        color: profileTile.isActive ? profileAccent : Colors.clear
-                                        opacity: profileTile.isActive ? 1.0 : 0.0
+                                    Text {
+                                        text: PowerProfileService.iconFor(modelData)
+                                        color: profileSegment.isActive ? profileAccent : (profileSegment.isSelected ? Colors.accent : Colors.textDim)
+                                        font.family: "Material Symbols Rounded"
+                                        font.pixelSize: 15
 
-                                        Behavior on opacity {
-                                            NumberAnimation {
+                                        Behavior on color {
+                                            ColorAnimation {
                                                 duration: Motion.durationFast
                                                 easing.type: Motion.easingStandard
                                             }
@@ -493,9 +401,18 @@ Item {
                                     }
 
                                     Text {
-                                        text: profileTile.isActive ? "Active" : root.profileSubtitle(modelData)
-                                        color: profileTile.isActive ? profileAccent : Colors.textFaint
-                                        font.pixelSize: 9
+                                        text: PowerProfileService.labelFor(modelData)
+                                        color: profileSegment.isActive ? Colors.text : (profileSegment.isSelected ? Colors.accent : Colors.textDim)
+                                        font.pixelSize: 11
+                                        font.weight: profileSegment.isActive ? Font.DemiBold : Font.Medium
+                                        elide: Text.ElideRight
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: Motion.durationFast
+                                                easing.type: Motion.easingStandard
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -516,23 +433,11 @@ Item {
                 }
             }
 
-            // Empty or loading profiles placeholder
-            Text {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 68
-                visible: PowerProfileService.profiles.length === 0
-                text: PowerProfileService.error || "Loading profiles…"
-                color: PowerProfileService.error ? Colors.critical : Colors.textDim
-                font.pixelSize: 11
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            // 3. System Actions Row
+            // 3. Apple 4-Button Session Quick Actions Cluster
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 44
-                spacing: 8
+                implicitHeight: 38
+                spacing: 6
 
                 Repeater {
                     model: root.sessionActions
@@ -549,48 +454,24 @@ Item {
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        z: actionItem.isSelected ? 5 : (actionMouse.containsMouse ? 2 : 1)
 
-                        // Focus halo for session action buttons with anti-cropping margin
-                        Rectangle {
-                            anchors.fill: actionSurface
-                            anchors.margins: -1
-                            radius: actionSurface.radius + 1
-                            color: actionItem.isDestructive ? Colors.criticalSoft : Colors.accentSoft
-                            scale: actionSurface.scale
-                            transformOrigin: Item.Center
-                            opacity: actionItem.isSelected ? 0.65 : 0.0
-                            visible: opacity > 0.01
-                            z: -1
+                        scale: actionMouse.pressed
+                            ? Motion.scalePress
+                            : (actionMouse.containsMouse || isSelected)
+                                ? Motion.scaleTileHover
+                                : Motion.scaleNormal
+                        transformOrigin: Item.Center
 
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Motion.durationFast
-                                    easing.type: Motion.easingStandard
-                                }
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: actionMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                easing.type: actionMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
                             }
                         }
 
                         Rectangle {
-                            id: actionSurface
                             anchors.fill: parent
-                            anchors.margins: 2
-                            radius: 12
-
-                            scale: actionMouse.pressed
-                                ? Motion.scalePress
-                                : (actionMouse.containsMouse || isSelected)
-                                    ? Motion.scaleTileHover
-                                    : Motion.scaleNormal
-                            transformOrigin: Item.Center
-
-                            Behavior on scale {
-                                NumberAnimation {
-                                    duration: actionMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
-                                    easing.type: actionMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
-                                }
-                            }
-
+                            radius: 10
                             color: actionItem.isConfirming
                                 ? Colors.critical
                                 : actionItem.isSelected
@@ -598,10 +479,12 @@ Item {
                                     : (actionMouse.containsMouse && actionItem.isDestructive)
                                         ? Colors.criticalSoft
                                         : actionMouse.containsMouse
-                                            ? Colors.surface
+                                            ? Colors.surfaceMuted
                                             : Colors.surfaceSoft
-                            border.width: actionItem.isSelected ? 1.5 : (actionMouse.containsMouse ? 1 : 0)
-                            border.color: actionItem.isConfirming ? Colors.critical : (actionItem.isSelected ? (actionItem.isDestructive ? Colors.critical : Colors.accent) : Colors.border)
+                            border.width: actionItem.isSelected ? 1.5 : (actionItem.isConfirming ? 1 : 0)
+                            border.color: actionItem.isConfirming
+                                ? Colors.critical
+                                : (actionItem.isSelected ? (actionItem.isDestructive ? Colors.critical : Colors.accent) : Colors.border)
 
                             Behavior on color {
                                 ColorAnimation {
@@ -610,23 +493,27 @@ Item {
                                 }
                             }
 
-                            Text {
+                            RowLayout {
                                 anchors.centerIn: parent
-                                text: actionItem.isConfirming ? "priority_high" : modelData.icon
-                                color: actionItem.isConfirming
-                                    ? Colors.selectedText
-                                    : actionItem.isSelected
-                                        ? (actionItem.isDestructive ? Colors.critical : Colors.accent)
-                                        : (actionMouse.containsMouse && actionItem.isDestructive
-                                            ? Colors.critical
-                                            : (actionMouse.containsMouse ? Colors.text : Colors.textDim))
-                                font.family: "Material Symbols Rounded"
-                                font.pixelSize: 20
+                                spacing: 4
 
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Motion.durationFast
-                                        easing.type: Motion.easingStandard
+                                Text {
+                                    text: actionItem.isConfirming ? "priority_high" : modelData.icon
+                                    color: actionItem.isConfirming
+                                        ? Colors.selectedText
+                                        : actionItem.isSelected
+                                            ? (actionItem.isDestructive ? Colors.critical : Colors.accent)
+                                            : (actionMouse.containsMouse && actionItem.isDestructive
+                                                ? Colors.critical
+                                                : (actionMouse.containsMouse ? Colors.text : Colors.textDim))
+                                    font.family: "Material Symbols Rounded"
+                                    font.pixelSize: 18
+
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: Motion.durationFast
+                                            easing.type: Motion.easingStandard
+                                        }
                                     }
                                 }
                             }
@@ -654,7 +541,7 @@ Item {
                 }
             }
 
-            // Notice / Error bar (if any)
+            // Error notice banner (if any)
             Text {
                 Layout.fillWidth: true
                 visible: PowerProfileService.error !== ""

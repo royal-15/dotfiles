@@ -232,6 +232,44 @@ Dialog {
             spacing: 8
 
             Button {
+                id: cancelButton
+                Layout.preferredWidth: 84
+                implicitHeight: 38
+                text: "Cancel"
+                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
+                transformOrigin: Item.Center
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: cancelButton.down ? Motion.durationPressDown : Motion.durationPressRelease
+                        easing.type: cancelButton.down ? Motion.easingPressDown : Motion.easingPressRelease
+                    }
+                }
+
+                onClicked: root.close()
+                background: Rectangle {
+                    color: parent.down ? Colors.surface : parent.hovered ? Colors.surface : Colors.surfaceSoft
+                    radius: 11
+                    border.width: cancelButton.activeFocus ? 1.5 : (parent.hovered ? 1 : 0)
+                    border.color: cancelButton.activeFocus ? Colors.accent : Colors.border
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: parent.hovered ? Colors.text : Colors.textDim
+                    font.pixelSize: 12
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                HoverHandler { cursorShape: Qt.PointingHandCursor }
+            }
+
+            Button {
                 id: connectButton
                 Layout.fillWidth: true
                 implicitHeight: 38
@@ -271,44 +309,6 @@ Dialog {
                     color: parent.enabled ? Colors.selectedText : Colors.textDim
                     font.pixelSize: 12
                     font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                HoverHandler { cursorShape: Qt.PointingHandCursor }
-            }
-
-            Button {
-                id: cancelButton
-                Layout.preferredWidth: 84
-                implicitHeight: 38
-                text: "Cancel"
-                scale: down ? Motion.scalePress : (hovered ? Motion.scaleTileHover : Motion.scaleNormal)
-                transformOrigin: Item.Center
-
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: cancelButton.down ? Motion.durationPressDown : Motion.durationPressRelease
-                        easing.type: cancelButton.down ? Motion.easingPressDown : Motion.easingPressRelease
-                    }
-                }
-
-                onClicked: root.close()
-                background: Rectangle {
-                    color: parent.down ? Colors.surface : parent.hovered ? Colors.surface : Colors.surfaceSoft
-                    radius: 11
-                    border.width: cancelButton.activeFocus ? 1.5 : (parent.hovered ? 1 : 0)
-                    border.color: cancelButton.activeFocus ? Colors.accent : Colors.border
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Motion.durationFast
-                            easing.type: Motion.easingStandard
-                        }
-                    }
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: parent.hovered ? Colors.text : Colors.textDim
-                    font.pixelSize: 12
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }

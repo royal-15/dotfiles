@@ -58,8 +58,8 @@ PanelWindow {
         if (currentTabIndex === 0)
             return Math.min(540, (root.height > 0) ? root.height : 540);
         if (currentTabIndex === 1)
-            return Math.min(260, (root.height > 0) ? root.height : 260);
-        return 300;
+            return Math.min(216, (root.height > 0) ? root.height : 216);
+        return 280;
     }
 
     screen: root.barWindow ? root.barWindow.screen : null
@@ -296,11 +296,25 @@ PanelWindow {
     // Multi-layer ambient drop shadow for elevated depth
     Rectangle {
         anchors.fill: panelSurface
-        anchors.topMargin: 3
-        anchors.bottomMargin: -2
+        anchors.margins: -2
+        anchors.topMargin: 5
+        anchors.bottomMargin: -3
+        radius: panelSurface.radius + 2
+        color: Colors.shadowTip
+        opacity: 0.35 * root.slideProgress
+        transform: Translate {
+            x: root.slideTranslateX
+        }
+        z: -2
+    }
+
+    Rectangle {
+        anchors.fill: panelSurface
+        anchors.topMargin: 2
+        anchors.bottomMargin: -1
         radius: panelSurface.radius
         color: Colors.shadow
-        opacity: 0.55 * root.slideProgress
+        opacity: 0.50 * root.slideProgress
         transform: Translate {
             x: root.slideTranslateX
         }

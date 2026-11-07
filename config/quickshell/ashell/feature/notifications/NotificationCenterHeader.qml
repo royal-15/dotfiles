@@ -12,25 +12,25 @@ Item {
     signal clearAllRequested()
 
     implicitWidth: 320
-    implicitHeight: 40
+    implicitHeight: 38
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 16
-        anchors.rightMargin: 16
-        spacing: 8
+        anchors.leftMargin: 14
+        anchors.rightMargin: 14
+        spacing: 7
 
         Text {
             text: "Notifications"
             font.pixelSize: 14
-            font.weight: Font.Bold
+            font.weight: Font.DemiBold
             color: Colors.text
             verticalAlignment: Text.AlignVCenter
         }
 
         // Count badge
         Item {
-            implicitWidth: countText.implicitWidth + 12
+            implicitWidth: countText.implicitWidth + 10
             implicitHeight: 18
             visible: root.count > 0
 
@@ -55,9 +55,10 @@ Item {
         }
 
         // Do Not Disturb Toggle Button
-        Item {
-            implicitWidth: 30
-            implicitHeight: 26
+        Rectangle {
+            implicitWidth: 28
+            implicitHeight: 28
+            radius: 8
             scale: dndMouse.pressed
                 ? Motion.scalePress
                 : (dndMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
@@ -70,24 +71,23 @@ Item {
                 }
             }
 
-            Rectangle {
-                anchors.fill: parent
-                radius: 13
-                color: NotificationService.dndEnabled
-                    ? Colors.accentSoft
-                    : (dndMouse.containsMouse ? Colors.hover : Colors.clear)
+            color: NotificationService.dndEnabled
+                ? Colors.accentSoft
+                : (dndMouse.containsMouse ? Colors.hover : Colors.surfaceSoft)
+            border.width: NotificationService.dndEnabled ? 1 : 0
+            border.color: Colors.accent
 
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                    }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Motion.durationFast
+                    easing.type: Motion.easingStandard
                 }
             }
 
             Text {
                 anchors.centerIn: parent
                 text: NotificationService.dndEnabled ? "notifications_off" : "notifications"
-                font.family: "Material Symbols Outlined"
+                font.family: "Material Symbols Rounded"
                 font.pixelSize: 16
                 color: NotificationService.dndEnabled ? Colors.accent : (dndMouse.containsMouse ? Colors.text : Colors.textDim)
             }
@@ -102,9 +102,10 @@ Item {
         }
 
         // Clear All Button
-        Item {
+        Rectangle {
             implicitWidth: clearText.implicitWidth + 14
-            implicitHeight: 26
+            implicitHeight: 28
+            radius: 8
             visible: root.count > 0
             scale: clearMouse.pressed
                 ? Motion.scalePress
@@ -118,15 +119,13 @@ Item {
                 }
             }
 
-            Rectangle {
-                anchors.fill: parent
-                radius: 13
-                color: clearMouse.containsMouse ? Colors.hover : Colors.clear
+            color: clearMouse.containsMouse ? Colors.hover : Colors.surfaceSoft
+            border.width: 0
 
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Motion.durationFast
-                    }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Motion.durationFast
+                    easing.type: Motion.easingStandard
                 }
             }
 

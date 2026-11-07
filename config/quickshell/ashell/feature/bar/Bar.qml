@@ -225,61 +225,21 @@ PanelWindow {
             anchors.right: parent.right
             anchors.rightMargin: Decorations.barItemMarginHorizontal
             anchors.verticalCenter: parent.verticalCenter
-            spacing: bar.anyRightPanelOpen ? 4 : 7
+            spacing: 6
 
-            Behavior on spacing {
-                NumberAnimation {
-                    duration: Motion.durationNormal
-                    easing.type: Motion.easingStandard
-                }
+            StatusCapsule {
+                id: statusCapsule
+                networkActive: rightSidebar.isOpen && rightSidebar.currentTabIndex === 0
+                powerActive: rightSidebar.isOpen && rightSidebar.currentTabIndex === 1
+                dimmed: bar.anyRightPanelOpen && rightSidebar.currentTabIndex !== 0 && rightSidebar.currentTabIndex !== 1
+                onWifiClicked: rightSidebar.toggleTab("network")
+                onPowerClicked: rightSidebar.toggleTab("power")
             }
 
-            Pill {
-                id: wifiPill
-                icon: StatusBarService.wifiIcon()
-                label: (StatusBarService.wifiRadioEnabled && StatusBarService.wifiConnected)
-                    ? StatusBarService.activeConnection
-                    : ""
-                forceIconOnly: bar.anyRightPanelOpen
-                highlighted: rightSidebar.isOpen && rightSidebar.currentTabIndex === 0
-                dimmed: bar.anyRightPanelOpen && rightSidebar.currentTabIndex !== 0
-                iconColor: (rightSidebar.isOpen && rightSidebar.currentTabIndex === 0) ? Colors.accent : Colors.textDim
-                textColor: Colors.text
-                interactive: true
-                onClicked: rightSidebar.toggleTab("network")
-            }
-
-            Pill {
-                id: powerProfilePill
-                icon: StatusBarService.powerProfileIcon()
-                forceIconOnly: bar.anyRightPanelOpen
-                highlighted: rightSidebar.isOpen && rightSidebar.currentTabIndex === 1
-                dimmed: bar.anyRightPanelOpen && rightSidebar.currentTabIndex !== 1
-                iconColor: Colors.accent
-                label: (!StatusBarService.isAcConnected && StatusBarService.batteryPercent !== "")
-                    ? (StatusBarService.batteryPercent + "%")
-                    : ""
-                iconGradient: StatusBarService.isAcConnected
-                textColor: Colors.text
-                interactive: true
-                onClicked: rightSidebar.toggleTab("power")
-            }
-
-            Pill {
+            NotificationPill {
                 id: notificationPill
-                icon: NotificationService.dndEnabled
-                    ? "notifications_off"
-                    : (NotificationService.unreadCount > 0 ? "notifications_active" : "notifications")
-                label: NotificationService.unreadCount > 0 ? String(NotificationService.unreadCount) : ""
-                isVisible: NotificationService.unreadCount > 0 || (rightSidebar.isOpen && rightSidebar.currentTabIndex === 2) || NotificationService.dndEnabled
-                forceIconOnly: bar.anyRightPanelOpen
                 highlighted: rightSidebar.isOpen && rightSidebar.currentTabIndex === 2
                 dimmed: bar.anyRightPanelOpen && rightSidebar.currentTabIndex !== 2
-                iconColor: (rightSidebar.isOpen && rightSidebar.currentTabIndex === 2)
-                    ? Colors.accent
-                    : (NotificationService.dndEnabled ? Colors.textDim : (NotificationService.unreadCount > 0 ? Colors.accent : Colors.textDim))
-                textColor: Colors.text
-                interactive: true
                 onClicked: rightSidebar.toggleTab("notifications")
             }
         }

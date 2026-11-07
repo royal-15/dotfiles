@@ -44,7 +44,7 @@ Item {
     Component.onCompleted: syncNotificationData()
     onNotificationChanged: syncNotificationData()
 
-    readonly property real naturalHeight: Math.max(76, contentCol.implicitHeight + 20)
+    readonly property real naturalHeight: Math.max(70, contentCol.implicitHeight + 18)
 
     property real dragOffset: 0
     property real visualOpacity: 1.0
@@ -130,14 +130,14 @@ Item {
             anchors.bottomMargin: -1
             radius: cardSurface.radius
             color: root.isCritical ? Colors.criticalSoft : Colors.shadow
-            opacity: (root.isCritical ? 0.40 : 0.60) * root.liveOpacity
+            opacity: (root.isCritical ? 0.35 : 0.45) * root.liveOpacity
             z: -1
         }
 
         Rectangle {
             id: cardSurface
             anchors.fill: parent
-            radius: Decorations.cornerRadius
+            radius: 14
             color: root.isToast ? Colors.panel : Colors.surfaceSoft
             border.color: root.isCritical ? Colors.critical : Colors.border
             border.width: 1
@@ -197,24 +197,13 @@ Item {
                 }
             }
 
-            // Critical urgency left accent bar
-            Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: root.isCritical ? 3 : 0
-                color: Colors.critical
-                visible: root.isCritical
-            }
-
             ColumnLayout {
                 id: contentCol
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.margins: 10
-                anchors.leftMargin: root.isCritical ? 14 : 10
-                spacing: 5
+                spacing: 4
 
                 // Header: [App Icon + App Name | Close Button]
                 RowLayout {
@@ -223,7 +212,7 @@ Item {
 
                     Text {
                         text: root.isCritical ? "warning" : "notifications"
-                        font.family: "Material Symbols Outlined"
+                        font.family: "Material Symbols Rounded"
                         font.pixelSize: 14
                         color: root.isCritical ? Colors.critical : Colors.accent
                         verticalAlignment: Text.AlignVCenter
@@ -239,28 +228,27 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                     }
 
-                    // Close / Dismiss button
-                    Item {
-                        implicitWidth: 20
-                        implicitHeight: 20
-                        scale: closeMouse.pressed
-                            ? Motion.scalePress
-                            : (closeMouse.containsMouse ? Motion.scaleHover : Motion.scaleNormal)
-                        transformOrigin: Item.Center
+                    // Hover-revealed Apple Close / Dismiss button
+                    Rectangle {
+                        implicitWidth: 18
+                        implicitHeight: 18
+                        radius: 9
+                        color: closeMouse.containsMouse ? Colors.hover : Colors.surfaceMuted
+                        opacity: swipeArea.containsMouse || closeMouse.containsMouse ? 1.0 : 0.0
 
-                        Behavior on scale {
+                        Behavior on opacity {
                             NumberAnimation {
-                                duration: closeMouse.pressed ? Motion.durationPressDown : Motion.durationPressRelease
-                                easing.type: closeMouse.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
                             }
                         }
 
                         Text {
                             anchors.centerIn: parent
                             text: "close"
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: 14
-                            color: closeMouse.containsMouse ? Colors.text : Colors.textFaint
+                            font.family: "Material Symbols Rounded"
+                            font.pixelSize: 13
+                            color: closeMouse.containsMouse ? Colors.text : Colors.textDim
                         }
 
                         MouseArea {
@@ -268,9 +256,7 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.dismissCard(1);
-                            }
+                            onClicked: root.dismissCard(1)
                         }
                     }
                 }
@@ -279,7 +265,7 @@ Item {
                 Text {
                     text: root.displaySummary
                     font.pixelSize: 12
-                    font.weight: Font.Bold
+                    font.weight: Font.DemiBold
                     color: Colors.text
                     Layout.fillWidth: true
                     wrapMode: Text.Wrap
@@ -295,7 +281,7 @@ Item {
                     color: Colors.textDim
                     Layout.fillWidth: true
                     wrapMode: Text.Wrap
-                    maximumLineCount: root.isToast ? 3 : 6
+                    maximumLineCount: root.isToast ? 3 : 5
                     elide: Text.ElideRight
                     visible: text !== ""
                 }
