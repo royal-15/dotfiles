@@ -104,6 +104,30 @@ Item {
                 selectedTextColor: Colors.selectedText
 
                 Keys.onPressed: event => {
+                    // Wipe history shortcut: Ctrl+Shift+Delete
+                    if (event.key === Qt.Key_Delete && (event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.ShiftModifier)) {
+                        if (root.confirmingWipe)
+                            root.confirmWipe();
+                        else
+                            root.armWipe();
+                        event.accepted = true;
+                        return;
+                    }
+
+                    // Handling when confirming wipe
+                    if (root.confirmingWipe) {
+                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Y) {
+                            root.confirmWipe();
+                            event.accepted = true;
+                            return;
+                        }
+                        if (event.key === Qt.Key_Escape || event.key === Qt.Key_N) {
+                            root.cancelWipe();
+                            event.accepted = true;
+                            return;
+                        }
+                    }
+
                     // Down: Down, Tab (without Shift), Ctrl+N, Ctrl+J
                     if (event.key === Qt.Key_Down || (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier))
                         || ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_N || event.key === Qt.Key_J))) {
@@ -127,8 +151,8 @@ Item {
                         return;
                     }
 
-                    // Delete item: Delete or Shift+Delete
-                    if (event.key === Qt.Key_Delete) {
+                    // Delete item: Delete or Shift+Delete (without Ctrl)
+                    if (event.key === Qt.Key_Delete && !(event.modifiers & Qt.ControlModifier)) {
                         root.deleteCurrent();
                         event.accepted = true;
                         return;
@@ -217,6 +241,10 @@ Item {
                         anchors.fill: parent
                         visible: !root.confirmingWipe
 
+                        ToolTip.visible: wipeHover.hovered && !root.confirmingWipe
+                        ToolTip.text: "Clear history (Ctrl+Shift+Delete)"
+                        ToolTip.delay: 400
+
                         Text {
                             anchors.centerIn: parent
                             text: "delete_sweep"
@@ -231,10 +259,7 @@ Item {
                         }
 
                         TapHandler {
-                            onTapped: {
-                                root.confirmingWipe = true;
-                                confirmationTimer.restart();
-                            }
+                            onTapped: root.armWipe()
                         }
                     }
 
@@ -277,12 +302,7 @@ Item {
                             }
 
                             TapHandler {
-                                onTapped: {
-                                    root.confirmingWipe = false;
-                                    confirmationTimer.stop();
-                                    ClipboardService.wipe();
-                                    searchField.forceActiveFocus();
-                                }
+                                onTapped: root.confirmWipe()
                             }
                         }
 
@@ -307,17 +327,31 @@ Item {
                             }
 
                             TapHandler {
-                                onTapped: {
-                                    root.confirmingWipe = false;
-                                    confirmationTimer.stop();
-                                    searchField.forceActiveFocus();
-                                }
+                                onTapped: root.cancelWipe()
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    function armWipe() {
+        root.confirmingWipe = true;
+        confirmationTimer.restart();
+    }
+
+    function confirmWipe() {
+        root.confirmingWipe = false;
+        confirmationTimer.stop();
+        ClipboardService.wipe();
+        searchField.forceActiveFocus();
+    }
+
+    function cancelWipe() {
+        root.confirmingWipe = false;
+        confirmationTimer.stop();
+        searchField.forceActiveFocus();
     }
 
     function focusInput() {

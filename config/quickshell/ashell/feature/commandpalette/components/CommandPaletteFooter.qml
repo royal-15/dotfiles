@@ -8,6 +8,7 @@ Item {
 
     property int count: 0
     property int totalCount: 0
+    property bool isConfirmingDelete: false
 
     implicitHeight: 28
 
@@ -17,9 +18,11 @@ Item {
         anchors.rightMargin: 10
         spacing: 10
 
-        // Counter
+        // Counter or Confirmation status
         Text {
             text: {
+                if (root.isConfirmingDelete)
+                    return "Confirm delete? Press Delete or tap again";
                 if (root.totalCount === 0)
                     return "No commands";
                 if (root.count !== root.totalCount)
@@ -27,8 +30,16 @@ Item {
                 return `${root.count} commands`;
             }
             font.pixelSize: 11
-            color: Colors.textDim
+            font.weight: root.isConfirmingDelete ? Font.DemiBold : Font.Normal
+            color: root.isConfirmingDelete ? Colors.critical : Colors.textDim
             Layout.alignment: Qt.AlignVCenter
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Motion.durationFast
+                    easing.type: Motion.easingStandard
+                }
+            }
         }
 
         Item { Layout.fillWidth: true }
@@ -115,19 +126,20 @@ Item {
                 }
             }
 
-            // Ctrl+E key hint: Edit
+            // F2 / Ctrl+E key hint: Edit
             Row {
                 spacing: 3
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 16
-                    width: 38
+                    width: editKeyText.implicitWidth + 8
                     radius: 3
                     color: Colors.surfaceMuted
 
                     Text {
+                        id: editKeyText
                         anchors.centerIn: parent
-                        text: "Ctrl+E"
+                        text: "F2 / Ctrl+E"
                         font.pixelSize: 9
                         font.family: "JetBrainsMono Nerd Font"
                         color: Colors.textDim

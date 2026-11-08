@@ -1,20 +1,27 @@
--- This is an example Hyprland Lua config file.
--- Refer to the wiki for more information.
--- https://wiki.hypr.land/Configuring/Start/
--- Please note not all available settings / options are set here.
--- For a full list, see the wiki
--- You can (and should!!) split this configuration into multiple files
--- Create your files separately and then require them like this:
--- require("myColors")
+-- =============================================================================
+-- HYPRLAND MAIN CONFIGURATION
+-- =============================================================================
+-- Documentation: https://wiki.hypr.land/Configuring/Start/
+
+-- -----------------------------------------------------------------------------
+-- System & Environment
+-- -----------------------------------------------------------------------------
 require("modules.monitors")
 require("modules.autostart")
 require("modules.env")
+
+-- -----------------------------------------------------------------------------
+-- Visuals, Appearance & Layout
+-- -----------------------------------------------------------------------------
 require("modules.decorations")
 require("modules.animations")
 require("modules.layout")
 require("modules.misc")
+
+-- -----------------------------------------------------------------------------
+-- Input, Keybindings & Window Rules
+-- -----------------------------------------------------------------------------
 require("modules.input")
 require("modules.binds")
 require("modules.windowrules")
 require("modules.workspaces")
-

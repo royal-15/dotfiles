@@ -51,6 +51,10 @@ Item {
         opacity: root.modalOpacity
         scale: 0.95 + 0.05 * root.modalOpacity
 
+        TapHandler {
+            // Absorb taps within modal card so backdrop scrim does not close dialog
+        }
+
         Behavior on scale {
             NumberAnimation {
                 duration: Motion.durationNormal
@@ -190,14 +194,33 @@ Item {
                             verticalAlignment: TextInput.AlignVCenter
                             selectionColor: Colors.selectedBackground
                             selectedTextColor: Colors.selectedText
+                            activeFocusOnTab: true
 
                             Keys.onPressed: event => {
                                 if (event.key === Qt.Key_Escape) {
                                     root.close();
                                     event.accepted = true;
-                                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                    return;
+                                }
+                                if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_S)) {
+                                    root.submit();
+                                    event.accepted = true;
+                                    return;
+                                }
+                                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                     snippetArea.forceActiveFocus();
                                     event.accepted = true;
+                                    return;
+                                }
+                                if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
+                                    snippetArea.forceActiveFocus();
+                                    event.accepted = true;
+                                    return;
+                                }
+                                if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
+                                    saveButton.forceActiveFocus();
+                                    event.accepted = true;
+                                    return;
                                 }
                             }
                         }
@@ -273,6 +296,7 @@ Item {
                                 background: null
                                 selectionColor: Colors.selectedBackground
                                 selectedTextColor: Colors.selectedText
+                                activeFocusOnTab: true
 
                                 onTextChanged: {
                                     if (root.hasError && text.trim() !== "")
@@ -285,8 +309,18 @@ Item {
                                         event.accepted = true;
                                         return;
                                     }
-                                    if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+                                    if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_S)) {
                                         root.submit();
+                                        event.accepted = true;
+                                        return;
+                                    }
+                                    if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
+                                        labelField.forceActiveFocus();
+                                        event.accepted = true;
+                                        return;
+                                    }
+                                    if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
+                                        cancelButton.forceActiveFocus();
                                         event.accepted = true;
                                         return;
                                     }
@@ -303,7 +337,7 @@ Item {
                 spacing: 8
 
                 Text {
-                    text: "Ctrl+Enter to save"
+                    text: "Ctrl+S / Ctrl+Enter to save"
                     font.pixelSize: 10
                     color: Colors.textFaint
                     Layout.alignment: Qt.AlignVCenter
@@ -312,82 +346,203 @@ Item {
                 Item { Layout.fillWidth: true }
 
                 // Cancel Button
-                Rectangle {
+                Item {
+                    id: cancelWrapper
                     Layout.preferredWidth: 70
                     Layout.preferredHeight: 32
-                    radius: 6
-                    color: cancelHover.hovered ? Colors.hover : Colors.surfaceMuted
-                    scale: cancelTap.pressed
-                        ? Motion.scalePress
-                        : (cancelHover.hovered ? Motion.scaleTileHover : Motion.scaleNormal)
-                    transformOrigin: Item.Center
 
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: cancelTap.pressed ? Motion.durationPressDown : Motion.durationPressRelease
-                            easing.type: cancelTap.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                    // Focus halo
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: -2
+                        radius: 8
+                        color: Colors.accentSoft
+                        opacity: cancelButton.activeFocus ? 0.75 : 0.0
+                        visible: opacity > 0.01
+                        z: -1
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
                         }
                     }
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Cancel"
-                        font.pixelSize: 12
-                        color: Colors.text
-                    }
+                    Rectangle {
+                        id: cancelButton
+                        anchors.fill: parent
+                        radius: 6
+                        focus: true
+                        activeFocusOnTab: true
+                        color: (cancelHover.hovered || cancelButton.activeFocus) ? Colors.hover : Colors.surfaceMuted
+                        border.width: cancelButton.activeFocus ? 1.5 : 0
+                        border.color: Colors.accent
 
-                    HoverHandler {
-                        id: cancelHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
+                        scale: cancelTap.pressed
+                            ? Motion.scalePress
+                            : ((cancelHover.hovered || cancelButton.activeFocus) ? Motion.scaleTileHover : Motion.scaleNormal)
+                        transformOrigin: Item.Center
 
-                    TapHandler {
-                        id: cancelTap
-                        onTapped: root.close()
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: cancelTap.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                easing.type: cancelTap.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                            }
+                        }
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            font.pixelSize: 12
+                            color: Colors.text
+                        }
+
+                        HoverHandler {
+                            id: cancelHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
+                        TapHandler {
+                            id: cancelTap
+                            onTapped: root.close()
+                        }
+
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Escape) {
+                                root.close();
+                                event.accepted = true;
+                                return;
+                            }
+                            if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_S)) {
+                                root.submit();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                                root.close();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
+                                snippetArea.forceActiveFocus();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
+                                saveButton.forceActiveFocus();
+                                event.accepted = true;
+                                return;
+                            }
+                        }
                     }
                 }
 
                 // Save Button
-                Rectangle {
+                Item {
+                    id: saveWrapper
                     Layout.preferredWidth: 70
                     Layout.preferredHeight: 32
-                    radius: 6
-                    color: saveHover.hovered ? Colors.accent : Colors.accentSoft
-                    scale: saveTap.pressed
-                        ? Motion.scalePress
-                        : (saveHover.hovered ? Motion.scaleTileHover : Motion.scaleNormal)
-                    transformOrigin: Item.Center
 
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: saveTap.pressed ? Motion.durationPressDown : Motion.durationPressRelease
-                            easing.type: saveTap.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                    // Focus halo
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: -2
+                        radius: 8
+                        color: Colors.accentSoft
+                        opacity: saveButton.activeFocus ? 0.75 : 0.0
+                        visible: opacity > 0.01
+                        z: -1
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
                         }
                     }
 
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Motion.durationFast
-                            easing.type: Motion.easingStandard
+                    Rectangle {
+                        id: saveButton
+                        anchors.fill: parent
+                        radius: 6
+                        focus: true
+                        activeFocusOnTab: true
+                        color: (saveHover.hovered || saveButton.activeFocus) ? Colors.accent : Colors.accentSoft
+                        border.width: saveButton.activeFocus ? 1.5 : 0
+                        border.color: Colors.accent
+
+                        scale: saveTap.pressed
+                            ? Motion.scalePress
+                            : ((saveHover.hovered || saveButton.activeFocus) ? Motion.scaleTileHover : Motion.scaleNormal)
+                        transformOrigin: Item.Center
+
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: saveTap.pressed ? Motion.durationPressDown : Motion.durationPressRelease
+                                easing.type: saveTap.pressed ? Motion.easingPressDown : Motion.easingPressRelease
+                            }
                         }
-                    }
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Save"
-                        font.pixelSize: 12
-                        font.weight: Font.DemiBold
-                        color: saveHover.hovered ? Colors.textAccent : Colors.accent
-                    }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Motion.durationFast
+                                easing.type: Motion.easingStandard
+                            }
+                        }
 
-                    HoverHandler {
-                        id: saveHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Save"
+                            font.pixelSize: 12
+                            font.weight: Font.DemiBold
+                            color: (saveHover.hovered || saveButton.activeFocus) ? Colors.textAccent : Colors.accent
+                        }
 
-                    TapHandler {
-                        id: saveTap
-                        onTapped: root.submit()
+                        HoverHandler {
+                            id: saveHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
+                        TapHandler {
+                            id: saveTap
+                            onTapped: root.submit()
+                        }
+
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Escape) {
+                                root.close();
+                                event.accepted = true;
+                                return;
+                            }
+                            if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_S)) {
+                                root.submit();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                                root.submit();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
+                                cancelButton.forceActiveFocus();
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
+                                labelField.forceActiveFocus();
+                                event.accepted = true;
+                                return;
+                            }
+                        }
                     }
                 }
             }
@@ -411,7 +566,10 @@ Item {
         snippetArea.text = entry.snippet || "";
         root.hasError = false;
         root.isOpen = true;
-        Qt.callLater(() => snippetArea.forceActiveFocus());
+        Qt.callLater(() => {
+            snippetArea.forceActiveFocus();
+            snippetArea.cursorPosition = snippetArea.text.length;
+        });
     }
 
     function close() {

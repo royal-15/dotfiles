@@ -16,12 +16,12 @@ Scope {
         blockAllReads: true
         watchChanges: true
         onFileChanged: {
-            if (!root.isSwitchingTheme) {
+            if (!root.isSwitchingTheme && root.pendingTheme === "") {
                 currentColorsFileView.reload();
             }
         }
         onTextChanged: {
-            if (!root.isSwitchingTheme) {
+            if (!root.isSwitchingTheme && root.pendingTheme === "") {
                 root.reloadCurrentColors();
             }
         }
@@ -34,12 +34,12 @@ Scope {
         blockAllReads: true
         watchChanges: true
         onFileChanged: {
-            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper) {
+            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper && root.pendingTheme === "" && root.pendingWallpaper === "") {
                 activeEnvFileView.reload();
             }
         }
         onTextChanged: {
-            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper) {
+            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper && root.pendingTheme === "" && root.pendingWallpaper === "") {
                 root.reloadActiveEnv();
             }
         }
@@ -61,7 +61,7 @@ Scope {
         running: true
         repeat: true
         onTriggered: {
-            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper) {
+            if (!root.isSwitchingTheme && !root.isSwitchingWallpaper && root.pendingTheme === "" && root.pendingWallpaper === "") {
                 activeEnvFileView.reload();
             }
         }
@@ -215,6 +215,32 @@ Scope {
     property bool isSwitchingTheme: false
     property bool isSwitchingWallpaper: false
 
+    property string pendingTheme: ""
+    property string pendingWallpaper: ""
+
+    function processNextPending() {
+        if (root.isSwitchingTheme || root.isSwitchingWallpaper)
+            return;
+
+        if (root.pendingTheme !== "") {
+            const nextTheme = root.pendingTheme;
+            root.pendingTheme = "";
+            root.isSwitchingTheme = true;
+            themeProcess.command = [Paths.themeSwitcherBin, "switch", "theme", nextTheme];
+            themeProcess.running = true;
+            return;
+        }
+
+        if (root.pendingWallpaper !== "") {
+            const nextWp = root.pendingWallpaper;
+            root.pendingWallpaper = "";
+            root.isSwitchingWallpaper = true;
+            wallpaperProcess.command = [Paths.themeSwitcherBin, "switch", "wallpaper", nextWp];
+            wallpaperProcess.running = true;
+            return;
+        }
+    }
+
     Process {
         id: themeProcess
         stderr: SplitParser {
@@ -231,6 +257,7 @@ Scope {
             }
             activeEnvFileView.reload();
             currentColorsFileView.reload();
+            root.processNextPending();
         }
     }
 
@@ -249,6 +276,7 @@ Scope {
                 console.error("[ThemeService] Wallpaper switch command failed with code " + exitCode + ", status " + exitStatus);
             }
             activeEnvFileView.reload();
+            root.processNextPending();
         }
     }
 
@@ -301,10 +329,10 @@ Scope {
         const text = activeEnvFileView.text();
         const env = parseEnv(text);
         root.activeEnv = env;
-        if (env.ACTIVE_THEME && env.ACTIVE_THEME !== root.activeTheme && !root.isSwitchingTheme) {
+        if (env.ACTIVE_THEME && env.ACTIVE_THEME !== root.activeTheme && !root.isSwitchingTheme && root.pendingTheme === "") {
             root.loadThemeByName(env.ACTIVE_THEME);
         }
-        if (env.ACTIVE_WALLPAPER && !root.isWallpaperActive(root.activeWallpaper, env.ACTIVE_WALLPAPER) && !root.isSwitchingWallpaper) {
+        if (env.ACTIVE_WALLPAPER && !root.isWallpaperActive(root.activeWallpaper, env.ACTIVE_WALLPAPER) && !root.isSwitchingWallpaper && root.pendingWallpaper === "") {
             root.activeWallpaper = env.ACTIVE_WALLPAPER;
         }
     }
@@ -457,32 +485,45 @@ Scope {
     }
 
     function switchTheme(name) {
-        if (!name || name === "" || !/^[A-Za-z0-9_.-]+$/.test(name) || root.isSwitchingTheme || root.isSwitchingWallpaper)
+        if (!name || name === "" || !/^[A-Za-z0-9_.-]+$/.test(name))
             return;
 
-        // If theme is already active and palette applied, do nothing
-        if (root.activeTheme === name && root.currentColors && Object.keys(root.currentColors).length > 0)
+        // If theme is already active and palette applied, and no pending theme queued, do nothing
+        if (root.activeTheme === name && root.currentColors && Object.keys(root.currentColors).length > 0 && root.pendingTheme === "")
             return;
 
         // Optimistically apply the theme immediately from cache for zero-latency UI updates
-        root.isSwitchingTheme = true;
         root.loadThemeByName(name);
 
+        if (root.isSwitchingTheme || root.isSwitchingWallpaper) {
+            root.pendingTheme = name;
+            root.pendingWallpaper = ""; // Clear wallpaper from previous theme
+            return;
+        }
+
+        root.pendingTheme = "";
+        root.isSwitchingTheme = true;
         themeProcess.command = [Paths.themeSwitcherBin, "switch", "theme", name];
         themeProcess.running = true;
     }
 
     function switchWallpaper(filename) {
-        if (!filename || filename === "" || filename.indexOf("..") >= 0 || filename.startsWith("/") || filename.indexOf("\\") >= 0 || root.isSwitchingWallpaper || root.isSwitchingTheme)
+        if (!filename || filename === "" || filename.indexOf("..") >= 0 || filename.startsWith("/") || filename.indexOf("\\") >= 0)
             return;
 
-        if (root.isWallpaperActive(filename, root.activeWallpaper))
+        if (root.isWallpaperActive(filename, root.activeWallpaper) && root.pendingWallpaper === "")
             return;
 
         // Optimistically update active wallpaper for instant UI checkmark response
         root.activeWallpaper = filename;
-        root.isSwitchingWallpaper = true;
 
+        if (root.isSwitchingTheme || root.isSwitchingWallpaper) {
+            root.pendingWallpaper = filename;
+            return;
+        }
+
+        root.pendingWallpaper = "";
+        root.isSwitchingWallpaper = true;
         wallpaperProcess.command = [Paths.themeSwitcherBin, "switch", "wallpaper", filename];
         wallpaperProcess.running = true;
     }

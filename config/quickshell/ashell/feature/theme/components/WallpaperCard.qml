@@ -15,6 +15,7 @@ Item {
 
     signal activated()
     signal selectRequested()
+    signal doubleActivated()
 
     implicitWidth: 260
     implicitHeight: 154
@@ -139,6 +140,7 @@ Item {
                     root.selectRequested();
                 }
             }
+            onDoubleClicked: root.doubleActivated()
         }
     }
 }

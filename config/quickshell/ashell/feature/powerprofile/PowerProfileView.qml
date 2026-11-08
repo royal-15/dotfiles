@@ -23,10 +23,10 @@ Item {
     }
 
     readonly property var sessionActions: [
-        { key: "lock", label: "Lock", subtitle: "Lock session", icon: "lock", destructive: false },
-        { key: "logout", label: "Log Out", subtitle: "Log out of Hyprland", icon: "logout", destructive: true },
-        { key: "reboot", label: "Restart", subtitle: "Restart computer", icon: "restart_alt", destructive: true },
-        { key: "poweroff", label: "Shut Down", subtitle: "Shut down computer", icon: "power_settings_new", destructive: true }
+        { key: "lock", label: "Lock", subtitle: "Lock session", icon: "lock", destructive: false, shortcut: "L" },
+        { key: "logout", label: "Log Out", subtitle: "Log out of Hyprland", icon: "logout", destructive: true, shortcut: "O" },
+        { key: "reboot", label: "Restart", subtitle: "Restart computer", icon: "restart_alt", destructive: true, shortcut: "R" },
+        { key: "poweroff", label: "Shut Down", subtitle: "Shut down computer", icon: "power_settings_new", destructive: true, shortcut: "S" }
     ]
 
     readonly property int totalProfiles: PowerProfileService.profiles.length
@@ -73,7 +73,29 @@ Item {
                 root.closeRequested();
             }
             return true;
-        } else if ((event.modifiers & Qt.ControlModifier) !== 0) {
+        }
+
+        // Direct session action shortcuts without Ctrl/Alt/Meta: L, O, R, S
+        if ((event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)) === 0) {
+            let directActionKey = "";
+            if (event.key === Qt.Key_L) directActionKey = "lock";
+            else if (event.key === Qt.Key_O) directActionKey = "logout";
+            else if (event.key === Qt.Key_R) directActionKey = "reboot";
+            else if (event.key === Qt.Key_S) directActionKey = "poweroff";
+
+            if (directActionKey !== "") {
+                for (let i = 0; i < sessionActions.length; i++) {
+                    if (sessionActions[i].key === directActionKey) {
+                        selectedIndex = totalProfiles + i;
+                        break;
+                    }
+                }
+                triggerSessionAction(directActionKey, true);
+                return true;
+            }
+        }
+
+        if ((event.modifiers & Qt.ControlModifier) !== 0) {
             return false;
         } else if (event.key === Qt.Key_Left) {
             moveH(-1);
@@ -94,8 +116,12 @@ Item {
             moveSelection(1);
             return true;
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-            if (!event.isAutoRepeat)
-                activateCurrentSelection();
+            if (!event.isAutoRepeat) {
+                if (root.confirmingAction !== "")
+                    triggerSessionAction(root.confirmingAction, true);
+                else
+                    activateCurrentSelection();
+            }
             return true;
         }
         return false;
@@ -158,6 +184,8 @@ Item {
             closeAfterAction = true;
 
         if (key === "lock") {
+            confirmResetTimer.stop();
+            confirmingAction = "";
             root.closeImmediateRequested();
             PowerProfileService.executeSessionAction("lock");
             return;
@@ -191,13 +219,21 @@ Item {
         return "";
     }
 
+    function actionShortcut(key) {
+        for (let i = 0; i < sessionActions.length; i++) {
+            if (sessionActions[i].key === key)
+                return sessionActions[i].shortcut;
+        }
+        return "";
+    }
+
     readonly property string dynamicStatusText: {
         if (PowerProfileService.applyingProfile !== "")
             return `Applying ${PowerProfileService.labelFor(PowerProfileService.applyingProfile)}…`;
         if (PowerProfileService.error !== "")
             return "Could not change power profile";
         if (root.confirmingAction !== "")
-            return `Confirm ${root.actionLabel(root.confirmingAction)}? Tap again`;
+            return `Confirm ${root.actionLabel(root.confirmingAction)}? Press ${root.actionShortcut(root.confirmingAction)} or Enter to confirm`;
         if (root.hoveredActionKey !== "")
             return root.actionSubtitle(root.hoveredActionKey);
         if (root.selectedIndex >= root.totalProfiles && root.selectedIndex < root.totalItems) {

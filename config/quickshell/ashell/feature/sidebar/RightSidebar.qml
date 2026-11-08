@@ -49,7 +49,9 @@ PanelWindow {
     property int previousTabIndex: 0
     property int tabTransitionDirection: 1 // +1 for moving to the right, -1 for moving to the left
     property real tabSwitchProgress: 1.0
-    readonly property real slideTranslateX: Math.round(((root.width > 0 ? root.width : root.implicitWidth) + root.margins.right) * (1.0 - root.slideProgress))
+    readonly property real panelWidth: 360
+    readonly property real slideDistance: panelWidth + Decorations.screenEdgePadding + 45
+    readonly property real slideTranslateX: Math.round(root.slideDistance * (1.0 - root.slideProgress))
 
     // Adaptive height based on active tab
     readonly property real targetSurfaceHeight: {
@@ -77,19 +79,24 @@ PanelWindow {
     margins {
         top: Decorations.exclusiveZoneHeight
         bottom: Decorations.screenEdgePadding
-        right: Decorations.screenEdgePadding
+        right: 0
     }
 
-    implicitWidth: 360
+    implicitWidth: root.panelWidth + Decorations.screenEdgePadding
     color: Colors.clear
     visible: false
     focusable: root.ownsKeyboardInput
 
-    // Click-through input mask: mouse clicks pass through the transparent region outside panelSurface
+    Item {
+        id: windowBounds
+        anchors.fill: parent
+    }
+
+    // Click-through input mask: mouse clicks pass through the transparent region outside panelSurface when resting
     mask: Region {
         Region {
-            item: panelSurface
-            radius: Decorations.cornerRadius
+            item: (root.closingWithAnimation || slideAnimation.running) ? windowBounds : panelSurface
+            radius: (root.closingWithAnimation || slideAnimation.running) ? 0 : Decorations.cornerRadius
         }
     }
 
@@ -153,7 +160,7 @@ PanelWindow {
         target: root
         property: "slideProgress"
         duration: Motion.durationPanel
-        easing.type: Motion.easingStandard
+        easing.type: Motion.easingFluid
         onFinished: {
             if (root.closingWithAnimation) {
                 root.visible = false;
@@ -219,7 +226,7 @@ PanelWindow {
         slideAnimation.from = 0;
         slideAnimation.to = 1;
         slideAnimation.duration = Motion.durationPanel;
-        slideAnimation.easing.type = Motion.easingStandard;
+        slideAnimation.easing.type = Motion.easingFluid;
         slideAnimation.restart();
 
         Qt.callLater(() => focusCurrentTab());
@@ -263,8 +270,8 @@ PanelWindow {
         slideAnimation.stop();
         slideAnimation.from = slideProgress;
         slideAnimation.to = 0;
-        slideAnimation.duration = Math.max(60, Math.round(Motion.durationExit * slideProgress));
-        slideAnimation.easing.type = Motion.easingIn;
+        slideAnimation.duration = Math.max(80, Math.round(Motion.durationPanel * slideProgress));
+        slideAnimation.easing.type = Motion.easingStandard;
         slideAnimation.restart();
     }
 
@@ -326,7 +333,8 @@ PanelWindow {
         id: panelSurface
         anchors.top: parent.top
         anchors.right: parent.right
-        width: parent.width
+        anchors.rightMargin: Decorations.screenEdgePadding
+        width: root.panelWidth
         height: root.targetSurfaceHeight
         radius: Decorations.cornerRadius
         color: Colors.panel
@@ -344,7 +352,6 @@ PanelWindow {
         transform: Translate {
             x: root.slideTranslateX
         }
-        opacity: root.slideProgress
 
         HoverHandler {
             id: panelPointer

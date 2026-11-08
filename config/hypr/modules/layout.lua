@@ -1,20 +1,45 @@
--- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
-hl.config({general = {layout = "dwindle"}})
+-- =============================================================================
+-- WINDOW LAYOUTS
+-- =============================================================================
+-- Documentation: https://wiki.hypr.land/Configuring/Layouts/
 
+-- -----------------------------------------------------------------------------
+-- Default Layout
+-- -----------------------------------------------------------------------------
 hl.config({
-    dwindle = {
-        preserve_split = true -- You probably want this
-    }
+    general = {
+        layout = "dwindle",
+    },
 })
 
--- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
-hl.config({master = {new_status = "master"}})
+-- -----------------------------------------------------------------------------
+-- Dwindle Layout Settings
+-- -----------------------------------------------------------------------------
+-- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/
+hl.config({
+    dwindle = {
+        preserve_split = true,
+    },
+})
 
--- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/ for more
+-- -----------------------------------------------------------------------------
+-- Master Layout Settings
+-- -----------------------------------------------------------------------------
+-- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/
+hl.config({
+    master = {
+        new_status = "master",
+    },
+})
+
+-- -----------------------------------------------------------------------------
+-- Scrolling Layout Settings
+-- -----------------------------------------------------------------------------
+-- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/
 hl.config({
     scrolling = {
         fullscreen_on_one_column = true,
-        column_width = 0.8,
-        explicit_column_widths = "0.35, 0.5, 0.7, 1.0"
-    }
+        column_width             = 0.8,
+        explicit_column_widths   = "0.35, 0.5, 0.7, 1.0",
+    },
 })

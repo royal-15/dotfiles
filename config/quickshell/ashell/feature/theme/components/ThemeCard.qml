@@ -12,6 +12,7 @@ Item {
     property bool isHighlighted: false
 
     signal activated()
+    signal doubleActivated()
 
     implicitWidth: 264
     implicitHeight: 88
@@ -127,6 +128,7 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: root.activated()
+            onDoubleClicked: root.doubleActivated()
         }
 
         ColumnLayout {

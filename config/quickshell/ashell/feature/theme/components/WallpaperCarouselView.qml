@@ -11,6 +11,7 @@ FocusScope {
     property int selectedIndex: 0
     signal backRequested()
     signal openThemesRequested()
+    signal closeRequested()
 
     implicitWidth: 700
     implicitHeight: 290
@@ -40,7 +41,12 @@ FocusScope {
     function applySelected() {
         const list = ThemeService.availableWallpapers;
         if (list && selectedIndex >= 0 && selectedIndex < list.length) {
-            ThemeService.switchWallpaper(list[selectedIndex].name);
+            const selectedItem = list[selectedIndex];
+            if (ThemeService.isWallpaperActive(selectedItem.name)) {
+                root.closeRequested();
+            } else {
+                ThemeService.switchWallpaper(selectedItem.name);
+            }
         }
     }
 
@@ -153,11 +159,22 @@ FocusScope {
                     onActivated: {
                         root.selectedIndex = index;
                         carouselList.currentIndex = index;
-                        ThemeService.switchWallpaper(modelData.name);
+                        if (!ThemeService.isWallpaperActive(modelData.name)) {
+                            ThemeService.switchWallpaper(modelData.name);
+                        }
                     }
 
                     onSelectRequested: {
                         root.selectIndex(index);
+                    }
+
+                    onDoubleActivated: {
+                        root.selectedIndex = index;
+                        carouselList.currentIndex = index;
+                        if (!ThemeService.isWallpaperActive(modelData.name)) {
+                            ThemeService.switchWallpaper(modelData.name);
+                        }
+                        root.closeRequested();
                     }
                 }
             }

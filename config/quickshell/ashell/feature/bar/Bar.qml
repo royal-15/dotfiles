@@ -114,7 +114,7 @@ PanelWindow {
         }
         onCleared: {
             if (commandPalette.isOpen && !commandPalette.closingWithAnimation)
-                commandPalette.requestClose();
+                commandPalette.requestClose(true);
         }
     }
 

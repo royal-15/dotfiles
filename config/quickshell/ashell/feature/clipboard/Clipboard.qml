@@ -63,6 +63,7 @@ Item {
         searchBar.text = "";
         ClipboardService.searchQuery = "";
         ClipboardService.refresh();
+        listView.resetSelection();
 
         if (islandSurface.expanded && islandSurface.closingWithAnimation) {
             islandSurface.closingWithAnimation = false;
@@ -93,6 +94,7 @@ Item {
         islandSurface.morphProgress = 0;
         searchBar.text = "";
         ClipboardService.searchQuery = "";
+        listView.resetSelection();
     }
 
     function requestClose() {
@@ -118,11 +120,25 @@ Item {
         context: Qt.WindowShortcut
         enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
         onActivated: {
-            if (searchBar.text !== "") {
+            if (searchBar.confirmingWipe) {
+                searchBar.cancelWipe();
+            } else if (searchBar.text !== "") {
                 searchBar.text = "";
             } else {
                 root.requestClose();
             }
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+Delete"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        onActivated: {
+            if (searchBar.confirmingWipe)
+                searchBar.confirmWipe();
+            else
+                searchBar.armWipe();
         }
     }
 

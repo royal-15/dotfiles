@@ -60,6 +60,7 @@ Item {
                 islandSurface.expanded = false;
                 islandSurface.closingWithAnimation = false;
                 root.currentStage = "hub";
+                themesView.clearSearch();
             } else if (islandSurface.expanded) {
                 root.focusPrimary();
             }
@@ -83,7 +84,7 @@ Item {
         sequence: "Escape"
         context: Qt.ApplicationShortcut
         autoRepeat: false
-        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation && (!themesView.isSearching || root.currentStage !== "themes")
         onActivated: root.navigateBack()
     }
 
@@ -91,7 +92,7 @@ Item {
         sequence: "Backspace"
         context: Qt.ApplicationShortcut
         autoRepeat: false
-        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation && (!themesView.isSearching || root.currentStage !== "themes")
         onActivated: root.navigateBack()
     }
 
@@ -116,6 +117,7 @@ Item {
     }
 
     function openNow(argument) {
+        themesView.clearSearch();
         if (argument && (argument === "themes" || argument === "wallpapers" || argument === "hub"))
             root.currentStage = argument;
 
@@ -154,6 +156,7 @@ Item {
         islandSurface.closingWithAnimation = false;
         islandSurface.morphProgress = 0;
         root.currentStage = "hub";
+        themesView.clearSearch();
     }
 
     function requestClose() {
@@ -260,6 +263,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 opacity: root.currentStage === "hub" ? 1.0 : 0.0
                 visible: opacity > 0.01
+                focus: root.currentStage === "hub"
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -313,6 +317,7 @@ Item {
 
                 onBackRequested: root.setStage("hub")
                 onOpenThemesRequested: root.setStage("themes")
+                onCloseRequested: root.requestClose()
             }
         }
     }

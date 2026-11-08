@@ -88,6 +88,31 @@ Item {
                 }
             }
 
+            // Wipe history hint
+            Row {
+                spacing: 3
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 16
+                    width: 58
+                    radius: 3
+                    color: Colors.surfaceMuted
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Ctrl+⇧+Del"
+                        font.pixelSize: 8
+                        color: Colors.textDim
+                    }
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Wipe"
+                    font.pixelSize: 10
+                    color: Colors.textFaint
+                }
+            }
+
             // Escape key hint
             Row {
                 spacing: 3

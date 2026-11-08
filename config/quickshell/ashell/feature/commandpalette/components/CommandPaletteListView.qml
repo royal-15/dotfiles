@@ -7,6 +7,8 @@ Item {
 
     property var modelData: []
     property int currentIndex: 0
+    property string selectedItemId: ""
+    property string confirmingDeleteId: ""
     property var expandedIds: ({})
 
     signal itemActivated(var item)
@@ -16,13 +18,53 @@ Item {
 
     readonly property int count: modelData ? modelData.length : 0
 
+    Timer {
+        id: confirmDeleteResetTimer
+        interval: 3000
+        repeat: false
+        onTriggered: root.confirmingDeleteId = ""
+    }
+
+    function cancelDeleteConfirmation() {
+        confirmingDeleteId = "";
+        confirmDeleteResetTimer.stop();
+    }
+
+    function updateSelection(newIndex) {
+        if (confirmingDeleteId !== "") {
+            cancelDeleteConfirmation();
+        }
+        if (!modelData || modelData.length === 0) {
+            currentIndex = 0;
+            selectedItemId = "";
+            return;
+        }
+        const count = modelData.length;
+        currentIndex = Math.max(0, Math.min(newIndex, count - 1));
+        const current = modelData[currentIndex];
+        selectedItemId = (current && current.id) ? String(current.id) : "";
+        listView.positionViewAtIndex(currentIndex, ListView.Contain);
+    }
+
+    function selectItemById(id) {
+        if (!id || !modelData || modelData.length === 0)
+            return;
+        const targetId = String(id);
+        const idx = modelData.findIndex(item => item && String(item.id) === targetId);
+        if (idx !== -1) {
+            currentIndex = idx;
+            selectedItemId = targetId;
+            listView.positionViewAtIndex(currentIndex, ListView.Contain);
+        }
+    }
+
     function moveSelection(delta) {
         if (!modelData || modelData.length === 0)
             return;
 
         const count = modelData.length;
-        currentIndex = (currentIndex + delta + count) % count;
-        listView.positionViewAtIndex(currentIndex, ListView.Contain);
+        const next = (currentIndex + delta + count) % count;
+        updateSelection(next);
     }
 
     function toggleExpandCurrent() {
@@ -62,27 +104,54 @@ Item {
         }
     }
 
+    function requestDelete(item) {
+        if (!item || !item.id)
+            return;
+        const itemId = String(item.id);
+        if (root.confirmingDeleteId === itemId) {
+            confirmDeleteResetTimer.stop();
+            root.confirmingDeleteId = "";
+            root.itemDeleteRequested(item);
+        } else {
+            root.confirmingDeleteId = itemId;
+            confirmDeleteResetTimer.restart();
+        }
+    }
+
     function deleteCurrent() {
         if (!modelData || modelData.length === 0)
             return;
         if (currentIndex >= 0 && currentIndex < modelData.length) {
-            root.itemDeleteRequested(modelData[currentIndex]);
+            requestDelete(modelData[currentIndex]);
         }
     }
 
     function resetSelection() {
-        currentIndex = 0;
+        cancelDeleteConfirmation();
         root.expandedIds = ({});
+        updateSelection(0);
         if (modelData && modelData.length > 0) {
             listView.positionViewAtIndex(0, ListView.Beginning);
         }
     }
 
     onModelDataChanged: {
-        currentIndex = 0;
-        if (modelData && modelData.length > 0) {
-            listView.positionViewAtIndex(0, ListView.Beginning);
+        if (!modelData || modelData.length === 0) {
+            currentIndex = 0;
+            selectedItemId = "";
+            cancelDeleteConfirmation();
+            return;
         }
+        if (selectedItemId !== "") {
+            const idx = modelData.findIndex(item => item && String(item.id) === selectedItemId);
+            if (idx !== -1) {
+                currentIndex = idx;
+                listView.positionViewAtIndex(currentIndex, ListView.Contain);
+                return;
+            }
+        }
+        cancelDeleteConfirmation();
+        updateSelection(Math.min(currentIndex, modelData.length - 1));
     }
 
     ListView {
@@ -99,24 +168,28 @@ Item {
             itemData: modelData
             isCurrent: index === root.currentIndex
             isExpanded: Boolean(root.expandedIds[modelData.id])
+            isConfirmingDelete: root.confirmingDeleteId !== "" && String(modelData.id) === root.confirmingDeleteId
 
             onClicked: {
-                root.currentIndex = index;
+                root.updateSelection(index);
                 root.itemActivated(modelData);
             }
             onCopyRequested: {
-                root.currentIndex = index;
+                root.updateSelection(index);
                 root.itemActivated(modelData);
             }
             onEditRequested: {
-                root.currentIndex = index;
+                root.updateSelection(index);
                 root.itemEditRequested(modelData);
             }
             onDeleteRequested: {
-                root.itemDeleteRequested(modelData);
+                root.requestDelete(modelData);
+            }
+            onCancelDeleteRequested: {
+                root.cancelDeleteConfirmation();
             }
             onToggleExpandRequested: {
-                root.currentIndex = index;
+                root.updateSelection(index);
                 root.toggleExpandItem(modelData);
             }
         }

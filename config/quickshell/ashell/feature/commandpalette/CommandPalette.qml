@@ -98,14 +98,17 @@ Item {
         islandSurface.morphProgress = 0;
         searchBar.text = "";
         CommandPaletteService.searchQuery = "";
+        listView.cancelDeleteConfirmation();
         if (dialog.isOpen)
             dialog.close();
     }
 
-    function requestClose() {
+    function requestClose(forceFullDismiss) {
+        listView.cancelDeleteConfirmation();
         if (dialog.isOpen) {
             dialog.close();
-            return;
+            if (!forceFullDismiss)
+                return;
         }
 
         if (!islandSurface.expanded || islandSurface.closingWithAnimation)
@@ -139,12 +142,21 @@ Item {
         onActivated: {
             if (dialog.isOpen) {
                 dialog.close();
+            } else if (listView.confirmingDeleteId !== "") {
+                listView.cancelDeleteConfirmation();
             } else if (searchBar.text !== "") {
                 searchBar.text = "";
             } else {
                 root.requestClose();
             }
         }
+    }
+
+    Shortcut {
+        sequence: "F2"
+        context: Qt.WindowShortcut
+        enabled: islandSurface.expanded && !islandSurface.closingWithAnimation && !dialog.isOpen
+        onActivated: listView.editCurrent()
     }
 
     // Global 's' key listener to refocus search when panel has focus outside search field
@@ -238,13 +250,16 @@ Item {
                 CommandPaletteSearchBar {
                     id: searchBar
                     Layout.fillWidth: true
+                    isConfirmingDelete: listView.confirmingDeleteId !== ""
                     onTextChanged: {
                         CommandPaletteService.searchQuery = text;
+                        listView.cancelDeleteConfirmation();
                     }
                     onNavigateDown: listView.moveSelection(1)
                     onNavigateUp: listView.moveSelection(-1)
                     onActivateCurrent: listView.activateCurrent()
                     onDeleteCurrent: listView.deleteCurrent()
+                    onCancelConfirmationRequested: listView.cancelDeleteConfirmation()
                     onToggleExpandCurrent: listView.toggleExpandCurrent()
                     onAddNewRequested: dialog.openForNew()
                     onEditCurrentRequested: listView.editCurrent()
@@ -276,6 +291,7 @@ Item {
                     Layout.fillWidth: true
                     count: CommandPaletteService.filteredItems.length
                     totalCount: CommandPaletteService.totalCount
+                    isConfirmingDelete: listView.confirmingDeleteId !== ""
                 }
             }
 
@@ -287,8 +303,11 @@ Item {
                 onSaved: (id, label, snippet) => {
                     if (id && id !== "") {
                         CommandPaletteService.updateEntry(id, label, snippet);
+                        listView.selectItemById(id);
                     } else {
-                        CommandPaletteService.addEntry(label, snippet);
+                        const newId = CommandPaletteService.addEntry(label, snippet);
+                        if (newId)
+                            listView.selectItemById(newId);
                     }
                     root.focusSearch();
                 }

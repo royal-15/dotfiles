@@ -1,115 +1,118 @@
---------------------------------
----- WINDOWS AND WORKSPACES ----
---------------------------------
--- Normal
-hl.window_rule({
-    match = {class = "google-chrome", title = "New Tab.*"},
-    workspace = "3"
-})
-hl.window_rule({match = {class = "zen", title = "Zen Browser"}, workspace = "3"})
-hl.window_rule({match = {class = "firefox"}, workspace = "special:s2"})
+-- =============================================================================
+-- WINDOW RULES & BEHAVIOR
+-- =============================================================================
+-- Documentation: https://wiki.hypr.land/Configuring/Window-Rules/
 
-hl.window_rule({
-    match = {class = "jetbrains-studio", title = ""},
-    workspace = "1"
-})
-hl.window_rule({
-    match = {class = "jetbrains-studio", title = "Agent.*"},
-    workspace = "2"
-})
-hl.window_rule({
-    match = {class = "jetbrains-studio", title = "Logcat.*"},
-    workspace = "4"
-})
+-- =============================================================================
+-- 1. WORKSPACE ASSIGNMENTS (BROWSERS & EDITORS)
+-- =============================================================================
 
--- Special
+-- Web Browsers
 hl.window_rule({
-    match = {class = "md.obsidian.Obsidian"},
-    opacity = "0.8 override 0.8 override",
-    workspace = "special:s1"
+    match     = {class = "google-chrome", title = "New Tab.*"},
+    workspace = "3",
 })
 hl.window_rule({
-    match = {class = "Spotify"},
-    opacity = "0.8 override 0.8 override",
-    workspace = "special:s2"
+    match     = {class = "zen", title = "Zen Browser"},
+    workspace = "3",
 })
 hl.window_rule({
-    match = {class = "youtube-music-desktop-app"},
-    opacity = "0.8 override 0.8 override",
-    workspace = "special:s2"
-})
-hl.window_rule({
-    match = {class = "com.github.wwmm.easyeffects"},
-    opacity = "0.8 override 0.8 override",
-    workspace = "special:s2"
-})
-hl.window_rule({
-    match = {class = "kew-kitty"},
-    opacity = "0.8 override 0.8 override",
-    workspace = "special:s2"
+    match     = {class = "firefox"},
+    workspace = "special:s2",
 })
 
--- Ignore maximize requests from all apps. You'll probably like this.
+-- Android Studio & Development Environments
 hl.window_rule({
-    name = "suppress-maximize-events",
-    match = {class = ".*"},
-
-    suppress_event = "maximize"
+    match     = {class = "jetbrains-studio", title = ""},
+    workspace = "1",
+})
+hl.window_rule({
+    match     = {class = "antigravity", title = "Antigravity"},
+    workspace = "1",
+})
+hl.window_rule({
+    match     = {class = "jetbrains-studio", title = "Agent.*"},
+    workspace = "2",
+})
+hl.window_rule({
+    match     = {class = "jetbrains-studio", title = "Logcat.*"},
+    workspace = "4",
 })
 
--- Fix some dragging issues with XWayland
+-- =============================================================================
+-- 2. SPECIAL WORKSPACES / SCRATCHPADS (WITH OPACITY OVERRIDES)
+-- =============================================================================
+
+-- Obsidian (Scratchpad s1)
 hl.window_rule({
-    name = "fix-xwayland-drags",
-    match = {
-        class = "^$",
-        title = "^$",
-        xwayland = true,
-        float = true,
+    match     = {class = "md.obsidian.Obsidian"},
+    opacity   = "0.8 override 0.8 override",
+    workspace = "special:s1",
+})
+
+-- Media & Audio Apps (Scratchpad s2)
+hl.window_rule({
+    match     = {class = "Spotify"},
+    opacity   = "0.8 override 0.8 override",
+    workspace = "special:s2",
+})
+hl.window_rule({
+    match     = {class = "youtube-music-desktop-app"},
+    opacity   = "0.8 override 0.8 override",
+    workspace = "special:s2",
+})
+hl.window_rule({
+    match     = {class = "com.github.wwmm.easyeffects"},
+    opacity   = "0.8 override 0.8 override",
+    workspace = "special:s2",
+})
+hl.window_rule({
+    match     = {class = "kew-kitty"},
+    opacity   = "0.8 override 0.8 override",
+    workspace = "special:s2",
+})
+
+-- =============================================================================
+-- 3. WINDOW MANAGEMENT & COMPOSITOR BEHAVIOR FIXES
+-- =============================================================================
+
+-- Suppress maximize events across all applications
+hl.window_rule({
+    name           = "suppress-maximize-events",
+    match          = {class = ".*"},
+    suppress_event = "maximize",
+})
+
+-- Fix XWayland empty drag/drop windows stealing focus
+hl.window_rule({
+    name       = "fix-xwayland-drags",
+    match      = {
+        class      = "^$",
+        title      = "^$",
+        xwayland   = true,
+        float      = true,
         fullscreen = false,
-        pin = false
+        pin        = false,
     },
-
-    no_focus = true
+    no_focus   = true,
 })
 
+-- Waydroid Emulation
 hl.window_rule({
-    name = "Waydroid fullscreen",
-    match = {class = "Waydroid"},
+    name       = "Waydroid fullscreen",
+    match      = {class = "Waydroid"},
     fullscreen = true,
-    workspace = "4"
+    workspace  = "4",
 })
 
--- Layer rules also return a handle.
--- local overlayLayerRule = hl.layer_rule({
---     name  = "no-anim-overlay",
---     match = { namespace = "^my-overlay$" },
---     no_anim = true,
--- })
--- overlayLayerRule:set_enabled(false)
+-- =============================================================================
+-- 4. UTILITY DIALOGS & RUNNERS
+-- =============================================================================
 
--- Hyprland-run windowrule
+-- Hyprland Run Menu Placement
 hl.window_rule({
-    name = "move-hyprland-run",
+    name  = "move-hyprland-run",
     match = {class = "hyprland-run"},
-
-    move = "20 monitor_h-120",
-    float = true
+    move  = "20 monitor_h-120",
+    float = true,
 })
-
--- Ref https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
--- "Smart gaps" / "No gaps when only"
--- uncomment all if you wish to use that.
--- hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
--- hl.workspace_rule({ workspace = "f[1]",   gaps_out = 0, gaps_in = 0 })
--- hl.window_rule({
---     name  = "no-gaps-wtv1",
---     match = { float = false, workspace = "w[tv1]" },
---     border_size = 0,
---     rounding    = 0,
--- })
--- hl.window_rule({
---     name  = "no-gaps-f1",
---     match = { float = false, workspace = "f[1]" },
---     border_size = 0,
---     rounding    = 0,
--- })

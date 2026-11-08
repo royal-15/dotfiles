@@ -9,11 +9,13 @@ Item {
     property var itemData: null
     property bool isCurrent: false
     property bool isExpanded: false
+    property bool isConfirmingDelete: false
 
     signal clicked()
     signal copyRequested()
     signal editRequested()
     signal deleteRequested()
+    signal cancelDeleteRequested()
     signal toggleExpandRequested()
 
     readonly property var snippetLines: (itemData && itemData.snippet) ? itemData.snippet.split("\n") : []
@@ -38,15 +40,22 @@ Item {
         anchors.fill: delegateSurface
         anchors.margins: -1
         radius: delegateSurface.radius + 1
-        color: Colors.accentSoft
+        color: root.isConfirmingDelete ? Colors.criticalSoft : Colors.accentSoft
         scale: delegateSurface.scale
         transformOrigin: Item.Center
-        opacity: root.isCurrent ? 0.65 : 0.0
+        opacity: (root.isConfirmingDelete || root.isCurrent) ? 0.65 : 0.0
         visible: opacity > 0.01
         z: -1
 
         Behavior on opacity {
             NumberAnimation {
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+
+        Behavior on color {
+            ColorAnimation {
                 duration: Motion.durationFast
                 easing.type: Motion.easingStandard
             }
@@ -62,12 +71,14 @@ Item {
         anchors.leftMargin: 6
         anchors.rightMargin: 6
         radius: 8
-        color: root.isCurrent
-            ? Colors.accentSoft
-            : (delegateHover.hovered ? Colors.surfaceSoft : Colors.clear)
+        color: root.isConfirmingDelete
+            ? Colors.criticalSoft
+            : (root.isCurrent
+                ? Colors.accentSoft
+                : (delegateHover.hovered ? Colors.surfaceSoft : Colors.clear))
 
-        border.width: root.isCurrent ? 1 : 0
-        border.color: Colors.accent
+        border.width: (root.isConfirmingDelete || root.isCurrent) ? 1 : 0
+        border.color: root.isConfirmingDelete ? Colors.critical : Colors.accent
 
         scale: tapArea.pressed
             ? Motion.scalePress
@@ -83,7 +94,14 @@ Item {
 
         Behavior on color {
             ColorAnimation {
-                duration: Motion.durationInstant
+                duration: Motion.durationFast
+                easing.type: Motion.easingStandard
+            }
+        }
+
+        Behavior on border.color {
+            ColorAnimation {
+                duration: Motion.durationFast
                 easing.type: Motion.easingStandard
             }
         }
@@ -95,7 +113,14 @@ Item {
 
         TapHandler {
             id: tapArea
-            onTapped: root.clicked()
+            enabled: !copyHover.hovered && !editHover.hovered && !deleteHover.hovered && !badgeHover.hovered
+            onTapped: {
+                if (root.isConfirmingDelete) {
+                    root.cancelDeleteRequested();
+                    return;
+                }
+                root.clicked();
+            }
         }
 
         implicitHeight: contentColumn.implicitHeight + 16
@@ -176,6 +201,7 @@ Item {
 
                 // Copy Action Button
                 Rectangle {
+                    visible: !root.isConfirmingDelete
                     Layout.preferredWidth: 24
                     Layout.preferredHeight: 24
                     Layout.alignment: Qt.AlignVCenter
@@ -207,6 +233,7 @@ Item {
 
                 // Edit Action Button
                 Rectangle {
+                    visible: !root.isConfirmingDelete
                     Layout.preferredWidth: 24
                     Layout.preferredHeight: 24
                     Layout.alignment: Qt.AlignVCenter
@@ -236,25 +263,65 @@ Item {
                     }
                 }
 
-                // Delete Action Button
+                // Delete Action Button (Expands to confirmation chip when confirming)
                 Rectangle {
-                    Layout.preferredWidth: 24
+                    Layout.preferredWidth: root.isConfirmingDelete ? (confirmRow.implicitWidth + 12) : 24
                     Layout.preferredHeight: 24
                     Layout.alignment: Qt.AlignVCenter
-                    radius: 4
-                    color: deleteHover.hovered ? Colors.criticalSoft : Colors.clear
-                    opacity: (delegateHover.hovered || root.isCurrent) ? 1.0 : 0.0
+                    radius: root.isConfirmingDelete ? 6 : 4
+                    color: root.isConfirmingDelete
+                        ? Colors.critical
+                        : (deleteHover.hovered ? Colors.criticalSoft : Colors.clear)
+                    opacity: (root.isConfirmingDelete || delegateHover.hovered || root.isCurrent) ? 1.0 : 0.0
+
+                    Behavior on Layout.preferredWidth {
+                        NumberAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Motion.durationFast
+                            easing.type: Motion.easingStandard
+                        }
+                    }
 
                     Behavior on opacity {
                         NumberAnimation { duration: Motion.durationFast }
                     }
 
-                    Text {
+                    RowLayout {
+                        id: confirmRow
                         anchors.centerIn: parent
-                        text: "delete"
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 15
-                        color: deleteHover.hovered ? Colors.critical : (root.isCurrent ? Colors.textDim : Colors.textFaint)
+                        spacing: 4
+
+                        Text {
+                            text: root.isConfirmingDelete ? "priority_high" : "delete"
+                            font.family: "Material Symbols Rounded"
+                            font.pixelSize: 15
+                            color: root.isConfirmingDelete
+                                ? Colors.selectedText
+                                : (deleteHover.hovered ? Colors.critical : (root.isCurrent ? Colors.textDim : Colors.textFaint))
+                            Layout.alignment: Qt.AlignVCenter
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Motion.durationFast
+                                    easing.type: Motion.easingStandard
+                                }
+                            }
+                        }
+
+                        Text {
+                            visible: root.isConfirmingDelete
+                            text: "Delete?"
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            color: Colors.selectedText
+                            Layout.alignment: Qt.AlignVCenter
+                        }
                     }
 
                     HoverHandler {

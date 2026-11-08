@@ -209,12 +209,13 @@ Scope {
     function updateEntry(id, label, snippet) {
         if (!id)
             return false;
+        const targetId = String(id);
         const cleanSnippet = (snippet || "").trim();
         if (!cleanSnippet)
             return false;
 
         const updated = root.items.map(entry => {
-            if (entry.id === id) {
+            if (entry && String(entry.id) === targetId) {
                 return {
                     id: entry.id,
                     label: (label || "").trim(),
@@ -232,7 +233,8 @@ Scope {
     function deleteEntry(id) {
         if (!id)
             return;
-        const updated = root.items.filter(entry => entry.id !== id);
+        const targetId = String(id);
+        const updated = root.items.filter(entry => entry && String(entry.id) !== targetId);
         root.items = updated;
         triggerSave();
     }

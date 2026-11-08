@@ -8,25 +8,40 @@ Item {
 
     property var modelData: []
     property int currentIndex: 0
+    property string selectedItemId: ""
 
     signal itemActivated(var item)
     signal itemDeleteRequested(var item)
 
     readonly property int count: modelData ? modelData.length : 0
 
+    function updateSelection(newIndex) {
+        if (!modelData || modelData.length === 0) {
+            currentIndex = 0;
+            selectedItemId = "";
+            return;
+        }
+        const count = modelData.length;
+        currentIndex = Math.max(0, Math.min(newIndex, count - 1));
+        const current = modelData[currentIndex];
+        selectedItemId = (current && current.id) ? String(current.id) : "";
+        listView.positionViewAtIndex(currentIndex, ListView.Contain);
+    }
+
     function moveSelection(delta) {
         if (!modelData || modelData.length === 0)
             return;
 
-        const maxIdx = modelData.length - 1;
-        let next = currentIndex + delta;
-        if (next < 0)
-            next = 0;
-        else if (next > maxIdx)
-            next = maxIdx;
+        const count = modelData.length;
+        const next = (currentIndex + delta + count) % count;
+        updateSelection(next);
+    }
 
-        currentIndex = next;
-        listView.positionViewAtIndex(currentIndex, ListView.Contain);
+    function resetSelection() {
+        updateSelection(0);
+        if (modelData && modelData.length > 0) {
+            listView.positionViewAtIndex(0, ListView.Beginning);
+        }
     }
 
     function activateCurrent() {
@@ -48,9 +63,21 @@ Item {
     onModelDataChanged: {
         if (!modelData || modelData.length === 0) {
             currentIndex = 0;
-        } else if (currentIndex >= modelData.length) {
-            currentIndex = modelData.length - 1;
+            selectedItemId = "";
+            return;
         }
+        if (selectedItemId !== "") {
+            const idx = modelData.findIndex(item => item && String(item.id) === selectedItemId);
+            if (idx !== -1) {
+                currentIndex = idx;
+                return;
+            }
+        }
+        if (currentIndex >= modelData.length) {
+            currentIndex = Math.max(0, modelData.length - 1);
+        }
+        const cur = modelData[currentIndex];
+        selectedItemId = (cur && cur.id) ? String(cur.id) : "";
     }
 
     ListView {
@@ -68,7 +95,7 @@ Item {
             itemData: modelData
             isCurrent: index === root.currentIndex
             onClicked: {
-                root.currentIndex = index;
+                root.updateSelection(index);
                 root.itemActivated(modelData);
             }
             onDeleteRequested: {

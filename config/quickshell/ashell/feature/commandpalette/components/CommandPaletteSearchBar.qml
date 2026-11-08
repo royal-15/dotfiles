@@ -9,11 +9,13 @@ Item {
 
     property alias text: searchField.text
     property alias searchField: searchField
+    property bool isConfirmingDelete: false
 
     signal navigateDown()
     signal navigateUp()
     signal activateCurrent()
     signal deleteCurrent()
+    signal cancelConfirmationRequested()
     signal toggleExpandCurrent()
     signal addNewRequested()
     signal editCurrentRequested()
@@ -111,8 +113,8 @@ Item {
                         return;
                     }
 
-                    // Ctrl + E: Edit selected snippet
-                    if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_E) {
+                    // Ctrl + E or F2: Edit selected snippet
+                    if (((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_E) || event.key === Qt.Key_F2) {
                         root.editCurrentRequested();
                         event.accepted = true;
                         return;
@@ -148,9 +150,11 @@ Item {
                         return;
                     }
 
-                    // Escape: Clear query or close
+                    // Escape: Cancel delete confirmation, clear query, or close
                     if (event.key === Qt.Key_Escape) {
-                        if (searchField.text !== "") {
+                        if (root.isConfirmingDelete) {
+                            root.cancelConfirmationRequested();
+                        } else if (searchField.text !== "") {
                             searchField.text = "";
                         } else {
                             root.closeRequested();
