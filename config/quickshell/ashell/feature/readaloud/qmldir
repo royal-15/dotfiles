@@ -1,0 +1,5 @@
+module qs.feature.readaloud
+singleton ReadAloudRouter 1.0 ReadAloudRouter.qml
+singleton ReadAloudService 1.0 ReadAloudService.qml
+ReadAloudContent 1.0 ReadAloudContent.qml
+VoiceWaveform 1.0 VoiceWaveform.qml

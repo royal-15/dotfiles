@@ -69,17 +69,7 @@ generate_cava_theme() {
     [[ -s "$source" ]] || die "Colors file not found or empty: $source"
 
     mkdir -p "$(dirname "$target")"
-    jq -r '
-    "[color]",
-    "gradient = 1",
-    "gradient_count = 6",
-    "gradient_color_1 = '\''" + .accentAlt + "'\''",
-    "gradient_color_2 = '\''" + .accent + "'\''",
-    "gradient_color_3 = '\''" + .success + "'\''",
-    "gradient_color_4 = '\''" + .warning + "'\''",
-    "gradient_color_5 = '\''" + .critical + "'\''",
-    "gradient_color_6 = '\''" + .text + "'\''"
-    ' "$source" > "$target"
+    python3 "$SCRIPT_DIR/generate_cava_theme.py" "$source" "$target"
 }
 
 generate_hyprlock_theme() {
@@ -331,11 +321,13 @@ main() {
                     ;;
                 cava)
                     generate_cava_theme
+                    "$SCRIPT_DIR"/reload cava
                     ok "Cava theme generated"
                     ;;
                 all)
                     generate_cava_theme
                     generate_hyprlock_theme
+                    "$SCRIPT_DIR"/reload cava
                     ok "All generated themes updated"
                     ;;
                 *)

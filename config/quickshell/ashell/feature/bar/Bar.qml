@@ -16,6 +16,7 @@ import qs.feature.media
 import qs.feature.theme
 import qs.feature.clipboard
 import qs.feature.commandpalette
+import qs.feature.readaloud
 
 PanelWindow {
     id: bar
@@ -23,7 +24,7 @@ PanelWindow {
     property var modelData
 
     readonly property bool anyRightPanelOpen: rightSidebar.isOpen
-    readonly property bool anyPanelOpen: launcher.isOpen || themeStudio.isOpen || rightSidebar.isOpen || mediaIsland.isOpen || clipboard.isOpen || commandPalette.isOpen
+    readonly property bool anyPanelOpen: launcher.isOpen || themeStudio.isOpen || rightSidebar.isOpen || leftSidebar.isOpen || mediaIsland.isOpen || clipboard.isOpen || commandPalette.isOpen
 
     screen: modelData
     implicitHeight: 490
@@ -147,6 +148,9 @@ PanelWindow {
             Pill {
                 label: StatusBarService.clockValue
                 textColor: Colors.text
+                interactive: true
+                highlighted: leftSidebar.isOpen
+                onClicked: CalendarRouter.toggle()
             }
 
             Pill {
@@ -250,6 +254,11 @@ PanelWindow {
         barWindow: bar
     }
 
+    LeftSidebar {
+        id: leftSidebar
+        barWindow: bar
+    }
+
     Binding {
         target: NotificationService
         property: "anyPanelOpen"
@@ -274,8 +283,22 @@ PanelWindow {
         modelData: bar.screen
     }
 
+    ActiveStateOsd {
+        id: readAloudOsd
+        modelData: bar.screen
+        rightSidebarOpen: rightSidebar.isOpen
+        leftSidebarOpen: leftSidebar.isOpen
+        onDismissed: {
+            if (ReadAloudService.isPlaying)
+                ReadAloudService.stop();
+        }
+
+        ReadAloudContent {}
+    }
+
     onScreenChanged: {
         if (screen) {
+            CalendarRouter.registerPanel(screen, leftSidebar);
             NetworkCenterRouter.registerPanel(screen, rightSidebar.networkProxy);
             PowerProfileRouter.registerPanel(screen, rightSidebar.powerProfileProxy);
             NotificationCenterRouter.registerPanel(screen, rightSidebar.notificationsProxy);
@@ -284,6 +307,8 @@ PanelWindow {
             ClipboardRouter.registerPanel(screen, clipboard);
             CommandPaletteRouter.registerPanel(screen, commandPalette);
             MediaRouter.registerPanel(screen, mediaIsland);
+            ReadAloudRouter.registerOsd(screen, readAloudOsd);
+            StatusBarPanelCoordinator.registerPanel(screen, leftSidebar);
             StatusBarPanelCoordinator.registerPanel(screen, rightSidebar);
             StatusBarPanelCoordinator.registerPanel(screen, launcher);
             StatusBarPanelCoordinator.registerPanel(screen, themeStudio);
@@ -294,6 +319,7 @@ PanelWindow {
     }
 
     Component.onCompleted: {
+        CalendarRouter.registerPanel(bar.screen, leftSidebar);
         NetworkCenterRouter.registerPanel(bar.screen, rightSidebar.networkProxy);
         PowerProfileRouter.registerPanel(bar.screen, rightSidebar.powerProfileProxy);
         NotificationCenterRouter.registerPanel(bar.screen, rightSidebar.notificationsProxy);
@@ -302,6 +328,8 @@ PanelWindow {
         ClipboardRouter.registerPanel(bar.screen, clipboard);
         CommandPaletteRouter.registerPanel(bar.screen, commandPalette);
         MediaRouter.registerPanel(bar.screen, mediaIsland);
+        ReadAloudRouter.registerOsd(bar.screen, readAloudOsd);
+        StatusBarPanelCoordinator.registerPanel(bar.screen, leftSidebar);
         StatusBarPanelCoordinator.registerPanel(bar.screen, rightSidebar);
         StatusBarPanelCoordinator.registerPanel(bar.screen, launcher);
         StatusBarPanelCoordinator.registerPanel(bar.screen, themeStudio);
@@ -310,6 +338,7 @@ PanelWindow {
         StatusBarPanelCoordinator.registerPanel(bar.screen, mediaIsland);
     }
     Component.onDestruction: {
+        CalendarRouter.unregisterPanel(leftSidebar);
         NetworkCenterRouter.unregisterPanel(rightSidebar.networkProxy);
         PowerProfileRouter.unregisterPanel(rightSidebar.powerProfileProxy);
         NotificationCenterRouter.unregisterPanel(rightSidebar.notificationsProxy);
@@ -318,6 +347,8 @@ PanelWindow {
         ClipboardRouter.unregisterPanel(clipboard);
         CommandPaletteRouter.unregisterPanel(commandPalette);
         MediaRouter.unregisterPanel(mediaIsland);
+        ReadAloudRouter.unregisterOsd(readAloudOsd);
+        StatusBarPanelCoordinator.unregisterPanel(leftSidebar);
         StatusBarPanelCoordinator.unregisterPanel(rightSidebar);
         StatusBarPanelCoordinator.unregisterPanel(launcher);
         StatusBarPanelCoordinator.unregisterPanel(themeStudio);

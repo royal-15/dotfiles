@@ -1,2 +1,6 @@
 module qs.feature.sidebar
+singleton CalendarRouter 1.0 CalendarRouter.qml
 RightSidebar 1.0 RightSidebar.qml
+LeftSidebar 1.0 LeftSidebar.qml
+CalendarView 1.0 CalendarView.qml
+CalendarGrid 1.0 CalendarGrid.qml

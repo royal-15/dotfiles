@@ -112,6 +112,10 @@ hl.bind("Print", hl.dsp.exec_cmd(
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd(
             "grim -g \"$(slurp)\" - | swappy -f - # Region → edit with swappy"))
 
+-- Read Aloud
+hl.bind(mainMod .. " + R",
+        hl.dsp.exec_cmd("qs -c ashell ipc call readaloud toggle"))
+
 -- =============================================================================
 -- 7. HARDWARE KEYS & MEDIA CONTROLS
 -- =============================================================================

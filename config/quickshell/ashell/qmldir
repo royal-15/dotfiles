@@ -25,11 +25,20 @@ singleton ClipboardRouter 1.0 feature/clipboard/ClipboardRouter.qml
 singleton ClipboardService 1.0 feature/clipboard/ClipboardService.qml
 singleton CommandPaletteRouter 1.0 feature/commandpalette/CommandPaletteRouter.qml
 singleton CommandPaletteService 1.0 feature/commandpalette/CommandPaletteService.qml
+singleton CalendarRouter 1.0 feature/sidebar/CalendarRouter.qml
+singleton ReadAloudRouter 1.0 feature/readaloud/ReadAloudRouter.qml
+singleton ReadAloudService 1.0 feature/readaloud/ReadAloudService.qml
 Poller 1.0 components/Poller.qml
 Pill 1.0 components/Pill.qml
+ActiveStateOsd 1.0 components/ActiveStateOsd.qml
 ThemeStudio 1.0 feature/theme/ThemeStudio.qml
 RightSidebar 1.0 feature/sidebar/RightSidebar.qml
+LeftSidebar 1.0 feature/sidebar/LeftSidebar.qml
+CalendarView 1.0 feature/sidebar/CalendarView.qml
+CalendarGrid 1.0 feature/sidebar/CalendarGrid.qml
 NotificationPill 1.0 feature/bar/NotificationPill.qml
 StatusCapsule 1.0 feature/bar/StatusCapsule.qml
 Clipboard 1.0 feature/clipboard/Clipboard.qml
 CommandPalette 1.0 feature/commandpalette/CommandPalette.qml
+ReadAloudContent 1.0 feature/readaloud/ReadAloudContent.qml
+VoiceWaveform 1.0 feature/readaloud/VoiceWaveform.qml

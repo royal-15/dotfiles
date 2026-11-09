@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Backward compatibility shim for read-selection, delegating to ashell ReadAloud IPC
+exec qs -c ashell ipc call readaloud toggle

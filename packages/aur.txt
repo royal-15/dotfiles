@@ -7,8 +7,11 @@ cursor-bin
 github-desktop-bin
 google-chrome
 graphite-gtk-theme
+nitch
 orchis-dracula-theme-git
 papirus-folders
+piper-tts
+piper-voices-en-us
 python-pywal
 rofi-pass-wayland-git
 spicetify-cli

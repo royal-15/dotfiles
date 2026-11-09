@@ -15,8 +15,25 @@ import qs.feature.media
 import qs.feature.theme
 import qs.feature.clipboard
 import qs.feature.commandpalette
+import qs.feature.sidebar
+import qs.feature.readaloud
 
 ShellRoot {
+    IpcHandler {
+        target: "calendar"
+
+        function open() {
+            CalendarRouter.open();
+        }
+
+        function close() {
+            CalendarRouter.close();
+        }
+
+        function toggle() {
+            CalendarRouter.toggle();
+        }
+    }
     IpcHandler {
         target: "network"
 
@@ -322,6 +339,26 @@ ShellRoot {
 
         function refresh() {
             CommandPaletteService.loadData();
+        }
+    }
+
+    IpcHandler {
+        target: "readaloud"
+
+        function start() {
+            ReadAloudRouter.start();
+        }
+
+        function stop() {
+            ReadAloudRouter.stop();
+        }
+
+        function toggle() {
+            ReadAloudRouter.toggle();
+        }
+
+        function status() {
+            return ReadAloudService.status();
         }
     }
 
