@@ -90,6 +90,32 @@ generate_hyprlock_theme() {
     ' "$source" > "$target"
 }
 
+generate_gtk_theme() {
+    local source="${1:-$CURRENT_COLORS_JSON_LINK}"
+    local base_theme="${2:-}"
+    local icon_theme="${3:-}"
+
+    [[ -s "$source" ]] || die "Colors file not found or empty: $source"
+
+    local cmd=(python3 "$SCRIPT_DIR/generate_gtk_theme.py" "$source")
+    [[ -n "$base_theme" ]] && cmd+=(--base-theme "$base_theme")
+    [[ -n "$icon_theme" ]] && cmd+=(--icon-theme "$icon_theme")
+
+    "${cmd[@]}"
+}
+
+generate_qt_theme() {
+    local source="${1:-$CURRENT_COLORS_JSON_LINK}"
+    local base_theme="${2:-}"
+
+    [[ -s "$source" ]] || die "Colors file not found or empty: $source"
+
+    local cmd=(python3 "$SCRIPT_DIR/generate_qt_theme.py" "$source")
+    [[ -n "$base_theme" ]] && cmd+=(--base-theme "$base_theme")
+
+    "${cmd[@]}"
+}
+
 ###############################################################################
 # Theme Switching
 ###############################################################################
@@ -132,9 +158,27 @@ switch_theme() {
         "$HYPRLOCK_COLORS_TARGET"
 
     local theme_file="$THEMES_DIR/$theme/theme.env"
+    local base_gtk="adw-gtk3-dark"
+    local icon_theme="Papirus-Dark"
+    local base_kvantum=""
+    if [[ -f "$theme_file" ]]; then
+        base_gtk="$( (source "$theme_file" 2>/dev/null && echo "${GTK_THEME:-adw-gtk3-dark}") )"
+        icon_theme="$( (source "$theme_file" 2>/dev/null && echo "${GTK_ICON_THEME:-Papirus-Dark}") )"
+        base_kvantum="$( (source "$theme_file" 2>/dev/null && echo "${KVANTUM_THEME:-}") )"
+    fi
+
+    generate_gtk_theme \
+        "$CURRENT_COLORS_JSON_LINK" \
+        "${base_gtk:-adw-gtk3-dark}" \
+        "${icon_theme:-Papirus-Dark}"
+
     if [[ -f "$theme_file" ]]; then
         "$SCRIPT_DIR"/theme_helper "$theme_file"
     fi
+
+    generate_qt_theme \
+        "$CURRENT_COLORS_JSON_LINK" \
+        "$base_kvantum"
 
     # Theme default wallpaper
     # Theme blurred wallpaper
@@ -290,6 +334,9 @@ Usage:
   theme_switcher switch theme <theme>
   theme_switcher switch wallpaper <wallpaper>
   theme_switcher generate hyprlock
+  theme_switcher generate cava
+  theme_switcher generate gtk
+  theme_switcher generate qt
   theme_switcher generate all
 EOF
 }
@@ -324,10 +371,24 @@ main() {
                     "$SCRIPT_DIR"/reload cava
                     ok "Cava theme generated"
                     ;;
+                gtk)
+                    generate_gtk_theme
+                    "$SCRIPT_DIR"/reload gtk
+                    ok "GTK theme generated"
+                    ;;
+                qt)
+                    generate_qt_theme
+                    "$SCRIPT_DIR"/reload qt
+                    ok "Qt theme generated"
+                    ;;
                 all)
                     generate_cava_theme
                     generate_hyprlock_theme
+                    generate_gtk_theme
+                    generate_qt_theme
                     "$SCRIPT_DIR"/reload cava
+                    "$SCRIPT_DIR"/reload gtk
+                    "$SCRIPT_DIR"/reload qt
                     ok "All generated themes updated"
                     ;;
                 *)

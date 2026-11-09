@@ -1,11 +1,11 @@
 [color]
 gradient = 1
 gradient_count = 8
-gradient_color_1 = '#73aa95'
-gradient_color_2 = '#a8a49a'
-gradient_color_3 = '#d39aa0'
-gradient_color_4 = '#fa8ea6'
-gradient_color_5 = '#fda4b7'
-gradient_color_6 = '#febbc8'
-gradient_color_7 = '#fed0d9'
-gradient_color_8 = '#fde6eb'
+gradient_color_1 = '#439e93'
+gradient_color_2 = '#8aa27a'
+gradient_color_3 = '#bea259'
+gradient_color_4 = '#eea016'
+gradient_color_5 = '#f1b25b'
+gradient_color_6 = '#f3c486'
+gradient_color_7 = '#f4d6ac'
+gradient_color_8 = '#f4e7d1'

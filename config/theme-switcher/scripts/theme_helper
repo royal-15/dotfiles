@@ -30,13 +30,27 @@ command_exists() {
 }
 
 apply_gtk_theme() {
-    [[ -n "${GTK_THEME:-}" ]] || return 0
+    local theme="${GTK_THEME:-adw-gtk3-dark}"
 
     if command_exists gsettings; then
-        log "Applying GTK theme: $GTK_THEME"
+        local current_theme
+        current_theme="$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null | tr -d "'\"" || true)"
+        if [[ "$theme" == "adw-gtk3-dark" ]]; then
+            if [[ "$current_theme" =~ ^ThemeSwitcherDynamic- ]]; then
+                log "Preserving dynamic GTK theme: $current_theme (will alternate in reload_gtk)"
+                return 0
+            fi
+            # Initialize to dynamic variant if not already active
+            log "Activating dynamic GTK theme: ThemeSwitcherDynamic-A"
+            gsettings set org.gnome.desktop.interface gtk-theme "ThemeSwitcherDynamic-A"
+            gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
+            return 0
+        fi
 
-        gsettings set org.gnome.desktop.interface gtk-theme \
-            "$GTK_THEME"
+        log "Applying GTK theme: $theme"
+
+        gsettings set org.gnome.desktop.interface gtk-theme "$theme"
+        gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
     else
         warn "gsettings not found. Skipping GTK theme."
     fi
@@ -120,11 +134,8 @@ apply_spotify_and_reload() {
 }
 
 reload_gtk_apps() {
-    if command_exists hyprctl; then
-        log "Refreshing GTK settings"
-
-        hyprctl reload >/dev/null 2>&1 || true
-    fi
+    # Compositor reload is handled centrally by reload_all / reload_hyprland
+    :
 }
 
 main() {

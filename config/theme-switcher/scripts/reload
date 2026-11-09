@@ -33,11 +33,50 @@ reload_cava() {
     fi
 }
 
+reload_gtk() {
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [[ -x "$script_dir/reload_gtk.sh" ]]; then
+        "$script_dir/reload_gtk.sh"
+    fi
+}
+
+reload_qt() {
+    # 1. In-place touch to notify QFileSystemWatcher monitors in qt5ct / qt6ct / Kvantum
+    for conf in \
+        "$HOME/.config/qt5ct/style-colors.conf" \
+        "$HOME/.config/qt5ct/qt5ct.conf" \
+        "$HOME/.config/qt6ct/style-colors.conf" \
+        "$HOME/.config/qt6ct/qt6ct.conf" \
+        "$HOME/.config/Kvantum/kvantum.kvconfig"; do
+        if [[ -f "$conf" ]]; then
+            touch "$conf"
+        fi
+    done
+
+    # 2. Best-effort D-Bus notifications if session bus is active
+    if command -v qdbus >/dev/null 2>&1; then
+        qdbus org.kde.KGlobalSettings /KGlobalSettings org.kde.KGlobalSettings.notifyChange 0 0 2>/dev/null || true
+    fi
+    if command -v qdbus6 >/dev/null 2>&1; then
+        qdbus6 org.kde.KGlobalSettings /KGlobalSettings org.kde.KGlobalSettings.notifyChange 0 0 2>/dev/null || true
+    fi
+
+    # 3. Reload xsettingsd if active (notifies Qt X11 / XWayland bridges)
+    if command -v pgrep >/dev/null 2>&1 && pgrep -x xsettingsd >/dev/null 2>&1; then
+        pkill -HUP -x xsettingsd 2>/dev/null || true
+    fi
+
+    echo "[reload_qt] Qt configuration touched and signals dispatched (active palettes updated; restart running apps for full SVG restyle)"
+}
+
 reload_all() {
     reload_hyprland
     reload_wallpaper fade
     reload_kitty
     reload_cava
+    reload_gtk
+    reload_qt
 }
 
 main() {
@@ -59,6 +98,12 @@ main() {
                 ;;
             cava)
                 reload_cava
+                ;;
+            gtk)
+                reload_gtk
+                ;;
+            qt)
+                reload_qt
                 ;;
             all)
                 reload_all
