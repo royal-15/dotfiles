@@ -70,6 +70,7 @@ linux
 linux-firmware
 linux-headers
 linux-lts
+linux-lts-headers
 linux-zen
 llvm
 lsp-plugins
@@ -101,10 +102,13 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+plasma-meta
 playerctl
 polkit-gnome
 polkit-kde-agent
 power-profiles-daemon
+ppsspp
+ppsspp-assets
 pyenv
 qt5-wayland
 qt5ct

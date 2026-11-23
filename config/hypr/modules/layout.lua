@@ -2,35 +2,22 @@
 -- WINDOW LAYOUTS
 -- =============================================================================
 -- Documentation: https://wiki.hypr.land/Configuring/Layouts/
-
 -- -----------------------------------------------------------------------------
 -- Default Layout
 -- -----------------------------------------------------------------------------
-hl.config({
-    general = {
-        layout = "dwindle",
-    },
-})
+hl.config({general = {layout = "dwindle"}})
 
 -- -----------------------------------------------------------------------------
 -- Dwindle Layout Settings
 -- -----------------------------------------------------------------------------
 -- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/
-hl.config({
-    dwindle = {
-        preserve_split = true,
-    },
-})
+hl.config({dwindle = {preserve_split = true}})
 
 -- -----------------------------------------------------------------------------
 -- Master Layout Settings
 -- -----------------------------------------------------------------------------
 -- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/
-hl.config({
-    master = {
-        new_status = "master",
-    },
-})
+hl.config({master = {new_status = "master"}})
 
 -- -----------------------------------------------------------------------------
 -- Scrolling Layout Settings
@@ -39,7 +26,7 @@ hl.config({
 hl.config({
     scrolling = {
         fullscreen_on_one_column = true,
-        column_width             = 0.8,
-        explicit_column_widths   = "0.35, 0.5, 0.7, 1.0",
-    },
+        column_width = 0.8,
+        explicit_column_widths = "0.5, 0.7, 1.0"
+    }
 })

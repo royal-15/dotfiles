@@ -379,7 +379,7 @@ Item {
         Qt.callLater(() => root.focusKeyboardTarget());
     }
 
-    function moveKeyboardSelection(direction) {
+    function moveKeyboardSelection(direction, wrap = false) {
         keyboardNavActive = true;
         const count = activeKeyboardItemCount();
         if (count === 0)
@@ -391,8 +391,12 @@ Item {
         if (direction < 0) {
             if (keyboardSelectedIndex > 0)
                 selectKeyboardItem(keyboardSelectedIndex - 1);
+            else if (wrap)
+                selectKeyboardItem(count - 1);
         } else if (keyboardSelectedIndex < count - 1) {
             selectKeyboardItem(keyboardSelectedIndex + 1);
+        } else if (wrap) {
+            selectKeyboardItem(0);
         }
     }
 
@@ -462,12 +466,10 @@ Item {
             moveKeyboardSelection(1);
             event.accepted = true;
         } else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
-            if (!event.isAutoRepeat)
-                switchKeyboardTab();
+            moveKeyboardSelection(-1, true);
             event.accepted = true;
         } else if (event.key === Qt.Key_Tab) {
-            if (!event.isAutoRepeat)
-                switchKeyboardTab();
+            moveKeyboardSelection(1, true);
             event.accepted = true;
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             if (!event.isAutoRepeat)

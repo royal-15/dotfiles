@@ -245,14 +245,14 @@ Item {
     }
 
     Shortcut {
-        sequence: "Left"
+        sequences: ["Left", ",", "<", "Shift+,"]
         context: Qt.WindowShortcut
         enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
         onActivated: MediaService.previous()
     }
 
     Shortcut {
-        sequence: "Right"
+        sequences: ["Right", ".", ">", "Shift+."]
         context: Qt.WindowShortcut
         enabled: islandSurface.expanded && !islandSurface.closingWithAnimation
         onActivated: MediaService.next()

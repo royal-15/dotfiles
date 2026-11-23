@@ -1,15 +1,14 @@
 ani-cli
-antigravity
 apple_cursor
 brave-nightly-bin
 claude-code
-cursor-bin
 github-desktop-bin
 google-chrome
 graphite-gtk-theme
 nitch
 orchis-dracula-theme-git
 papirus-folders
+pcsx2
 piper-tts
 piper-voices-en-us
 python-pywal
@@ -24,6 +23,5 @@ vscodium-bin-marketplace
 waydroid-image
 wlogout
 yay
-yay-debug
 ytmdesktop
 zen-browser-bin

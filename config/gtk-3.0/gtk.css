@@ -3,3 +3,5 @@
 /* Colors are managed dynamically via ThemeSwitcherDynamic-[A|B] themes.     */
 /* Global @define-color rules are excluded here to allow live GTK3 reloading */
 /* ========================================================================= */
+
+@import 'colors.css';
