@@ -404,16 +404,21 @@ Scope {
         const count = wallpapersModel.count;
         const list = [];
         for (let i = 0; i < count; i++) {
-            const name = wallpapersModel.get(i, "fileName");
-            if (!name || name.startsWith("."))
+            const fileName = wallpapersModel.get(i, "fileName");
+            if (!fileName || fileName.startsWith("."))
                 continue;
 
-            const filePath = Paths.themesDir + "/" + root.activeTheme + "/wallpapers/" + name;
+            const wallpaperDir = Paths.themesDir + "/" + root.activeTheme + "/wallpapers";
+            const isPreview = /_preview\.[^.]+$/i.test(fileName);
+            // GIF wallpapers are stored under wallpapers/gifs and use a still preview
+            // in the wallpaper root. Show that preview once, but select the GIF itself.
+            const name = isPreview ? ("gifs/" + fileName.replace(/_preview\.[^.]+$/i, ".gif")) : fileName;
+            const filePath = wallpaperDir + "/" + fileName;
             list.push({
                 name: name,
-                path: filePath,
+                path: wallpaperDir + "/" + name,
                 fullUrl: "file://" + filePath,
-                isPreview: name.indexOf("_preview") >= 0
+                isPreview: isPreview
             });
         }
 
@@ -429,7 +434,9 @@ Scope {
         if (root.availableWallpapers && root.availableWallpapers.length === list.length && list.length > 0) {
             let isIdentical = true;
             for (let j = 0; j < list.length; j++) {
-                if (root.availableWallpapers[j].name !== list[j].name) {
+                if (root.availableWallpapers[j].name !== list[j].name ||
+                    root.availableWallpapers[j].path !== list[j].path ||
+                    root.availableWallpapers[j].fullUrl !== list[j].fullUrl) {
                     isIdentical = false;
                     break;
                 }

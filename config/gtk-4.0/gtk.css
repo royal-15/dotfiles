@@ -4,53 +4,53 @@
 /* ========================================================================= */
 
 /* --- Primary Palette & Libadwaita Variables --- */
-@define-color accent_color #a77c50;
-@define-color accent_bg_color #a77c50;
-@define-color accent_fg_color #171713;
+@define-color accent_color #c28b55;
+@define-color accent_bg_color #c28b55;
+@define-color accent_fg_color #101813;
 
-@define-color window_bg_color #171713;
-@define-color window_fg_color #eee9d8;
+@define-color window_bg_color #101813;
+@define-color window_fg_color #d9e4d8;
 
-@define-color view_bg_color #303125;
-@define-color view_fg_color #eee9d8;
+@define-color view_bg_color #23342a;
+@define-color view_fg_color #d9e4d8;
 
-@define-color headerbar_bg_color #24251b;
-@define-color headerbar_fg_color #eee9d8;
-@define-color headerbar_border_color #4b4c37;
-@define-color headerbar_backdrop_color #171713;
+@define-color headerbar_bg_color #1b2820;
+@define-color headerbar_fg_color #d9e4d8;
+@define-color headerbar_border_color #3a5141;
+@define-color headerbar_backdrop_color #101813;
 @define-color headerbar_shade_color rgba(0, 0, 0, 0.28);
 
-@define-color card_bg_color #3c3e2e;
-@define-color card_fg_color #eee9d8;
+@define-color card_bg_color #2d4033;
+@define-color card_fg_color #d9e4d8;
 @define-color card_shade_color rgba(0, 0, 0, 0.28);
 
-@define-color dialog_bg_color #4b4c37;
-@define-color dialog_fg_color #eee9d8;
+@define-color dialog_bg_color #3a5141;
+@define-color dialog_fg_color #d9e4d8;
 
-@define-color popover_bg_color #4b4c37;
-@define-color popover_fg_color #eee9d8;
+@define-color popover_bg_color #3a5141;
+@define-color popover_fg_color #d9e4d8;
 @define-color popover_shade_color rgba(0, 0, 0, 0.28);
 
-@define-color sidebar_bg_color #24251b;
-@define-color sidebar_fg_color #eee9d8;
-@define-color sidebar_backdrop_color #171713;
-@define-color secondary_sidebar_bg_color #303125;
-@define-color secondary_sidebar_fg_color #eee9d8;
+@define-color sidebar_bg_color #1b2820;
+@define-color sidebar_fg_color #d9e4d8;
+@define-color sidebar_backdrop_color #101813;
+@define-color secondary_sidebar_bg_color #23342a;
+@define-color secondary_sidebar_fg_color #d9e4d8;
 
 @define-color shade_color rgba(0, 0, 0, 0.28);
-@define-color scrollbar_outline_color #4b4c37;
-@define-color border_color #4b4c37;
+@define-color scrollbar_outline_color #3a5141;
+@define-color border_color #3a5141;
 
 /* --- Semantic Indicators --- */
 @define-color destructive_color #d16b62;
 @define-color destructive_bg_color #d16b62;
 @define-color destructive_fg_color #ffffff;
-@define-color success_color #87946b;
-@define-color success_bg_color #87946b;
+@define-color success_color #729985;
+@define-color success_bg_color #729985;
 @define-color success_fg_color #ffffff;
-@define-color warning_color #a77c50;
-@define-color warning_bg_color #a77c50;
-@define-color warning_fg_color #ffffff;
+@define-color warning_color #c28b55;
+@define-color warning_bg_color #c28b55;
+@define-color warning_fg_color #000000;
 @define-color error_color #d16b62;
 @define-color error_bg_color #d16b62;
 @define-color error_fg_color #ffffff;
